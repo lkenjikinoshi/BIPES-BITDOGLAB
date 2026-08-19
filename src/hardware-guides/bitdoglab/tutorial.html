@@ -1,0 +1,58 @@
+<section class="project-panel is-active" id="bitdoglab" data-panel="bitdoglab">
+  <header class="article-header">
+    <p class="article-index" data-copy="boardEyebrow">BITDOGLAB PADRÃO</p>
+    <h2 data-copy="boardTitle">Primeiros passos com a BitDogLab V7</h2>
+    <p data-copy="boardArticleIntro">Antes de fazer uma montagem, conheça as partes da placa. A BitDogLab já possui os principais componentes usados nas atividades: tela, botões, joystick, luzes, microfone e buzzer. O RP2040 é o componente que executa o programa e controla todas essas partes.</p>
+  </header>
+
+  <div class="prose-block procedure-block">
+    <h3 data-copy="firstContactTitle">Comece por aqui</h3>
+    <ol>
+      <li data-copy="firstContact1">Deixe a placa desligada e desconecte o cabo USB.</li>
+      <li data-copy="firstContact2">Coloque a BitDogLab sobre uma mesa seca, com os componentes voltados para cima.</li>
+      <li data-copy="firstContact3">Observe a imagem abaixo. Clique em cada área marcada para conhecer o nome e a função do componente.</li>
+      <li data-copy="firstContact4">Localize os conectores I²C na parte superior e o barramento de expansão na parte inferior. Eles serão usados nas próximas montagens.</li>
+    </ol>
+  </div>
+
+  <figure class="board-figure">
+    <div class="board-interactive-stage">
+      <img src="../assets/images/logos/bitlab.png" alt="BitDogLab V7 com seus componentes identificados" data-copy-alt="boardImageAlt">
+      <div id="boardHotspots" class="board-hotspots" aria-label="Componentes interativos da BitDogLab"></div>
+    </div>
+    <div id="boardInfoPanel" class="board-info-panel" hidden>
+      <div><strong id="boardInfoTitle"></strong><p id="boardInfoText"></p></div>
+      <button id="boardInfoClose" type="button" aria-label="Fechar explicação">Fechar</button>
+    </div>
+    <figcaption data-copy="boardCaption">Clique em um componente ou em seu nome para descobrir o que ele faz.</figcaption>
+  </figure>
+
+  <div class="prose-block">
+    <h3 data-copy="externalConnectionsTitle">Onde conectar componentes externos</h3>
+    <p data-copy="externalConnectionsText">A placa possui duas áreas principais para conectar componentes externos: os conectores I²C, na parte superior, e o barramento de expansão, na parte inferior.</p>
+
+    <div class="simple-columns">
+      <div>
+        <h4 data-copy="i2cTitle">Conectores I²C superiores</h4>
+        <p data-copy="i2cProse">I²C é um tipo de comunicação usado pela BitDogLab para trocar informações com componentes externos. Cada conector possui quatro pinos: <strong>3V3</strong> fornece a tensão de 3,3 volts para alimentar o componente; <strong>GND</strong> é a referência elétrica e o retorno do circuito; <strong>SDA</strong> transmite os dados; e <strong>SCL</strong> sincroniza a comunicação. Ao fazer uma ligação, use sempre os quatro pinos do mesmo conector.</p>
+      </div>
+      <div>
+        <h4 data-copy="busTitle">Barramento de expansão inferior</h4>
+        <p data-copy="busProse">Um barramento é um conjunto de pinos de conexão. O barramento inferior fornece alimentação e sinais de controle para componentes externos. Esses sinais permitem controlar o funcionamento do componente. Como cada pino possui uma função específica, leia o nome impresso ao lado dele antes de conectar um fio.</p>
+      </div>
+    </div>
+    <p class="caution-text" data-copy="connectionWarning"><strong>Atenção:</strong> não escolha o pino pela posição ou pela cor do fio. Compare sempre o nome no componente com o nome na BitDogLab.</p>
+  </div>
+
+  <div class="prose-block">
+    <h3 data-copy="integratedTitle">O que já existe na placa</h3>
+    <dl class="component-list">
+      <div><dt data-copy="displayTerm">Display OLED (tela)</dt><dd data-copy="displayDefinition">Mostra textos, números, desenhos e mensagens do programa.</dd></div>
+      <div><dt data-copy="controlsTerm">Joystick e botões</dt><dd data-copy="controlsDefinition">Permitem interação com jogos, menus e projetos.</dd></div>
+      <div><dt data-copy="lightTerm">Matriz de LEDs e LED RGB</dt><dd data-copy="lightDefinition">Produzem desenhos, animações, cores e sinais visuais.</dd></div>
+      <div><dt data-copy="soundTerm">Microfone e buzzer</dt><dd data-copy="soundDefinition">O microfone percebe sons. O buzzer produz bipes, alertas e notas musicais.</dd></div>
+      <div><dt data-copy="powerTerm">Bateria e monitoramento</dt><dd data-copy="powerDefinition">A bateria alimenta a placa. A BitDogLab também mede a tensão e a corrente elétrica para acompanhar as condições de alimentação e o consumo do circuito.</dd></div>
+    </dl>
+  </div>
+
+</section>

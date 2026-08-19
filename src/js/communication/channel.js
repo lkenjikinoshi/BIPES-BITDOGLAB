@@ -70,7 +70,7 @@ class ProtocolManager {
       UI['notify'].send(MSG['notConnected']);
     }
   }
-  // LIFO: Priority send (prepend to queue for urgent commands)
+  // LIFO: prepend an urgent command without disturbing queued callbacks.
   static bufferUnshift(code) {
     if (Channel['webserial'].connected) {
       Channel['webserial'].buffer.unshift(code);
@@ -88,5 +88,5 @@ class ProtocolManager {
     }
   }
 }
-//Legacy alias (multiplexer concept)
+// Compatibility alias for the current multiplexer facade.
 const mux = ProtocolManager;

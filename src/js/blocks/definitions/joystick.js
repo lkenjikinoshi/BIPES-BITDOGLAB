@@ -87,6 +87,7 @@ Blockly.Blocks['joystick_mover_player'] = {
   init: function() {
     this.appendDummyInput()
         .appendField("🕹️ Joystick mover no Display");
+    appendDisplayTypeInput(this);
     this.appendDummyInput()
         .appendField("tamanho do player:")
         .appendField(new Blockly.FieldNumber(5, 2, 20), "TAMANHO")
@@ -104,6 +105,7 @@ Blockly.Blocks['joystick_lousa_magica'] = {
   init: function() {
     this.appendDummyInput()
         .appendField("🎨 Lousa Mágica no Display");
+    appendDisplayTypeInput(this);
     this.appendDummyInput()
         .appendField("tamanho da caneta:")
         .appendField(new Blockly.FieldNumber(2, 1, 10), "TAMANHO")
@@ -174,7 +176,7 @@ Blockly.Blocks['joystick_seletor'] = {
         .appendField("  anterior:")
         .appendField(new Blockly.FieldDropdown(DIR_PREV), "DIR_ANTERIOR");
     this.appendStatementInput("OPCOES")
-        .setCheck(null)
+        .setCheck("MatrixOptionCommand")
         .appendField("opções:");
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);

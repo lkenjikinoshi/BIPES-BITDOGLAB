@@ -1,24 +1,23 @@
 // ==========================================
 // DISPLAY BLOCKS
 // ==========================================
-// Display Christmas message block
-Blockly.Blocks['display_natal'] = {
-  init: function() {
-    this.appendDummyInput()
-        .appendField("🎄 Natal");
-    this.setPreviousStatement(true, null);
-    this.setNextStatement(true, null);
-    this.setColour("#16a085");
-    this.setTooltip("Exibe 'FELIZ NATAL!' com arte bonita no display SSD1306");
-    this.setHelpUrl("");
-  }
-};
+var DISPLAY_TYPE_OPTIONS = [
+  ["pequeno OLED", "SMALL"],
+  ["grande SH1107", "LARGE"]
+];
+
+function appendDisplayTypeInput(block) {
+  block.appendDummyInput()
+      .appendField("tipo de display")
+      .appendField(new Blockly.FieldDropdown(DISPLAY_TYPE_OPTIONS), "DISPLAY_TYPE");
+}
 
 // Display border block
 Blockly.Blocks['display_criar_borda'] = {
   init: function() {
     this.appendDummyInput()
         .appendField("🖼️ Desenhar moldura");
+    appendDisplayTypeInput(this);
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour("#16a085");
@@ -32,25 +31,11 @@ Blockly.Blocks['display_limpar_borda'] = {
   init: function() {
     this.appendDummyInput()
         .appendField("🧹 Apagar moldura");
+    appendDisplayTypeInput(this);
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour("#16a085");
     this.setTooltip("Apaga a moldura do display");
-    this.setHelpUrl("");
-  }
-};
-
-// Display update container block
-Blockly.Blocks['display_atualizar'] = {
-  init: function() {
-    this.appendDummyInput()
-        .appendField("Atualizar display");
-    this.appendStatementInput("COMANDOS")
-        .setCheck(null);
-    this.setPreviousStatement(true, null);
-    this.setNextStatement(true, null);
-    this.setColour("#e74c3c");
-    this.setTooltip("Container para atualizar o display OLED. Coloque blocos de comandos (texto, formas, bordas, etc.) dentro deste bloco.");
     this.setHelpUrl("");
   }
 };
@@ -60,6 +45,7 @@ Blockly.Blocks['display_testar_conexao'] = {
   init: function() {
     this.appendDummyInput()
         .appendField("🔍 Testar se display funciona");
+    appendDisplayTypeInput(this);
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour("#16a085");
@@ -81,40 +67,12 @@ Blockly.Blocks['display_testar_sh1107'] = {
   }
 };
 
-// Display show block (simple - just calls oled.show())
-Blockly.Blocks['display_show'] = {
-  init: function() {
-    this.appendDummyInput()
-        .appendField("🎨 Atualizar Display");
-    this.setPreviousStatement(true, null);
-    this.setNextStatement(true, null);
-    this.setColour("#16a085");
-    this.setTooltip("Atualiza o display OLED mostrando tudo que foi escrito no buffer (chama oled.show())");
-    this.setHelpUrl("");
-  }
-};
-
-// Display show block (container)
-Blockly.Blocks['display_mostrar'] = {
-  init: function() {
-    this.appendDummyInput()
-        .appendField("📺 Mostrar no display");
-    this.appendStatementInput("COMANDOS")
-        .setCheck(null);
-    this.setPreviousStatement(true, null);
-    this.setNextStatement(true, null);
-    this.setColour("#16a085");
-    this.setTooltip("Container para comandos do display. Executa os comandos dentro e depois mostra no display (oled.show()). NÃO limpa o display antes.");
-    this.setHelpUrl("");
-  }
-};
-
 // Display text block
 Blockly.Blocks['display_texto'] = {
   init: function() {
     this.appendDummyInput()
         .appendField("✏️ Escrever")
-        .appendField(new Blockly.FieldTextInput("Olá!"), "TEXTO")
+        .appendField(new Blockly.FieldTextInput("Ola!"), "TEXTO")
         .appendField("linha")
         .appendField(new Blockly.FieldDropdown([
           ["1", "1"],
@@ -128,6 +86,7 @@ Blockly.Blocks['display_texto'] = {
           ["Ao centro", "CENTER"],
           ["À direita", "RIGHT"]
         ]), "ALINHAMENTO");
+    appendDisplayTypeInput(this);
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour("#16a085");
@@ -141,7 +100,7 @@ Blockly.Blocks['display_piscar_texto'] = {
   init: function() {
     this.appendDummyInput()
         .appendField("💫 Piscar texto")
-        .appendField(new Blockly.FieldTextInput("Olá!"), "TEXTO");
+        .appendField(new Blockly.FieldTextInput("Ola!"), "TEXTO");
     this.appendDummyInput()
         .appendField("linha")
         .appendField(new Blockly.FieldDropdown([
@@ -164,6 +123,7 @@ Blockly.Blocks['display_piscar_texto'] = {
         .appendField("Tempo apagado")
         .appendField(new Blockly.FieldNumber(1, 0.1, 10, 0.1), "TEMPO_APAGADO")
         .appendField("seg");
+    appendDisplayTypeInput(this);
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour("#16a085");
@@ -192,6 +152,7 @@ Blockly.Blocks['display_mostrar_calculo'] = {
           ["Ao centro", "CENTER"],
           ["À direita", "RIGHT"]
         ]), "ALINHAMENTO");
+    appendDisplayTypeInput(this);
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour("#16a085");
@@ -220,6 +181,7 @@ Blockly.Blocks['display_mostrar_valor'] = {
           ["Ao centro", "CENTER"],
           ["À direita", "RIGHT"]
         ]), "ALINHAMENTO");
+    appendDisplayTypeInput(this);
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour("#16a085");
@@ -249,6 +211,7 @@ Blockly.Blocks['display_mostrar_estado_led'] = {
           ["Ao centro", "CENTER"],
           ["À direita", "RIGHT"]
         ]), "ALINHAMENTO");
+    appendDisplayTypeInput(this);
     this.setInputsInline(true);
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
@@ -263,6 +226,7 @@ Blockly.Blocks['display_limpar'] = {
   init: function() {
     this.appendDummyInput()
         .appendField("🧹 Apagar display");
+    appendDisplayTypeInput(this);
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour("#16a085");
@@ -331,6 +295,7 @@ Blockly.Blocks['display_mostrar_estado_botao'] = {
           ["Ao centro", "CENTER"],
           ["À direita", "RIGHT"]
         ]), "ALINHAMENTO_CONTAGEM");
+    appendDisplayTypeInput(this);
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour("#16a085");
@@ -373,6 +338,7 @@ Blockly.Blocks['display_mostrar_status_buzzer'] = {
           ["Ao centro", "CENTER"],
           ["À direita", "RIGHT"]
         ]), "ALINHAMENTO_FREQ");
+    appendDisplayTypeInput(this);
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour("#16a085");
@@ -466,6 +432,7 @@ Blockly.Blocks['display_dashboard_matriz'] = {
           ["Ao centro", "CENTER"],
           ["À direita", "RIGHT"]
         ]), "ALIGN_5");
+    appendDisplayTypeInput(this);
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour("#16a085");
@@ -503,6 +470,7 @@ Blockly.Blocks['display_mostrar_tempo_ligado'] = {
           ["Segundos totais", "SECONDS"],
           ["Milissegundos", "MILLISECONDS"]
         ]), "FORMAT");
+    appendDisplayTypeInput(this);
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour(190);
@@ -518,7 +486,7 @@ Blockly.Blocks['cronometro_iniciar'] = {
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour(190);
-    this.setTooltip("Inicia o cronômetro ou retoma de onde pausou");
+    this.setTooltip("Inicia o cronômetro uma vez. Dentro de um bloco de botão, retoma de onde pausou.");
     this.setHelpUrl("");
   }
 };
@@ -579,6 +547,7 @@ Blockly.Blocks['cronometro_mostrar'] = {
           ["Segundos.ms", "S_MILLI"],
           ["Segundos totais", "SECONDS"]
         ]), "FORMAT");
+    appendDisplayTypeInput(this);
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour(190);

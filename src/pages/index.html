@@ -12,51 +12,97 @@
   <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicons/bitdog-logo.jpg">
   <meta name="theme-color" content="#2980b9">
 
-  <link rel="stylesheet" href="../styles/main.css?ver=20260403a7">
+  <link rel="stylesheet" href="../styles/main.css?ver=20260816led1">
+  <link rel="stylesheet" href="../styles/visual-themes.css?ver=20260722b2">
+  <link rel="stylesheet" href="../../device-file-manager/device-files.css?ver=20260718a8">
   <link rel="stylesheet" href="../styles/libs.css">
+  <link rel="stylesheet" href="../js/lib/codemirror/codemirror.css">
+  <script src="../js/ui/visual-themes.js?ver=20260722b2"></script>
   <!-- Blockly core -->
   <script src="../js/lib/blockly/blockly_compressed.js?ver=0.2.1.8260042"></script>
   <script src="../js/lib/blockly/python_compressed.js?ver=0.2.3.9292231"></script>
 
   <!-- BitdogLab core modules -->
   <script src="../js/core/storage.js?ver=20260402v3"></script>
-  <script src="../js/core/utils.js?ver=20260403a7"></script>
-  <script src="../js/config/bitdoglab_v7.js"></script>
-  <script src="../js/config/bitdoglab_v6.js"></script>
-  <script src="../js/core/language.js?ver=20260403a7"></script>
+  <script src="../js/core/execution/runner.js?ver=20260817validation1"></script>
+  <script src="../js/core/execution/main-file.js?ver=20260809arch1"></script>
+  <script src="../js/core/dom.js?ver=20260809arch1"></script>
+  <script src="../js/core/terminal.js?ver=20260809arch1"></script>
+  <script src="../js/core/execution/index.js?ver=20260809arch1"></script>
+  <script src="../js/core/utils.js?ver=20260809arch1"></script>
+  <script src="../../device-file-manager/device-files.js?ver=20260723files1"></script>
+  <script src="../../device-file-manager/window.js?ver=20260723files1"></script>
+  <script src="../../device-file-manager/connection.js?ver=20260727files6"></script>
+  <script src="../../device-file-manager/browser.js?ver=20260727files6"></script>
+  <script src="../../device-file-manager/preview.js?ver=20260727files6"></script>
+  <script src="../../device-file-manager/operations.js?ver=20260727files6"></script>
+  <script src="../js/config/profiles/base.js?ver=20260809arch1"></script>
+  <script src="../js/config/profiles/v7.js?ver=20260814dht3"></script>
+  <script src="../js/config/profiles/v6.js?ver=20260814dht3"></script>
+  <script src="../js/core/language.js?ver=20260817category2"></script>
   <script src="../js/core/tabs.js?ver=20260403a7"></script>
-  <script src="../js/core/codegen.js?ver=20260402a3"></script>
-  <script src="../js/core/filemanager.js?ver=20260402a3"></script>
-  <script src="../js/core/workspace.js?ver=20260402a3"></script>
-  <script src="../js/core/app.js?ver=20260402a3"></script>
-  <script src="../js/communication/i2c_scanner.js?ver=0.2.3.20251001v2"></script>
-  <script src="../js/communication/webserial.js?ver=0.2.3.20251001v2"></script>
+  <script src="../js/core/codegen/python-organizer.js?ver=20260809arch1"></script>
+  <script src="../js/core/codegen/generator.js?ver=20260809arch1"></script>
+  <script src="../js/core/codegen/auto-generation.js?ver=20260809arch1"></script>
+  <script src="../js/core/codegen/index.js?ver=20260809arch1"></script>
+  <script src="../js/core/workspace/lifecycle.js?ver=20260809arch1"></script>
+  <script src="../js/core/workspace/toolbox.js?ver=20260809arch1"></script>
+  <script src="../js/core/workspace/projects.js?ver=20260809arch1"></script>
+  <script src="../js/core/workspace/hints.js?ver=20260817language1"></script>
+  <script src="../js/core/workspace/index.js?ver=20260817language1"></script>
+  <script src="../js/core/app.js?ver=20260814device1"></script>
+  <script src="../js/communication/i2c_scanner.js?ver=20260612a1"></script>
+  <script src="../js/communication/webserial.js?ver=20260604a1"></script>
   <script src="../js/communication/channel.js?ver=0.2.3.20251001v2"></script>
-  <script src="../js/ui/ui.js?ver=0.2.3.1125"></script>
-  <script src="../js/core/i18n.js?ver=20260402v4"></script>
+  <script src="../js/ui/panels.js?ver=20260809arch1"></script>
+  <script src="../js/ui/notifications.js?ver=20260809arch1"></script>
+  <script src="../js/ui/progress.js?ver=20260809arch1"></script>
+  <script src="../js/ui/workspace-controls.js?ver=20260814device1"></script>
+  <script src="../js/ui/ui.js?ver=20260809arch1"></script>
+  <script src="../js/core/i18n/index.js?ver=20260809arch1"></script>
+  <script src="../js/core/i18n/generated-code.js?ver=20260809arch1"></script>
+  <script src="../js/core/i18n/interface.js?ver=20260809arch1"></script>
   <script src="../js/lib/filesaver/FileSaver.js"></script>
 
   <!-- Custom BitdogLab blocks (includes basic repetition blocks) -->
+  <script src="../js/blocks/contracts/types.js?ver=20260816led2"></script>
   <script src="../js/blocks/definitions/base.js?ver=20260402a2"></script>
-  <script src="../js/blocks/definitions/led.js?ver=20260402a2"></script>
-  <script src="../js/blocks/definitions/matrix.js?ver=20260402a2"></script>
-  <script src="../js/blocks/definitions/sound.js?ver=20260402a2"></script>
-  <script src="../js/blocks/definitions/display.js?ver=20260402a2"></script>
-  <script src="../js/blocks/definitions/input.js?ver=20260402a2"></script>
-  <script src="../js/blocks/definitions/joystick.js?ver=20260402a2"></script>
-  <script src="../js/blocks/definitions/sensor.js?ver=20260402a2"></script>
-  <script src="../js/blocks/definitions/index.js?ver=20260402a2"></script>
-  <script src="../js/blocks/sensor_libs.js?ver=20260309v1"></script>
-  <script src="../js/blocks/generators/helpers.js?ver=20260402a1"></script>
-  <script src="../js/blocks/generators/base.js?ver=20260402a1"></script>
+  <script src="../js/blocks/definitions/variables.js?ver=20260718a8"></script>
+  <script src="../js/blocks/definitions/led.js?ver=20260716b1"></script>
+  <script src="../js/blocks/definitions/matrix.js?ver=20260716b1"></script>
+  <script src="../js/blocks/definitions/sound.js?ver=20260716b1"></script>
+  <script src="../js/blocks/definitions/display.js?ver=20260716b1"></script>
+  <script src="../js/blocks/definitions/input.js?ver=20260612a1"></script>
+  <script src="../js/blocks/definitions/joystick.js?ver=20260716b1"></script>
+  <script src="../js/blocks/definitions/sensor.js?ver=20260612a1"></script>
+  <script src="../js/blocks/definitions/dht11.js?ver=20260817language1"></script>
+  <script src="../js/blocks/definitions/external_led.js?ver=20260817seconds1"></script>
+  <script src="../js/blocks/definitions/servo.js?ver=20260817language1"></script>
+  <script src="../js/blocks/definitions/robot.js?ver=20260614a4"></script>
+  <script src="../js/blocks/definitions/index.js?ver=20260716c1"></script>
+  <script src="../js/blocks/contracts/registry.js?ver=20260817language1"></script>
+  <script src="../js/blocks/contracts/external_resources.js?ver=20260817language1"></script>
+  <script src="../js/blocks/contracts/validator.js?ver=20260816led2"></script>
+  <script src="../js/ui/block_warning_ui.js?ver=20260817warning8"></script>
+  <script src="../js/blocks/sensor_libs.js?ver=20260811a2"></script>
+  <script src="../js/blocks/generators/helpers.js?ver=20260612a1"></script>
+  <script src="../js/blocks/generators/base.js?ver=20260729a2"></script>
+  <script src="../js/blocks/generators/variables.js?ver=20260718a4"></script>
   <script src="../js/blocks/generators/led.js?ver=20260402a1"></script>
-  <script src="../js/blocks/generators/matrix.js?ver=20260402a1"></script>
-  <script src="../js/blocks/generators/display.js?ver=20260402a1"></script>
-  <script src="../js/blocks/generators/sound.js?ver=20260402a1"></script>
-  <script src="../js/blocks/generators/input.js?ver=20260402a1"></script>
-  <script src="../js/blocks/generators/joystick.js?ver=20260402a1"></script>
-  <script src="../js/blocks/generators/sensor.js?ver=20260402a1"></script>
-  <script src="../js/blocks/generators/index.js?ver=20260402a1"></script>
+  <script src="../js/blocks/generators/matrix.js?ver=20260604a1"></script>
+  <script src="../js/blocks/generators/display.js?ver=20260614a4"></script>
+  <script src="../js/blocks/generators/sound.js?ver=20260612a1"></script>
+  <script src="../js/blocks/generators/input.js?ver=20260612a2"></script>
+  <script src="../js/blocks/generators/joystick.js?ver=20260612a1"></script>
+  <script src="../js/blocks/generators/sensor.js?ver=20260612a1"></script>
+  <script src="../js/blocks/generators/dht11.js?ver=20260814dht3"></script>
+  <script src="../js/blocks/generators/external_led.js?ver=20260817seconds1"></script>
+  <script src="../js/blocks/generators/servo.js?ver=20260813a1"></script>
+  <script src="../js/blocks/generators/robot.js?ver=20260614a4"></script>
+  <script src="../js/blocks/generators/index.js?ver=20260716c1"></script>
+  <script src="../js/blocks/generators/piano.js?ver=20260723piano1"></script>
+  <script src="../js/blocks/generators/timing.js?ver=20260723piano1"></script>
+  <script src="../js/blocks/registry.js?ver=20260809arch1"></script>
 
   <!-- Terminal (xterm.js) -->
   <script src="../js/lib/xterm/xterm.js?ver=4.13.0"></script>
@@ -81,10 +127,10 @@
 
   <!-- Project selector modal -->
   <div id="project-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(75,46,131,0.95); z-index:9998; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
-    <div style="position:relative; max-width:900px; width:90%;">
+    <div class="project-modal-content" style="position:relative; width:90%;">
       <button id="closeProjectModal" style="position:absolute; top:-50px; right:0; background:none; border:none; color:white; font-size:36px; cursor:pointer; font-weight:bold;">&times;</button>
       <h1 style="color:white; font-family:'Comic Sans MS', cursive; margin-bottom:30px; font-size:2.2rem;">Escolha seu Projeto!</h1>
-      <div style="display:flex; gap:25px; justify-content:center; flex-wrap:wrap;">
+      <div class="project-grid">
         <div class="project-card" data-project="basico">
           <div class="project-card-icon">&#11088;</div>
           <h2>Básico</h2>
@@ -95,14 +141,37 @@
           <h2>Robô Móvel</h2>
           <p>Controle motores e sensores do robô</p>
         </div>
+        <div class="project-card" data-project="externos">
+          <img
+            class="project-card-image"
+            src="../assets/images/devices/conexoes-externas.png"
+            alt="Base com conexões externas da BitDogLab"
+            data-i18n-alt="app.projectExternalConnectionsImageAlt">
+          <h2 data-i18n="app.projectExternalConnections">Conexões Externas</h2>
+          <p data-i18n="app.projectExternalConnectionsDescription">Conecte componentes e crie projetos fora da placa</p>
+        </div>
         <div class="project-card" data-project="estufa">
           <div class="project-card-icon">&#127793;</div>
           <h2>Estufa</h2>
-          <p>Meça temperatura, luz e umidade</p>
+          <p>Meça temperatura e umidade</p>
+        </div>
+        <div class="project-card" data-project="piano" style="border-color:#22c55e;">
+          <div class="project-card-icon">🎹</div>
+          <h2 class="project-title" data-i18n="app.projectPianoTitle">Piano Musical</h2>
+          <p class="project-desc" data-i18n="app.projectPianoDescription">Toque notas no piano, veja na pauta e gere código para o buzzer</p>
         </div>
       </div>
     </div>
   </div>
+
+  <aside id="project-hardware-notice" class="project-hardware-notice" role="region" aria-live="polite" aria-labelledby="projectHardwareNoticeTitle" hidden>
+    <div class="project-hardware-notice-copy">
+      <strong id="projectHardwareNoticeTitle"></strong>
+      <span id="projectHardwareNoticeText"></span>
+    </div>
+    <a id="projectHardwareNoticeLink" class="project-hardware-notice-link" href="device-reference.html"></a>
+    <button id="closeProjectHardwareNotice" class="project-hardware-notice-close" type="button" aria-label="Fechar aviso">&times;</button>
+  </aside>
 
   <!-- Welcome splash modal -->
   <div id="welcome-message" style="position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(75,46,131,0.95); z-index:9999; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; transition:opacity 1s ease;">
@@ -135,7 +204,7 @@
       <h3 style="margin:0;">Como Começar</h3>
       <button id="closeTutorialBtn" style="background:none; border:none; color:white; font-size:18px; cursor:pointer;">&times;</button>
     </div>
-    
+
     <div class="tutorial-content" style="padding:15px;">
       <div class="tutorial-step" style="margin-bottom:20px; display:flex; align-items:center;">
         <div style="width:30px; height:30px; background-color:#4b2e83; color:white; border-radius:50%; display:flex; justify-content:center; align-items:center; margin-right:10px; flex-shrink:0;">1</div>
@@ -144,7 +213,7 @@
           <p style="margin:0; font-size:14px; line-height:1.4;">Arraste blocos da paleta à esquerda para a área de trabalho.</p>
         </div>
       </div>
-      
+
       <div class="tutorial-step" style="margin-bottom:20px; display:flex; align-items:center;">
         <div style="width:30px; height:30px; background-color:#4b2e83; color:white; border-radius:50%; display:flex; justify-content:center; align-items:center; margin-right:10px; flex-shrink:0;">2</div>
         <div>
@@ -152,7 +221,7 @@
           <p style="margin:0; font-size:14px; line-height:1.4;">Antes de começar, instale o MicroPython na sua placa. Você pode fazer isso via modo BOOTSEL <a href="https://micropython.org/download/" target="_blank" style="color:#4b2e83; text-decoration:underline;">clicando aqui</a>.</p>
         </div>
       </div>
-      
+
       <div class="tutorial-step" style="margin-bottom:20px; display:flex; align-items:center;">
         <div style="width:30px; height:30px; background-color:#4b2e83; color:white; border-radius:50%; display:flex; justify-content:center; align-items:center; margin-right:10px; flex-shrink:0;">3</div>
         <div>
@@ -160,7 +229,7 @@
           <p style="margin:0; font-size:14px; line-height:1.4;">Clique no botão de dispositivo e conecte sua placa via USB.</p>
         </div>
       </div>
-      
+
       <div class="tutorial-step" style="margin-bottom:20px; display:flex; align-items:center;">
         <div style="width:30px; height:30px; background-color:#4b2e83; color:white; border-radius:50%; display:flex; justify-content:center; align-items:center; margin-right:10px; flex-shrink:0;">4</div>
         <div>
@@ -168,7 +237,7 @@
           <p style="margin:0; font-size:14px; line-height:1.4;">Monte os blocos como um quebra-cabeça para criar seu programa.</p>
         </div>
       </div>
-      
+
       <div class="tutorial-step" style="margin-bottom:20px; display:flex; align-items:center;">
         <div style="width:30px; height:30px; background-color:#4b2e83; color:white; border-radius:50%; display:flex; justify-content:center; align-items:center; margin-right:10px; flex-shrink:0;">5</div>
         <div>
@@ -176,7 +245,7 @@
           <p style="margin:0; font-size:14px; line-height:1.4;">Clique no botão de execução para enviar seu código para a placa.</p>
         </div>
       </div>
-      
+
       <div class="tutorial-step" style="margin-bottom:0; display:flex; align-items:center;">
         <div style="width:30px; height:30px; background-color:#4b2e83; color:white; border-radius:50%; display:flex; justify-content:center; align-items:center; margin-right:10px; flex-shrink:0;">6</div>
         <div>
@@ -185,7 +254,7 @@
         </div>
       </div>
     </div>
-    
+
     <div id="additional-steps" style="display:none; padding:15px; border-top:1px solid #e0e0e0; background-color:#fafafa;">
       <h4 style="color:#4b2e83; margin-top:0; font-weight:bold;">Vamos começar a programar:</h4>
       <ol style="padding-left:20px; margin-bottom:10px;">
@@ -196,128 +265,12 @@
         <li style="margin-bottom:0;"><strong>Salve seu projeto:</strong> Clique no botão de salvamento frequentemente para não perder seu trabalho</li>
       </ol>
     </div>
-    
+
     <div style="padding:10px 15px; background-color:#f0f0f0; text-align:right;">
       <button id="startCodingBtn" style="background-color:#85754d; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer; transition:all 0.2s ease;">Vamos Programar!</button>
     </div>
   </div>
 
-  <script>
-    // Bounce animation keyframes for buttons
-    document.head.insertAdjacentHTML('beforeend', '<style>@keyframes bounce{0%,20%,50%,80%,100%{transform:translateY(0)}40%{transform:translateY(-20px)}60%{transform:translateY(-10px)}}</style>');
-
-    // Welcome flow: splash -> partnership -> tutorial
-    window.addEventListener('DOMContentLoaded', function() {
-      var startBtn = document.getElementById('startAdventureBtn');
-      var welcomeMsg = document.getElementById('welcome-message');
-      var partnershipNotice = document.getElementById('partnership-notice');
-      var closePartnershipBtn = document.getElementById('closePartnershipBtn');
-      var tutorialContainer = document.getElementById('tutorial-steps');
-
-      welcomeMsg.style.display = 'flex';
-
-      // Welcome -> Partnership transition
-      if (startBtn && welcomeMsg && partnershipNotice) {
-        startBtn.addEventListener('click', function() {
-          welcomeMsg.style.opacity = '0';
-          setTimeout(function() {
-            welcomeMsg.style.display = 'none';
-            partnershipNotice.style.display = 'flex';
-            partnershipNotice.style.opacity = '0';
-            void partnershipNotice.offsetWidth; // Force reflow
-            setTimeout(function() {
-              partnershipNotice.style.opacity = '1';
-            }, 50);
-          }, 1000);
-        });
-      }
-
-      // Partnership -> Tutorial transition
-      if (closePartnershipBtn && partnershipNotice && tutorialContainer) {
-        closePartnershipBtn.addEventListener('click', function() {
-          partnershipNotice.style.opacity = '0';
-          setTimeout(function() {
-            partnershipNotice.style.display = 'none';
-            tutorialContainer.style.display = 'block';
-            localStorage.setItem('bitdoglab_visited', 'true'); // Mark first visit
-          }, 1000);
-        });
-      }
-
-      // Toggle additional tutorial steps
-      var startCodingBtn = document.getElementById('startCodingBtn');
-      var additionalSteps = document.getElementById('additional-steps');
-
-      if (startCodingBtn && additionalSteps) {
-        startCodingBtn.addEventListener('click', function() {
-          if (additionalSteps.style.display === 'block') {
-            additionalSteps.style.display = 'none';
-          } else {
-            additionalSteps.style.display = 'block';
-            additionalSteps.style.backgroundColor = '#f5f0d5'; // Highlight effect
-            setTimeout(function() {
-              additionalSteps.style.backgroundColor = '#fafafa';
-            }, 1000);
-            additionalSteps.scrollIntoView({behavior: 'smooth'});
-            startCodingBtn.style.animation = 'bounce 0.5s';
-            setTimeout(function() { startCodingBtn.style.animation = ''; }, 500);
-          }
-        });
-      }
-    });
-  </script>
-  
-  <script>
-    // Load Blockly toolbox from XML and apply project filter
-    window.addEventListener('load', function() {
-      try {
-        if (typeof Blockly !== 'undefined' && Blockly.getMainWorkspace()) {
-          var request = new XMLHttpRequest();
-          request.open('GET', '../js/config/toolbox.xml', true);
-          request.onreadystatechange = function() {
-            if (request.readyState === 4 && request.status === 200) {
-              var toolboxXml = Blockly.Xml.textToDom(request.responseText);
-
-              // Store original full toolbox for project filtering
-              Code._fullToolboxXml = toolboxXml;
-
-              // Apply project filter (uses saved project or 'basico')
-              var project = localStorage.getItem('bitdoglab_project') || 'basico';
-              Code.filterToolboxByProject(project);
-
-              // Initialize project selector events
-              Code.initProjectSelector();
-
-              console.log('[BitdogLab] Toolbox loaded, project:', project);
-              Blockly.svgResize(Blockly.getMainWorkspace());
-            }
-          };
-          request.send(null);
-        }
-      } catch(e) {
-        console.error('Toolbox load error:', e);
-      }
-    });
-
-    // Tutorial panel close handlers
-    window.addEventListener('DOMContentLoaded', function() {
-      var closeTutorialBtn = document.getElementById('closeTutorialBtn');
-      var startCodingBtn = document.getElementById('startCodingBtn');
-      var tutorialContainer = document.getElementById('tutorial-steps');
-
-      if (closeTutorialBtn && tutorialContainer) {
-        closeTutorialBtn.addEventListener('click', function() {
-          tutorialContainer.style.display = 'none';
-        });
-      }
-
-      if (startCodingBtn && tutorialContainer) {
-        startCodingBtn.addEventListener('click', function() {
-          tutorialContainer.style.display = 'none';
-        });
-      }
-    });
-  </script>
 
   <div class="top-menu">
 
@@ -326,8 +279,6 @@
         <div id="tab_blocks" class="tabon">Blocos</div>
         <div id="tab_console" class="taboff">Mensagens</div>
         <div id="tab_device" class="taboff">Dispositivo</div>
-        <div id="tab_files" class="taboff" style="display:none;">Arquivos</div>
-        <div id="tab_databoard" class="taboff" style="display:none;">Dados</div>
       </div>
       <button id="toolbarButton" class="notext icon medium" title="Ferramentas"></button>
       <div class="toolbar">
@@ -346,13 +297,18 @@
         <button id="runButton" class="notext primary icon" title="Executar Programa"></button>
       </div>
 
-        <button id="linkButton" class="notext icon" title="Compartilhar" style="display: none;"></button>
-
         <button id="saveButton" class="notext icon" title="Salvar"></button>
 
         <label id="loadButton" for="loadXML"  class="notext button icon" title="..."></label>
+        <button id="trashButton" class="notext icon" title="Apagar todos os blocos" onclick="Code.discard(); return false;"></button>
         <input name="XML" id="loadXML" type="file" accept=".xml" required="">
-        <button id="notificationButton" class="notext icon" title="..."></button>
+        <button id="saveMainButton" class="icon text" data-i18n-title="app.saveMainTooltip">
+          <span id="saveMainLabel" data-i18n="app.saveMainLabel">Salvar na placa</span>
+        </button>
+        <button id="visualThemeButton" type="button" title="Alterar visual" aria-controls="visualThemePanel" aria-expanded="false">
+          <span class="visual-theme-button-icon" aria-hidden="true"></span>
+          <span id="visualThemeButtonLabel">Visual</span>
+        </button>
         <button id="languageButton" class="icon text" title="Mudar idioma">
           <span id="languageButtonLabel">PT</span>
         </button>
@@ -364,13 +320,23 @@
       <button class='icon' id="serialButton">Serial</button>
     </div>
   </div>
+  <section id="visualThemePanel" class="visual-theme-panel" aria-hidden="true" aria-labelledby="visualThemePanelTitle">
+    <header class="visual-theme-panel-header">
+      <div>
+        <strong id="visualThemePanelTitle">Escolha o visual</strong>
+        <p id="visualThemePanelIntro">Mude o ambiente dos Blocos e das Mensagens.</p>
+      </div>
+      <button id="closeVisualThemePanel" type="button" aria-label="Fechar">×</button>
+    </header>
+    <div id="visualThemeOptions" class="visual-theme-options"></div>
+  </section>
   <!-- resetBoard hidden: mantido para compatibilidade com webserial.js -->
   <input type="checkbox" id="resetBoard" style="display:none" value="off">
 
   <div id="content_blocks" class="content"></div>
   <div id="content_console" class="content">
-       
-    <tr height="25%" id="termTR">
+
+    <tr height="25%">
      <td>
         <div style="display:inline-block; vertical-align:top; ">
     <div id="term" class="xterm">
@@ -398,61 +364,9 @@
     <iframe id="deviceReferenceFrame" src="device-reference.html" width="100%" height="100%" frameBorder="0" style="border:none;"></iframe>
   </div>
 
-  <div id="content_files" class="content">
-  <div id="file-boxes">
-  <div id="file-header">
-    <span>File manager</span>
-    <label id="putFileButton" for="put-file-select"  class="noteaxt button icon" title="Upload script to device"></label>
-    <input name="PutFileList" id="put-file-select" type="file" accept=".md,.py" required="">
-  </div>
-  <div id="file-status">...</div>
-  <span id='filesPanel'>
-  <details open>
-  <summary>
-  <h2>On device</h2>
-  <button value="List Files" id="refreshFilesList" class="notext button icon" title="Refresh device file list" onclick="Files.listFiles();" /></button>
-  </summary>
-  <span id='fileList'>...</span>
-  </details>
-  <details open>
-  <summary><h2>Blocks to code</h2></summary>
-  <span id='blocks2Code'>
-    <div id='blocks2codePython' title="Code generated by the blocks with Blockly."></div>
-    <div id='blocks2codeXML' title="BIPES files with all blocks and configuration, like freeboard workspace.">workspace.bipes.xml<span>internal</span></div>
-  </span></details>
-  <details>
-  <summary><h2>Templates</h2></summary>
-  <span id='fileTemplate'>
-    <div onclick="Tool.getText('main.py');">main.py</div>
-    <div onclick="Tool.getText('ssd1306.py');">ssd1306.py</div>
-    <div onclick="Tool.getText('sh1107.py');">sh1107.py</div>
-  </span>
-  </details>
-  </div>
-
-
-  <div>
-
-  <div id="file_save_as" class="py">
-  <input type=text id=content_file_name placeholder="Filename">
-  <button id="editor2DeviceButton" class="button icon text" onclick="Files.files_save_as();">Save</button>
-  <button id="generated2DeviceButton" class="button icon text" onclick="Files.file_save_as.className = 'py';  Files.files_save_as ();">Save a copy</button>
-  <button id="updateXMLButton"  class="button icon text" onclick="Files.editedXML2Workspace();">Push to workspace</button>
-  </div>
-  <textarea id="content_file_code" wrap="off"></textarea>
-
-  <link rel="stylesheet" href="../js/lib/codemirror/codemirror.css">
-  </div>
-</div>
-
-<div id="content_databoard" class="content" style="padding: 0;">
-  <iframe id="databoard_iframe" src="../databoard/index.html" width="100%" height="100%" frameBorder="0"></iframe>
-</div>
-
 </div>
 <div class='progress-bar'></div>
 <div class="notify"></div>
-<div class="notify-panel"></div>
 <div class="language-panel">
   <div class="language-panel-header" id="languagePanelTitle">Idioma da interface</div>
   <button class="language-option active" data-lang="pt-br">
@@ -465,72 +379,9 @@
   </button>
 </div>
 
-<script>
-// Initialize Blockly workspace
-Code.init ();
-
-// Communication channels (WebSerial)
-var Channel = {};
-Channel ['webserial'] = new webserial ();
-Channel ['mux'] = new mux ();
-
-// Terminal (xterm.js)
-var terminal = new Terminal ();
-term.init('#term');
-
-// File manager
-var Files = new files ('#fileList');
-
-// UI components
-var UI = {};
-UI ['responsive'] = new responsive ();
-UI ['notify'] = new notify ();
-UI ['progress'] = new progress ();
-UI ['account'] = new account ('#accountButton','.account-panel');
-UI ['notify-panel'] = new panel ('#notificationButton','.notify-panel');
-UI ['language-panel'] = new panel ('#languageButton','.language-panel');
-UI ['channel-panel'] = new channelPanel ('#channelButton','.channel-panel');
-UI ['toolbar'] = new panel ('#toolbarButton','.toolbar');
-UI ['workspace'] = new workspace ();
-
-// Clear queue from previous session
-Tool.clearQueue ();
-
-window.onload = function() {
-	// i18n: Auto-detect browser language
-	var userLang = navigator.language || navigator.userLanguage + " ";
-	var addMsg = "";
-
-	// Check URL params for language override
-	const queryString = window.location.search;
-	const urlParams = new URLSearchParams(queryString);
-	pLang = urlParams.get('lang');
-
-	if (!userLang) userLang = 'en';
-	if (!pLang) pLang = 'en';
-
-	// Keyboard shortcuts (Ctrl+Shift+...)
-	if (typeof shortcut !== 'undefined' && shortcut && typeof shortcut.add === 'function') {
-		shortcut.add("Ctrl+Shift+L", function() {
-			Tool.exportScreenshot(); // Screenshot
-		});
-
-		shortcut.add("Ctrl+Shift+E", function() {
-			Code.handleLink('console', 1); // Run + switch to console
-			Tool.runPython();
-		});
-
-		shortcut.add("Ctrl+Shift+R", function() {
-			Tool.runPython(); // Run program
-		});
-
-		shortcut.add("Ctrl+Shift+S", function() {
-			Tool.stopPython(); // Stop program
-		});
-	}
-};
-
-</script>
+<script src="../js/bootstrap/onboarding.js?ver=20260809arch1"></script>
+<script src="../js/bootstrap/services.js?ver=20260809arch1"></script>
+<script src="../js/bootstrap/page.js?ver=20260817category2"></script>
 
 </body>
 </html>

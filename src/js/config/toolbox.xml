@@ -124,6 +124,9 @@
     </block>
   </category>
 
+  <!-- VARIÁVEIS — memória numérica do programa -->
+  <category name="📦 Variáveis" colour="330" custom="VARIABLE"></category>
+
   <!-- 3. CONDICIONAIS -->
   <category name="🔀 Condicionais" colour="270">
     <block type="controls_if"></block>
@@ -291,7 +294,6 @@
     <block type="tocar_nota"></block>
     <block type="tocar_som_agudo"></block>
     <block type="parar_som"></block>
-    <!-- <block type="tocar_repetidamente"></block> -->
     <block type="bipe_curto"></block>
     <block type="bipe_duplo"></block>
     <block type="alerta_intermitente"></block>
@@ -377,9 +379,188 @@
 
   <!-- ========== CATEGORIAS DE PROJETO (aparecem conforme seletor) ========== -->
 
+  <!-- Projeto: Conexoes Externas -->
+  <category name="LEDs Externos" colour="#d97706" data-project="externos" custom="EXTERNAL_LED" css-icon="bitdoglab-external-led-category-icon"></category>
+  <category name="Sensor de luz e sombra (LDR)" colour="#16a085" data-project="externos"></category>
+  <category name="Temperatura e umidade externo" colour="#e67e22" data-project="externos" css-icon="bitdoglab-dht11-category-icon">
+    <block type="dht11_temperatura">
+      <field name="DIG">0</field>
+    </block>
+    <block type="display_mostrar_valor">
+      <value name="VALOR">
+        <block type="dht11_temperatura">
+          <field name="DIG">0</field>
+        </block>
+      </value>
+      <field name="LINHA">1</field>
+      <field name="ALINHAMENTO">CENTER</field>
+      <field name="DISPLAY_TYPE">SMALL</field>
+    </block>
+    <block type="dht11_umidade">
+      <field name="DIG">0</field>
+    </block>
+    <block type="display_mostrar_valor">
+      <value name="VALOR">
+        <block type="dht11_umidade">
+          <field name="DIG">0</field>
+        </block>
+      </value>
+      <field name="LINHA">2</field>
+      <field name="ALINHAMENTO">CENTER</field>
+      <field name="DISPLAY_TYPE">SMALL</field>
+    </block>
+    <block type="dht11_plotar">
+      <value name="VALOR">
+        <block type="dht11_temperatura">
+          <field name="DIG">0</field>
+        </block>
+      </value>
+      <field name="POSICAO">1</field>
+      <field name="DISPLAY_TYPE">SMALL</field>
+    </block>
+    <block type="dht11_plotar">
+      <value name="VALOR">
+        <block type="dht11_umidade">
+          <field name="DIG">0</field>
+        </block>
+      </value>
+      <field name="POSICAO">2</field>
+      <field name="DISPLAY_TYPE">SMALL</field>
+    </block>
+  </category>
+  <category name="Sensor de distância e presença" colour="#2980b9" data-project="externos"></category>
+  <category name="Servo externo" colour="#00897b" data-project="externos" css-icon="bitdoglab-servo-category-icon">
+    <block type="servo_mover">
+      <field name="DIG">0</field>
+      <field name="ANGLE">90</field>
+    </block>
+    <block type="servo_angulo_atual"><field name="DIG">0</field></block>
+    <block type="servo_joystick_controlar">
+      <field name="DIG">0</field>
+      <field name="DIR_INCREASE">UP</field>
+      <field name="DIR_DECREASE">DOWN</field>
+      <field name="INITIAL_ANGLE">90</field>
+      <field name="STEP">2</field>
+    </block>
+    <block type="servo_subir_gradualmente">
+      <field name="DIG">0</field>
+      <field name="TARGET">90</field>
+      <field name="STEP">10</field>
+      <field name="PAUSE">3</field>
+    </block>
+    <block type="servo_descer_gradualmente">
+      <field name="DIG">0</field>
+      <field name="TARGET">90</field>
+      <field name="STEP">10</field>
+      <field name="PAUSE">3</field>
+    </block>
+    <block type="display_mostrar_valor">
+      <value name="VALOR">
+        <block type="servo_angulo_atual"><field name="DIG">0</field></block>
+      </value>
+    </block>
+  </category>
+
   <!-- Projeto: Robo Movel -->
-  <category name="Controle Robô" colour="#e67e22" data-project="robo">
-    <label text="Em breve: blocos de motor e sensores" web-class="projectPlaceholder"></label>
+  <category name="🕹️ Controle Robô" colour="#e67e22" data-project="robo">
+    <block type="robo_inicializar">
+      <field name="ESPERA">5</field>
+    </block>
+    <block type="robo_frente">
+      <value name="TEMPO">
+        <shadow type="math_number">
+          <field name="NUM">2</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="robo_tras">
+      <value name="TEMPO">
+        <shadow type="math_number">
+          <field name="NUM">1</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="robo_girar">
+      <value name="GRAUS">
+        <shadow type="math_number">
+          <field name="NUM">45</field>
+        </shadow>
+      </value>
+      <field name="DIRECAO">L</field>
+    </block>
+    <block type="robo_parar"></block>
+    <block type="robo_joystick"></block>
+  </category>
+
+  <category name="📐 Movimento e Inclinação" colour="#8e44ad" data-project="robo">
+    <block type="robo_giro_valor"></block>
+    <block type="display_mostrar_valor">
+      <value name="VALOR">
+        <block type="robo_giro_valor"></block>
+      </value>
+      <field name="LINHA">1</field>
+      <field name="ALINHAMENTO">CENTER</field>
+      <field name="DISPLAY_TYPE">SMALL</field>
+    </block>
+    <block type="robo_aceleracao_x"></block>
+    <block type="display_mostrar_valor">
+      <value name="VALOR">
+        <block type="robo_aceleracao_x"></block>
+      </value>
+      <field name="LINHA">1</field>
+      <field name="ALINHAMENTO">CENTER</field>
+      <field name="DISPLAY_TYPE">SMALL</field>
+    </block>
+    <block type="robo_aceleracao_y"></block>
+    <block type="display_mostrar_valor">
+      <value name="VALOR">
+        <block type="robo_aceleracao_y"></block>
+      </value>
+      <field name="LINHA">2</field>
+      <field name="ALINHAMENTO">CENTER</field>
+      <field name="DISPLAY_TYPE">SMALL</field>
+    </block>
+    <block type="robo_aceleracao_z"></block>
+    <block type="display_mostrar_valor">
+      <value name="VALOR">
+        <block type="robo_aceleracao_z"></block>
+      </value>
+      <field name="LINHA">3</field>
+      <field name="ALINHAMENTO">CENTER</field>
+      <field name="DISPLAY_TYPE">SMALL</field>
+    </block>
+    <block type="robo_transferidor_360">
+      <field name="DISPLAY_TYPE">SMALL</field>
+    </block>
+  </category>
+
+  <category name="🔋 Bateria do Robô" colour="#27ae60" data-project="robo">
+    <block type="robo_tensao_bateria"></block>
+    <block type="display_mostrar_valor">
+      <value name="VALOR">
+        <block type="robo_tensao_bateria"></block>
+      </value>
+      <field name="LINHA">1</field>
+      <field name="ALINHAMENTO">CENTER</field>
+      <field name="DISPLAY_TYPE">SMALL</field>
+    </block>
+    <block type="robo_corrente_robo"></block>
+    <block type="display_mostrar_valor">
+      <value name="VALOR">
+        <block type="robo_corrente_robo"></block>
+      </value>
+      <field name="LINHA">2</field>
+      <field name="ALINHAMENTO">CENTER</field>
+      <field name="DISPLAY_TYPE">SMALL</field>
+    </block>
+  </category>
+
+  <!-- Projeto: Piano Musical -->
+  <category name="🎹 Controle Piano" colour="#22c55e" data-project="piano">
+    <block type="piano_interativo"></block>
+    <block type="piano_nota"></block>
+    <block type="parar_piano"></block>
+    <block type="temporizacao"></block>
   </category>
 
   <!-- Projeto: Estufa -->

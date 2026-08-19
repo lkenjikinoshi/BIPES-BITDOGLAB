@@ -8,6 +8,9 @@
   --bitdoglab-accent: #ff8c00;
   --bitdoglab-success: #4CAF50;
   --bitdoglab-warning: #FFC107;
+  --bitdoglab-warning-surface: #fffaf0;
+  --bitdoglab-warning-border: #d89b00;
+  --bitdoglab-warning-text: #332b1c;
   --bitdoglab-error: #F44336;
   --font-primary: 'Comic Sans MS', 'Marker Felt', sans-serif;
   --font-secondary: BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Fira Sans","Droid Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
@@ -167,7 +170,7 @@ h1 {
 .top-menu #channel_connect:hover  > a.selected{
   box-shadow: -1px 0 3px  #aaa;
 }
-#loadXML, #put-file-select {
+#loadXML {
   display: none;
 }
 
@@ -208,7 +211,7 @@ h1 {
   text-align: left;
   padding: 0.5rem 0.5rem 0.125rem 0.5rem;
 }
-.channel-panel input, #file_save_as input {
+.channel-panel input {
   border: none;
   padding: 0;
   height: 2rem;
@@ -454,16 +457,12 @@ pre.content {
 .content-padding {
   padding: 0;
 }
-#content_blocks, #content_device, #content_code, #content_console, #content_files, #content_databoard {
+#content_blocks, #content_device, #content_console, #content_files {
   height: calc(100vh - 4rem);
 }
-#content_device, #content_code, #content_console {
+#content_device, #content_console {
   overflow-y: auto;
   overflow-x: hidden;
-}
-#content_device #device_img {
-  max-width: 75rem;
-  width: 100%;
 }
 .blocklySvg {
   border-top: none !important;
@@ -476,6 +475,21 @@ pre.content {
   background-size: 550px 550px, 350px 350px, 250px 250px, 150px 150px !important; 
   background-position: 0 0, 40px 60px, 130px 270px, 70px 100px !important;
   background-attachment: fixed !important;
+}
+
+.blocklyZoom > image,
+.blocklyZoom > svg > image,
+.blocklyTrash image {
+  opacity: .9 !important;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .75));
+}
+
+.blocklyZoom:hover > image,
+.blocklyZoom:hover > svg > image,
+.blocklyTrash:hover image {
+  opacity: 1 !important;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, .9))
+    drop-shadow(0 0 4px rgba(255, 255, 255, .45));
 }
 
 /* Button styles */
@@ -569,14 +583,6 @@ button:hover {
   text-shadow: 0 0 10px #fff, 0 0 20px #ff5757, 0 0 30px #ff5757;
 }
 
-#languageIcon {
-  display: inline-flex;
-  align-items: center;
-  border: none;
-  opacity: 0.8;
-  margin: .5rem 0;
-}
-
 #content_console #term.on{
   box-shadow: 0 0 25px rgba(255, 105, 180, 0.9), 0 0 45px rgba(137, 207, 240, 0.9), 0 0 10px #fff inset;
 }
@@ -598,64 +604,7 @@ button:hover {
 #content_files {
   grid-template-columns: 18rem calc(100% - 18rem);
 }
-#file-boxes #file-header, #file-boxes #file-status  {
-  padding: 0 .25em 0 .5em;
-  text-align: center;
-}
-#file-boxes #file-header  {
-  display: flex;
-  height: 2.5rem;
-  align-items: center;
-  justify-content: space-between;
-  font-weight: bold;
-  border-bottom: 1px solid #ccc;
-  border-right: 1px solid #ccc;
-}
-#file-boxes #file-header > span {
-  flex-grow: 2;
-}
-#file_save_as {
-  height: 2.5rem;
-  border-bottom: 1px solid #ccc;
-  display: flex;
-  align-items: center;
-  padding: 0 .5rem 0 1.85rem
-}
-#file_save_as.py #updateXMLButton, #file_save_as.py #generated2DeviceButton {
-  display:none;
-}
-#file_save_as input {
-  font-weight: bold;
-  border-left: 1px solid #ccc;
-  padding-left: .5rem;
-}
-#file-boxes #file-status {
-  height: 1.5rem;
-  line-height: 1.5rem;
-  border-bottom: 1px solid #ccc;
-  border-right: 1px solid #ccc;
-  color:#666;
-  font-size: 0.85rem;
-  overflow: hidden;
-  font-weight: bold;
-  background: #f7f7f7;
-}
-
-#filesPanel {
-  display: block;
-  height: calc(100vh - 8rem);
-  overflow-y: auto;
-  padding: 0.25rem 0.5rem;
-  border-right: 1px solid #ccc;
-}
-#filesPanel h2, .account-panel h2 {
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  margin: 0;
-  height: 2.5rem;
-}
-#fileList > div, #fileTemplate > div, #blocks2Code > div, #ProjectList > div{
+#fileList > div {
   display: flex;
   align-items: stretch;
   justify-content: space-between;
@@ -667,24 +616,19 @@ button:hover {
   min-height: 2rem;
   font-size: 0.9rem;
 }
-#fileList > div > div:last-child, #ProjectList > div > div:last-child{
+#fileList > div > div:last-child{
   flex-shrink: 0;
 }
-#fileList .runText, #ProjectList .runText {
+#fileList .runText {
   width: 100%;
   font-family: monospace;
 }
-#fileTemplate > div, #blocks2Code > div  {
-  align-items: center;
-  word-break: break-word;
-  font-family: monospace;
-}
-#fileList > div > div, #ProjectList > div > div {
+#fileList > div > div {
   display: inline-flex;
   align-items: center;
   word-break: break-word;
 }
-#fileList .runText > span, #blocks2Code > div > span {
+#fileList .runText > span {
   font-size: 0.8rem;
   border: 1px solid #7b49ad;
   border-radius: .75rem;
@@ -695,46 +639,6 @@ button:hover {
   word-break: keep-all;
   font-family: sans-serif;
 }
-#fileList #runIcon {
-  filter: brightness(0)
-}
-#filesPanel details, .account-panel summary {
-  overflow: hidden;
-  transition: .125s ease border;
-}
-#filesPanel summary, .account-panel summary {
-  -webkit-tap-highlight-color: transparent;
-  white-space: normal;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-#filesPanel summary > h2:before, .account-panel summary > h2:before {
-  content: "\1433";
-  margin-right: .5rem;
-  transition: transform .25s ease;
-  display:inline-block;
-  font-weight: normal;
-  font-size: 0.8rem;
-  line-height: 1rem;
-}
-#filesPanel details[open] summary > h2:before, .account-panel details[open] summary > h2:before {
-  transform: rotateZ(90deg);
-}
-#ProjectList  > div {
-  transition: box-shadow ease .125s, background-color linear .125s, border-color linear .125s, color linear .125s;
-}
-#ProjectList > .current {
-    box-shadow: 0 0.125em 0.25em rgba(0,0,0,0.2);
-    background: #3298dc;
-    color: #fff;
-    border-color: #3298dc;
-}
-#ProjectList .current span {
-  filter: invert(1);
-}
-
 /* Toolbar */
 @media (min-width: 60em) {
   .top-menu > .toolbar {
@@ -829,21 +733,15 @@ button.icon.medium:before  {
 #trashButton:before, #trashIcon:before {
   background-position: left calc(-1.5rem*3) top;
 }
-#notificationButton:before {
-  background-position: left calc(-1.5rem*4) top;
-}
 #deviceSelect:before {
   background-position: left calc(-1.5rem*7) top;
 }
-#runButton:before, #runIcon:before {
+#runButton:before {
   transition: background ease .125s;
   background-position: left calc(-1.5rem*5) top;
 }
 #runButton.on:before {
   background-position: left calc(-1.5rem*5) bottom;
-}
-#languageIcon:before {
-  background-position: left calc(-1.5rem*6) top;
 }
 #serialButton:before, #channelButton.webserial:before {
   background-position: left calc(-1.5rem*9) top;
@@ -854,17 +752,10 @@ button.icon.medium:before  {
 #toolbarButton.on:before {
   background-position: left calc(-2.5rem*11) bottom;
 }
-#forumButton:before {
-  background-position: left calc(-1.5rem*12) top;
-}
-
 /* White icons */
-#notificationButton,
-#accountButton,
-#newProjectButton,
 #saveButton,
 #loadButton,
-#forumButton,
+#trashButton,
 #connectButton,
 #serialButton,
 #connectButton:before {
@@ -873,23 +764,6 @@ button.icon.medium:before  {
 #connectButton.on:before {
   background-position: left calc(-1.5rem*13) bottom;
 }
-#refreshFilesList:before {
-  background-position: left calc(-1.5rem*18) top;
-}
-#putFileButton:before, #editor2DeviceButton:before, #generated2DeviceButton:before{
-  background-position: left calc(-1.5rem*19) top;
-}
-#updateXMLButton:before {
-  background-position: left calc(-1.5rem*20) bottom;
-}
-#accountButton:before {
-  background-position: left calc(-1.5rem*22) top;
-}
-#newProjectButton:before {
-  background-position: left calc(-1.5rem*23) top;
-}
-
-
 @media (max-width: 710px) {
   .tab_collapse {
     display: none;
@@ -957,12 +831,66 @@ button.icon.medium:before  {
   letter-spacing: 0.08em;
 }
 
+#saveMainButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  height: 2.2rem;
+  padding: 0.2rem 0.9rem 0.2rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: linear-gradient(135deg, rgba(22, 160, 133, 0.95), rgba(39, 174, 96, 0.9));
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(22, 160, 133, 0.25);
+  transition: all ease .2s;
+}
+
+#saveMainButton:hover {
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 12px 28px rgba(22, 160, 133, 0.35);
+  transform: translateY(-1px);
+}
+
+#saveMainButton:disabled {
+  cursor: wait;
+  opacity: 0.65;
+  transform: none;
+}
+
+#saveMainButton:before {
+  background-position: left calc(-1.5rem*1) top;
+}
+
+#saveMainLabel {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
 /* Project modal cards */
+.project-modal-content {
+  max-width: 960px;
+}
+
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-rows: 1fr;
+  gap: 25px;
+}
+
 .project-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   background: white;
   border-radius: 20px;
-  padding: 35px 25px;
-  width: 240px;
+  box-sizing: border-box;
+  padding: 25px 20px;
+  width: 100%;
+  min-height: 220px;
   text-align: center;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -983,6 +911,13 @@ button.icon.medium:before  {
   line-height: 1;
   margin-bottom: 10px;
 }
+.project-card-image {
+  display: block;
+  width: 100%;
+  height: 92px;
+  margin: 0 auto 8px;
+  object-fit: contain;
+}
 .project-card h2 {
   color: var(--bitdoglab-primary);
   margin: 10px 0 5px;
@@ -992,6 +927,121 @@ button.icon.medium:before  {
   color: #666;
   font-size: 0.9rem;
   margin: 0;
+}
+
+@media (max-width: 720px) {
+  .project-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .project-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Hardware guide notice shown after selecting a project. */
+.project-hardware-notice {
+  position: fixed;
+  top: 74px;
+  left: 50%;
+  z-index: 9997;
+  display: flex;
+  width: min(760px, calc(100% - 32px));
+  box-sizing: border-box;
+  align-items: center;
+  gap: 18px;
+  padding: 16px 54px 16px 20px;
+  border: 1px solid #b9c8dc;
+  border-left: 5px solid var(--bitdoglab-primary);
+  border-radius: 12px;
+  background: #fff;
+  color: #253247;
+  box-shadow: 0 12px 32px rgba(24, 38, 61, 0.24);
+  transform: translateX(-50%);
+  animation: projectNoticeIn 0.22s ease-out;
+}
+
+.project-hardware-notice[hidden] {
+  display: none;
+}
+
+.project-hardware-notice-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+}
+
+.project-hardware-notice-copy strong {
+  color: var(--bitdoglab-dark);
+  font-size: 1rem;
+}
+
+.project-hardware-notice-copy span {
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.project-hardware-notice-link {
+  flex: 0 0 auto;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: var(--bitdoglab-primary);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.project-hardware-notice-link:hover,
+.project-hardware-notice-link:focus-visible {
+  background: var(--bitdoglab-dark);
+  outline: 3px solid rgba(75, 46, 131, 0.22);
+  outline-offset: 2px;
+}
+
+.project-hardware-notice-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  border: 0;
+  background: transparent;
+  color: #526077;
+  cursor: pointer;
+  font-size: 1.55rem;
+  line-height: 1;
+}
+
+.project-hardware-notice-close:hover,
+.project-hardware-notice-close:focus-visible {
+  color: var(--bitdoglab-dark);
+  outline: 2px solid rgba(75, 46, 131, 0.25);
+  outline-offset: 2px;
+}
+
+@keyframes projectNoticeIn {
+  from { opacity: 0; transform: translate(-50%, -10px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@media (max-width: 680px) {
+  .project-hardware-notice {
+    top: 70px;
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px 46px 16px 16px;
+  }
+
+  .project-hardware-notice-link {
+    align-self: flex-start;
+    white-space: normal;
+  }
 }
 
 /* Device selector */
@@ -1052,7 +1102,7 @@ button.icon.medium:before  {
   background: #fff;
   padding: .25em;
 }
-.account-panel, .notify-panel, .language-panel, .notify {
+.language-panel, .notify {
   user-select: none;
 	transition: top ease .5s, right ease .5s, opacity ease .125s, background linear .5s, margin-right ease .125s;
   transition-delay: 0s, 0s, .1s, 0s, 0s;
@@ -1061,7 +1111,7 @@ button.icon.medium:before  {
   background: #fff;
 }
 @media (min-width: 60em) {
-  .account-panel, .notify-panel, .language-panel {
+  .language-panel {
     border-radius: 1rem;
     margin: 0.5em;
     border: 1px solid #aaa !important;
@@ -1088,53 +1138,8 @@ button.icon.medium:before  {
   height: 1px;
   background-color: #fff;
 }
-.notify-panel > span, .notify {
+.notify {
 	border-radius: .25rem;
-}
-.notify-panel > span {
-  background: #fff;
-	padding: 1em;
-	display: flex;
-	align-items:center;
-	justify-content: space-between;
-	margin: .25rem 0;
-	transition: box-shadow ease .125s;
-	box-sizing: border-box;
-	border: solid 1px #ccc;
-}
-.notify-panel > span:hover {
-  border-color: #aaa;
-	box-shadow: 0 1px 2px rgba(0,0,0,.4);
-}
-.notify-panel > span > span {
-  cursor: pointer;
-  opacity: .6;
-  transition: opacity linear .125s;
-}
-.notify-panel > span > span:hover  {
-  opacity: 1;
-}
-.notify-panel, .account-panel{
-  position: fixed;
-  overflow-y: auto;
-  z-index: 998;
-  width: 18rem;
-  padding: 0 .5em;
-  top:3.5rem;
-  bottom:0;
-  right:-22em;
-  background: #fefefe;
-  border-left: solid 1px #ccc;
-	display: flex;
-  box-shadow: 0 0.25em 0.5em rgba(0, 0, 0, 0.5);
-}
-.account-panel {
-  flex-direction: column;
-  justify-content: space-between;
-}
-.notify-panel {
-  flex-direction: column-reverse;
-  justify-content: end;
 }
 .language-panel {
   position: fixed;
@@ -1207,18 +1212,11 @@ button.icon.medium:before  {
   font-weight: 700;
 }
 @media (max-width: 59.99em) {
-  .notify-panel, .account-panel{
-    padding-top: 4.5rem;
-  }
   .language-panel {
     top: 4.25rem;
     right: 0.35rem;
     width: min(15.5rem, calc(100vw - 0.7rem));
   }
-}
-.notify-panel#show, .account-panel#show {
-	opacity: 1;
-	right: 0;
 }
 /* Progress Bar */
 .progress-bar {
@@ -1277,18 +1275,6 @@ button.icon.medium:before  {
 		left: 0;
 		transform: translateX(-100%);
 	}
-}
-
-#account_header {
-  font-size: 1.25rem;
-  margin: .5em 0;
-  display: block;
-}
-
-#account_user {
-    border-bottom: 1px dashed #666;
-    font-weight: bold;
-    padding-bottom: .125rem;
 }
 
 /* Blockly toolbox */
@@ -1358,6 +1344,45 @@ button.icon.medium:before  {
     font-weight: bold;
 }
 
+/* Ícone visual da categoria de servo motor nas conexões externas. */
+.bitdoglab-servo-category-icon {
+  width: 2.1rem;
+  height: 2.1rem;
+  margin-inline-end: 0.35rem;
+  background-image: url('../assets/images/devices/servo-motor.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  visibility: visible !important;
+  vertical-align: middle;
+}
+
+/* Visual icon for the DHT11 external-temperature category. */
+.bitdoglab-dht11-category-icon {
+  width: 2.1rem;
+  height: 2.1rem;
+  margin-inline-end: 0.35rem;
+  background-image: url('../assets/images/devices/dht11.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  visibility: visible !important;
+  vertical-align: middle;
+}
+
+/* Ícone visual da categoria de LEDs externos. */
+.bitdoglab-external-led-category-icon {
+  width: 2.1rem;
+  height: 2.1rem;
+  margin-inline-end: 0.35rem;
+  background-image: url('../assets/images/devices/ky-016.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  visibility: visible !important;
+  vertical-align: middle;
+}
+
 .blocklyTreeSelected .blocklyTreeLabel {
     color: white !important;
 }
@@ -1365,6 +1390,27 @@ button.icon.medium:before  {
 /* Hide flyout label text */
 .blocklyFlyoutLabelText {
   display: none;
+}
+
+/* Contract warnings: readable, compact and distinct from block tooltips. */
+.bitdoglab-contract-warning-bubble {
+  filter: drop-shadow(0 5px 10px rgba(45, 32, 10, 0.2));
+}
+
+.bitdoglab-contract-warning-bubble .bitdoglab-warning-surface,
+.bitdoglab-contract-warning-bubble .bitdoglab-warning-arrow {
+  fill: var(--bitdoglab-warning-surface) !important;
+  stroke: var(--bitdoglab-warning-border);
+  stroke-width: 1.5px;
+  stroke-linejoin: round;
+}
+
+.bitdoglab-contract-warning-bubble .bitdoglab-warning-text {
+  fill: var(--bitdoglab-warning-text) !important;
+  font-family: var(--font-secondary) !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0;
 }
 
 /* Mutator icon */

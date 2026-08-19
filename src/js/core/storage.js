@@ -1,3 +1,38 @@
+// Account state used by project persistence and autosave
+function account () {
+
+	this.currentProject = {uid:'', xml:''};
+	this.projects = {}; // {uid: timestamp}
+
+  try {
+    this.restoreProjects(JSON.parse(localStorage.getItem('bipes_projects') || '{}'));
+  } catch (e) {
+    console.warn('[Account] Failed to restore project list:', e);
+    this.restoreProjects({});
+  }
+}
+// Restore project state from localStorage and discard orphaned entries
+account.prototype.restoreProjects = function (projects_) {
+  this.projects = (projects_ && typeof projects_ === 'object') ? projects_ : {};
+
+  var hasValidProjects = false;
+  for (const prop in this.projects) {
+    if (localStorage[prop]) {
+      hasValidProjects = true;
+    } else {
+      delete this.projects[prop]; // Clean orphaned project references
+    }
+  }
+
+  // If we have projects but currentProject.uid is not set, set it to the first one
+  if (hasValidProjects && !this.currentProject.uid) {
+    var firstProjectUid = Object.keys(this.projects)[0];
+    this.currentProject.uid = firstProjectUid;
+    this.currentProject.xml = localStorage[firstProjectUid];
+    console.log('[Account] Initialized currentProject.uid to:', firstProjectUid);
+  }
+};
+
 // Unified workspace persistence for autosave, project restore, and session backup.
 (function() {
   'use strict';
@@ -93,22 +128,6 @@
     UI['account'].currentProject.xml = xmlText || '';
   }
 
-  function markCurrentProjectInList(uid) {
-    if (!window.UI || !UI['account'] || !UI['account'].projectList) {
-      return;
-    }
-
-    var currentNode = UI['account'].projectList.querySelector('.current');
-    if (currentNode) {
-      currentNode.className = '';
-    }
-
-    var projectNode = UI['account'].projectList.querySelector('#' + uid);
-    if (projectNode) {
-      projectNode.className = 'current';
-    }
-  }
-
   function rememberCurrentProject(uid, timestamp) {
     if (!uid) {
       return;
@@ -126,16 +145,6 @@
       localStorage.setItem(LAST_PROJECT_KEY, uid);
     } catch (e) {
       console.error('[SimpleStorage] Failed to remember current project:', e);
-    }
-  }
-
-  function clearCurrentProjectMemory(uid) {
-    try {
-      if (localStorage.getItem(LAST_PROJECT_KEY) === uid) {
-        localStorage.removeItem(LAST_PROJECT_KEY);
-      }
-    } catch (e) {
-      console.error('[SimpleStorage] Failed to clear last project key:', e);
     }
   }
 
@@ -263,50 +272,7 @@
 
     rememberCurrentProject(uid, +new Date());
     setCurrentProject(uid, xmlText);
-    markCurrentProjectInList(uid);
     return true;
-  }
-
-  function createProject(uid, xmlText) {
-    if (!uid || !xmlText) {
-      return false;
-    }
-
-    try {
-      localStorage.setItem(uid, xmlText);
-    } catch (e) {
-      console.error('[SimpleStorage] Failed to create project:', e);
-      return false;
-    }
-
-    rememberCurrentProject(uid, +new Date());
-    setCurrentProject(uid, xmlText);
-    markCurrentProjectInList(uid);
-    return loadWorkspaceFromText(xmlText);
-  }
-
-  function deleteProject(uid) {
-    if (!uid) {
-      return;
-    }
-
-    try {
-      localStorage.removeItem(uid);
-    } catch (e) {
-      console.error('[SimpleStorage] Failed to delete project XML:', e);
-    }
-
-    var projects = readProjects();
-    delete projects[uid];
-    writeProjects(projects);
-    clearCurrentProjectMemory(uid);
-
-    if (window.UI && UI['account']) {
-      UI['account'].projects = projects;
-      if (UI['account'].currentProject.uid === uid) {
-        setCurrentProject('', '');
-      }
-    }
   }
 
   function restoreLastSession() {
@@ -317,18 +283,12 @@
     var projects = restoreProjectList();
     var backupXml = localStorage.getItem(WORKSPACE_BACKUP_KEY);
     if (backupXml && loadWorkspaceFromText(backupXml)) {
-      if (window.Files && typeof Files.handleCurrentProject === 'function') {
-        Files.handleCurrentProject();
-      }
       startupRestoreState = 'backup';
       return startupRestoreState;
     }
 
     var lastProjectUid = getLastProjectUid(projects);
     if (lastProjectUid && openProjectByUid(lastProjectUid)) {
-      if (window.Files && typeof Files.handleCurrentProject === 'function') {
-        Files.handleCurrentProject();
-      }
       startupRestoreState = 'project';
       return startupRestoreState;
     }
@@ -383,8 +343,6 @@
   }
 
   window.SimpleStorage = {
-    createProject: createProject,
-    deleteProject: deleteProject,
     getLastProjectUid: getLastProjectUid,
     getStartupRestoreState: function() { return startupRestoreState; },
     loadWorkspaceFromText: loadWorkspaceFromText,

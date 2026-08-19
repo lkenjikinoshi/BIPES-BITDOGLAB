@@ -1,0 +1,113 @@
+<section class="project-panel is-active" id="robo" data-panel="robo">
+  <header class="article-header">
+    <p class="article-index" data-copy="robotEyebrow">PROJETO ROBÔ MÓVEL</p>
+    <h2 data-copy="robotTitle">Monte o robô móvel por etapas</h2>
+    <p data-copy="robotArticleIntro">Nesta atividade, a BitDogLab controla quatro motores. A ponte H TB6612FNG recebe os comandos da placa e movimenta as rodas. O sensor MPU6050 percebe a aceleração e o giro do robô. Como esta montagem possui mais fios, conclua e confira uma etapa antes de iniciar a próxima.</p>
+  </header>
+
+  <div class="prose-block">
+    <h3 data-copy="robotGoalTitle">Objetivo da montagem</h3>
+    <p data-copy="robotGoalText">Montar o chassi, ligar os motores à ponte H, conectar a ponte H e o MPU6050 à BitDogLab e fazer um primeiro teste com segurança.</p>
+    <h4 data-copy="robotMaterialsTitle">Separe estes materiais</h4>
+    <ul class="guide-checklist">
+      <li data-copy="robotMaterial1">1 BitDogLab com bateria e 1 cabo USB;</li>
+      <li data-copy="robotMaterial2">1 chassi, 4 motores DC e 4 rodas;</li>
+      <li data-copy="robotMaterial3">1 ponte H TB6612FNG e 1 sensor MPU6050;</li>
+      <li data-copy="robotMaterial4">PCBs adaptadoras e cabo flat polarizado ou os fios indicados neste manual;</li>
+      <li data-copy="robotMaterial5">Ferramentas adequadas ao chassi, como chave de fenda, e material para prender e isolar os fios.</li>
+    </ul>
+  </div>
+
+  <figure class="wide-photo">
+    <img src="../assets/images/devices/robo-montado.png" alt="Robô móvel completo com a BitDogLab sobre o chassi" data-copy-alt="robotMountedAlt">
+    <figcaption data-copy="robotMountedCaption">Robô completo com a BitDogLab instalada sobre o chassi de quatro rodas.</figcaption>
+  </figure>
+
+  <div class="prose-block">
+    <h3 data-copy="robotPartsTitle">Entenda a função de cada parte</h3>
+    <p data-copy="robotPartsText">Os motores formam dois grupos: lado esquerdo e lado direito. A ponte H funciona como um controlador de potência: ela recebe sinais da BitDogLab e decide a velocidade e o sentido de giro de cada lado. O MPU6050 é um sensor de movimento ligado a um conector I²C superior.</p>
+    <p data-copy="robotPowerIntegrated">A bateria e a medição de tensão e corrente já fazem parte da BitDogLab. Não procure esses itens como módulos separados.</p>
+  </div>
+
+  <div class="photo-pair">
+    <figure><img src="../assets/images/devices/robo-ponte-mpu.png" alt="Ponte H e MPU6050 instalados no chassi" data-copy-alt="robotElectronicsAlt"><figcaption data-copy="robotElectronicsCaption">Ponte H e MPU6050 usando as PCBs adaptadoras do laboratório.</figcaption></figure>
+    <figure><img src="../assets/images/devices/robo-chassi.jpeg" alt="Chassi com quatro motores e módulos eletrônicos" data-copy-alt="robotChassisAlt"><figcaption data-copy="robotChassisCaption">Vista do chassi com os quatro motores separados em dois lados.</figcaption></figure>
+  </div>
+
+  <div class="recommendation-block">
+    <h3 data-copy="robotPcbRecommendationTitle">Montagem recomendada</h3>
+    <p data-copy="robotPcbRecommendationText">Use as PCBs adaptadoras e o cabo flat IDC de 14 pinos quando eles estiverem disponíveis. O conector polarizado possui um lado correto para encaixar e reúne vários fios em um único cabo. Isso deixa a montagem mais simples e organizada. Faça todos os encaixes com a BitDogLab desligada.</p>
+  </div>
+
+  <div class="prose-block">
+    <h3 data-copy="manualRobotTitle">Opção com fios individuais, sem as PCBs</h3>
+    <p data-copy="manualRobotText">Use fios individuais entre a ponte H e o barramento inferior da BitDogLab. Mantenha a placa desligada e sem o cabo USB. Comece pelas três ligações de alimentação — VM, VCC e GND — e depois faça os sete sinais de controle. Leia o nome de cada pino e marque uma linha da tabela após conferir a ligação.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th data-copy="driverPin">Pino da TB6612FNG</th><th data-copy="boardPin">BitDogLab</th><th data-copy="purpose">Função</th></tr></thead>
+        <tbody>
+          <tr><td><code>VM</code></td><td><code>5V</code></td><td data-copy="motorPower">Alimentação dos motores fornecida pela placa</td></tr>
+          <tr><td><code>VCC</code></td><td><code>3V3</code></td><td data-copy="logicPower">Alimentação lógica</td></tr>
+          <tr><td><code>GND</code></td><td><code>GND</code></td><td data-copy="ground">Terra comum</td></tr>
+          <tr><td><code>AIN1</code></td><td><code>GP4</code></td><td data-copy="leftDirection1">Direção do canal A</td></tr>
+          <tr><td><code>AIN2</code></td><td><code>GP9</code></td><td data-copy="leftDirection2">Direção do canal A</td></tr>
+          <tr><td><code>PWMA</code></td><td><code>GP8</code></td><td data-copy="leftSpeed">Velocidade do canal A</td></tr>
+          <tr><td><code>BIN1</code></td><td><code>GP18</code></td><td data-copy="rightDirection1">Direção do canal B</td></tr>
+          <tr><td><code>BIN2</code></td><td><code>GP19</code></td><td data-copy="rightDirection2">Direção do canal B</td></tr>
+          <tr><td><code>PWMB</code></td><td><code>GP16</code></td><td data-copy="rightSpeed">Velocidade do canal B</td></tr>
+          <tr><td><code>STBY</code></td><td><code>GP20</code></td><td data-copy="standby">Habilitação da ponte H</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="prose-block">
+    <h3 data-copy="motorsTitle">Etapa 1 — Ligue os quatro motores</h3>
+    <p data-copy="motorIndependenceText">Separe os motores em dois grupos: os dois do lado esquerdo e os dois do lado direito. Ligue o grupo esquerdo às saídas AO1 e AO2 e o grupo direito às saídas BO1 e BO2. Os dois motores de cada lado devem receber os mesmos dois pontos de ligação; isso é uma ligação em paralelo. Se apenas um motor girar ao contrário no teste, desligue a placa e troque entre si os dois fios desse motor.</p>
+    <div class="table-wrap compact-table">
+      <table>
+        <thead><tr><th data-copy="driverOutput">Saída da ponte H</th><th data-copy="motorGroup">Motores</th><th data-copy="howConnect">Ligação</th></tr></thead>
+        <tbody>
+          <tr><td><code>AO1 / AO2</code></td><td data-copy="leftMotors">Dois motores do lado esquerdo</td><td data-copy="parallel">Em paralelo</td></tr>
+          <tr><td><code>BO1 / BO2</code></td><td data-copy="rightMotors">Dois motores do lado direito</td><td data-copy="parallel">Em paralelo</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="caution-text" data-copy="motorWireWarning"><strong>Atenção:</strong> jumpers Dupont servem para os sinais de controle. Nos motores e na alimentação de potência, use fios mais robustos, bem presos e com as partes metálicas isoladas.</p>
+  </div>
+
+  <div class="prose-block">
+    <h3 data-copy="mpuTitle">Etapa 2 — Ligue o sensor MPU6050</h3>
+    <p data-copy="mpuIntro">Escolha um dos dois conectores I²C superiores. Ligue VCC, GND, SDA e SCL usando somente os pinos desse conector. O sistema encontra o sensor automaticamente. Não misture SDA de um conector com SCL do outro.</p>
+    <div class="table-wrap compact-table">
+      <table>
+        <thead><tr><th data-copy="mpuPin">Pino do MPU6050</th><th data-copy="boardPin">BitDogLab</th></tr></thead>
+        <tbody>
+          <tr><td><code>VCC</code></td><td><code>3V3</code></td></tr>
+          <tr><td><code>GND</code></td><td><code>GND</code></td></tr>
+          <tr><td><code>SDA</code></td><td><code>GP0</code> (I²C0) <span data-copy="or">ou</span> <code>GP2</code> (I²C1)</td></tr>
+          <tr><td><code>SCL</code></td><td><code>GP1</code> (I²C0) <span data-copy="or">ou</span> <code>GP3</code> (I²C1)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="prose-block procedure-block">
+    <h3 data-copy="robotProcedureTitle">Etapa 3 — Confira e faça o primeiro teste</h3>
+    <ol>
+      <li data-copy="robotProcedure1">Com a placa ainda desligada, confirme VM em 5V, VCC em 3V3 e GND em GND.</li>
+      <li data-copy="robotProcedure2">Confira os sete sinais de controle da ponte H, uma linha de cada vez.</li>
+      <li data-copy="robotProcedure3">Puxe cada fio com cuidado para verificar se está firme. Nenhuma parte metálica deve tocar o pino vizinho.</li>
+      <li data-copy="robotProcedure4">Apoie o chassi de modo seguro, deixando as quatro rodas sem contato com a mesa.</li>
+      <li data-copy="robotProcedure5">Ligue a placa e teste os motores em baixa velocidade. Desligue imediatamente se um fio aquecer, surgir cheiro incomum ou o movimento for inesperado.</li>
+    </ol>
+  </div>
+
+  <div class="prose-block">
+    <h3 data-copy="robotCheckTitle">Como saber se funcionou</h3>
+    <p data-copy="robotCheckText">No primeiro teste, as duas rodas de cada lado devem girar no mesmo sentido e responder ao comando de velocidade. O programa também deve reconhecer o MPU6050 sem mostrar aviso de sensor desconectado.</p>
+    <p class="caution-text" data-copy="robotTroubleText"><strong>Se algo não funcionar:</strong> desligue a placa antes de tocar nos fios. Se um único motor girar ao contrário, troque os dois fios desse motor. Se um lado inteiro não girar, confira as saídas A ou B e os respectivos sinais de controle. Se o MPU6050 não aparecer, confira VCC, GND e o par SDA/SCL.</p>
+  </div>
+
+</section>

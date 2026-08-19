@@ -1,10 +1,10 @@
-// Auto-extracted from legacy generators.js into sound.js
+// Generators for sound blocks.
 'use strict';
 
 const NOTE_FREQUENCIES = {
-  'C4': 262, 'D4': 294, 'E4': 330, 'F4': 349, 'G4': 392, 'A4': 440, 'B4': 494,
-  'C5': 523, 'D5': 587, 'E5': 659, 'F5': 698, 'G5': 784, 'A5': 880, 'B5': 988,
-  'C6': 1047, 'D6': 1175, 'E6': 1319, 'F6': 1397, 'G6': 1568, 'A6': 1760, 'B6': 1976
+  'C4': 262, 'C#4': 277, 'D4': 294, 'D#4': 311, 'E4': 330, 'F4': 349, 'F#4': 370, 'G4': 392, 'G#4': 415, 'A4': 440, 'A#4': 466, 'B4': 494,
+  'C5': 523, 'C#5': 554, 'D5': 587, 'D#5': 622, 'E5': 659, 'F5': 698, 'F#5': 740, 'G5': 784, 'G#5': 831, 'A5': 880, 'A#5': 932, 'B5': 988,
+  'C6': 1047, 'C#6': 1109, 'D6': 1175, 'D#6': 1245, 'E6': 1319, 'F6': 1397, 'F#6': 1480, 'G6': 1568, 'G#6': 1661, 'A6': 1760, 'A#6': 1865, 'B6': 1976
 };
 
 Blockly.Python["nota_do"] = function(block) {
@@ -33,6 +33,41 @@ Blockly.Python["nota_la"] = function(block) {
 
 Blockly.Python["nota_si"] = function(block) {
   return ['B', Blockly.Python.ORDER_ATOMIC];
+};
+
+Blockly.Python["piano_interativo"] = function(block) {
+  return '';
+};
+
+Blockly.Python["temporizacao"] = function(block) {
+  return '';
+};
+
+// Piano note block (simple: note dropdown + volume)
+Blockly.Python["piano_nota"] = function(block) {
+  var note = block.getFieldValue('NOTE');
+  var volume = block.getFieldValue('VOLUME') || 50;
+  Blockly.Python.definitions_['import_pin'] = 'from machine import Pin';
+  Blockly.Python.definitions_['import_pwm'] = 'from machine import PWM';
+  Blockly.Python.definitions_['import_time'] = 'import time';
+  Blockly.Python.definitions_['setup_buzzer'] = 'buzzer = PWM(Pin(' + BitdogLabConfig.PINS.BUZZER + '))';
+  Blockly.Python.definitions_['setup_buzzer_mudo'] = '_buzzer_mudo = False';
+  var noteKey = note + '4';
+  var frequency = NOTE_FREQUENCIES[noteKey];
+  if (!frequency) return '';
+  var duty = Math.round(65535 * volume * 0.7 / 100);
+  var code = '# SOUND_BLOCK_START\n';
+  code += 'buzzer.duty_u16(0)\n';
+  code += 'buzzer.freq(' + frequency + ')\n';
+  code += 'buzzer.duty_u16(' + duty + ')\n';
+  code += 'time.sleep(0.5)\n';
+  code += 'buzzer.duty_u16(0)\n';
+  code += '# SOUND_BLOCK_END\n';
+  return code;
+};
+
+Blockly.Python["parar_piano"] = function(block) {
+  return Blockly.Python["parar_som"](block);
 };
 
 Blockly.Python["tocar_nota"] = function(block) {
@@ -174,27 +209,6 @@ Blockly.Python["parar_som"] = function(block) {
   return code;
 };
 
-Blockly.Python["tocar_repetidamente"] = function(block) {
-  var statements_do = Blockly.Python.statementToCode(block, 'DO');
-  if (!statements_do || statements_do.trim() === '') {
-    return '';
-  }
-  Blockly.Python.definitions_['import_pin'] = 'from machine import Pin';
-  Blockly.Python.definitions_['import_pwm'] = 'from machine import PWM';
-  Blockly.Python.definitions_['setup_buzzer'] = 'buzzer = PWM(Pin(' + BitdogLabConfig.PINS.BUZZER + '))';
-  var code = '# LOOP_BLOCK_START\n';
-  code += 'try:\n';
-  code += '    while True:\n';
-  var indentedCode = statements_do.replace(/^/gm, '  ');
-  code += indentedCode;
-  if (!indentedCode.endsWith('\n')) {
-    code += '\n';
-  }
-  code += 'finally:\n';
-  code += '    buzzer.duty_u16(0)  # Turn off buzzer when stopping\n';
-  code += '# LOOP_BLOCK_END\n';
-  return code;
-};
 
 Blockly.Python["bipe_curto"] = function(block) {
   Blockly.Python.definitions_['import_pin'] = 'from machine import Pin';
@@ -895,20 +909,20 @@ Blockly.Python["brilha_brilha_estrelinha"] = function(block) {
   var cfg = _getBuzzerDisplayConfig();
   if (cfg) {
     var notes = [
-      {freq: 392, duration: 400},
-      {freq: 392, duration: 400},
-      {freq: 294, duration: 400},
-      {freq: 294, duration: 400},
-      {freq: 330, duration: 400},
-      {freq: 330, duration: 400},
-      {freq: 294, duration: 800},
       {freq: 262, duration: 400},
       {freq: 262, duration: 400},
-      {freq: 494, duration: 400},
-      {freq: 494, duration: 400},
+      {freq: 392, duration: 400},
+      {freq: 392, duration: 400},
       {freq: 440, duration: 400},
       {freq: 440, duration: 400},
-      {freq: 392, duration: 800}
+      {freq: 392, duration: 800},
+      {freq: 349, duration: 400},
+      {freq: 349, duration: 400},
+      {freq: 330, duration: 400},
+      {freq: 330, duration: 400},
+      {freq: 294, duration: 400},
+      {freq: 294, duration: 400},
+      {freq: 262, duration: 800}
     ];
 
     code += 'buzzer.duty_u16(0)\n';
@@ -948,33 +962,33 @@ Blockly.Python["brilha_brilha_estrelinha"] = function(block) {
     code += '  pass\n';
   } else {
     code += 'buzzer.duty_u16(' + duty_cycle + ')\n';
-    code += 'buzzer.freq(392)\n';
+    code += 'buzzer.freq(262)\n';
+    code += 'time.sleep_ms(400)\n';
+    code += 'buzzer.freq(262)\n';
     code += 'time.sleep_ms(400)\n';
     code += 'buzzer.freq(392)\n';
     code += 'time.sleep_ms(400)\n';
-    code += 'buzzer.freq(294)\n';
+    code += 'buzzer.freq(392)\n';
     code += 'time.sleep_ms(400)\n';
-    code += 'buzzer.freq(294)\n';
+    code += 'buzzer.freq(440)\n';
     code += 'time.sleep_ms(400)\n';
-    code += 'buzzer.freq(330)\n';
+    code += 'buzzer.freq(440)\n';
     code += 'time.sleep_ms(400)\n';
-    code += 'buzzer.freq(330)\n';
-    code += 'time.sleep_ms(400)\n';
-    code += 'buzzer.freq(294)\n';
+    code += 'buzzer.freq(392)\n';
     code += 'time.sleep_ms(800)\n';
-    code += 'buzzer.freq(262)\n';
+    code += 'buzzer.freq(349)\n';
+    code += 'time.sleep_ms(400)\n';
+    code += 'buzzer.freq(349)\n';
+    code += 'time.sleep_ms(400)\n';
+    code += 'buzzer.freq(330)\n';
+    code += 'time.sleep_ms(400)\n';
+    code += 'buzzer.freq(330)\n';
+    code += 'time.sleep_ms(400)\n';
+    code += 'buzzer.freq(294)\n';
+    code += 'time.sleep_ms(400)\n';
+    code += 'buzzer.freq(294)\n';
     code += 'time.sleep_ms(400)\n';
     code += 'buzzer.freq(262)\n';
-    code += 'time.sleep_ms(400)\n';
-    code += 'buzzer.freq(494)\n';
-    code += 'time.sleep_ms(400)\n';
-    code += 'buzzer.freq(494)\n';
-    code += 'time.sleep_ms(400)\n';
-    code += 'buzzer.freq(440)\n';
-    code += 'time.sleep_ms(400)\n';
-    code += 'buzzer.freq(440)\n';
-    code += 'time.sleep_ms(400)\n';
-    code += 'buzzer.freq(392)\n';
     code += 'time.sleep_ms(800)\n';
     code += 'buzzer.duty_u16(0)\n';
   }
@@ -992,9 +1006,7 @@ Blockly.Python["natal_jingle_bells"] = function(block) {
   // Check if buzzer display is configured
   var hasDisplay = _getBuzzerDisplayConfig();
   if (hasDisplay) {
-    Blockly.Python.definitions_['import_i2c'] = 'from machine import I2C';
-    Blockly.Python.definitions_['import_ssd1306'] = 'from ssd1306 import SSD1306_I2C';
-    Blockly.Python.definitions_['setup_display'] = 'i2c = I2C(' + BitdogLabConfig.DISPLAY.I2C_BUS + ', scl=Pin(' + BitdogLabConfig.PINS.I2C_SCL + '), sda=Pin(' + BitdogLabConfig.PINS.I2C_SDA + '), freq=' + BitdogLabConfig.DISPLAY.I2C_FREQ + ')\noled = SSD1306_I2C(' + BitdogLabConfig.DISPLAY.WIDTH + ', ' + BitdogLabConfig.DISPLAY.HEIGHT + ', i2c)';
+    _setupDisplayForConfig(hasDisplay);
   }
 
   var volume = block.getFieldValue('VOLUME');
@@ -1056,9 +1068,7 @@ Blockly.Python["natal_noite_feliz"] = function(block) {
   // Check if buzzer display is configured
   var hasDisplay = _getBuzzerDisplayConfig();
   if (hasDisplay) {
-    Blockly.Python.definitions_['import_i2c'] = 'from machine import I2C';
-    Blockly.Python.definitions_['import_ssd1306'] = 'from ssd1306 import SSD1306_I2C';
-    Blockly.Python.definitions_['setup_display'] = 'i2c = I2C(' + BitdogLabConfig.DISPLAY.I2C_BUS + ', scl=Pin(' + BitdogLabConfig.PINS.I2C_SCL + '), sda=Pin(' + BitdogLabConfig.PINS.I2C_SDA + '), freq=' + BitdogLabConfig.DISPLAY.I2C_FREQ + ')\noled = SSD1306_I2C(' + BitdogLabConfig.DISPLAY.WIDTH + ', ' + BitdogLabConfig.DISPLAY.HEIGHT + ', i2c)';
+    _setupDisplayForConfig(hasDisplay);
   }
 
   var volume = block.getFieldValue('VOLUME');
@@ -1124,9 +1134,7 @@ Blockly.Python["natal_bate_sino"] = function(block) {
   // Check if buzzer display is configured
   var hasDisplay = _getBuzzerDisplayConfig();
   if (hasDisplay) {
-    Blockly.Python.definitions_['import_i2c'] = 'from machine import I2C';
-    Blockly.Python.definitions_['import_ssd1306'] = 'from ssd1306 import SSD1306_I2C';
-    Blockly.Python.definitions_['setup_display'] = 'i2c = I2C(' + BitdogLabConfig.DISPLAY.I2C_BUS + ', scl=Pin(' + BitdogLabConfig.PINS.I2C_SCL + '), sda=Pin(' + BitdogLabConfig.PINS.I2C_SDA + '), freq=' + BitdogLabConfig.DISPLAY.I2C_FREQ + ')\noled = SSD1306_I2C(' + BitdogLabConfig.DISPLAY.WIDTH + ', ' + BitdogLabConfig.DISPLAY.HEIGHT + ', i2c)';
+    _setupDisplayForConfig(hasDisplay);
   }
 
   var volume = block.getFieldValue('VOLUME');
@@ -1189,9 +1197,7 @@ Blockly.Python["natal_noel"] = function(block) {
   // Check if buzzer display is configured
   var hasDisplay = _getBuzzerDisplayConfig();
   if (hasDisplay) {
-    Blockly.Python.definitions_['import_i2c'] = 'from machine import I2C';
-    Blockly.Python.definitions_['import_ssd1306'] = 'from ssd1306 import SSD1306_I2C';
-    Blockly.Python.definitions_['setup_display'] = 'i2c = I2C(' + BitdogLabConfig.DISPLAY.I2C_BUS + ', scl=Pin(' + BitdogLabConfig.PINS.I2C_SCL + '), sda=Pin(' + BitdogLabConfig.PINS.I2C_SDA + '), freq=' + BitdogLabConfig.DISPLAY.I2C_FREQ + ')\noled = SSD1306_I2C(' + BitdogLabConfig.DISPLAY.WIDTH + ', ' + BitdogLabConfig.DISPLAY.HEIGHT + ', i2c)';
+    _setupDisplayForConfig(hasDisplay);
   }
 
   var volume = block.getFieldValue('VOLUME');
@@ -1257,9 +1263,7 @@ Blockly.Python["natal_o_vinde"] = function(block) {
   // Check if buzzer display is configured
   var hasDisplay = _getBuzzerDisplayConfig();
   if (hasDisplay) {
-    Blockly.Python.definitions_['import_i2c'] = 'from machine import I2C';
-    Blockly.Python.definitions_['import_ssd1306'] = 'from ssd1306 import SSD1306_I2C';
-    Blockly.Python.definitions_['setup_display'] = 'i2c = I2C(' + BitdogLabConfig.DISPLAY.I2C_BUS + ', scl=Pin(' + BitdogLabConfig.PINS.I2C_SCL + '), sda=Pin(' + BitdogLabConfig.PINS.I2C_SDA + '), freq=' + BitdogLabConfig.DISPLAY.I2C_FREQ + ')\noled = SSD1306_I2C(' + BitdogLabConfig.DISPLAY.WIDTH + ', ' + BitdogLabConfig.DISPLAY.HEIGHT + ', i2c)';
+    _setupDisplayForConfig(hasDisplay);
   }
 
   var volume = block.getFieldValue('VOLUME');
@@ -1326,9 +1330,7 @@ Blockly.Python["criar_melodia"] = function(block) {
   // Check if buzzer display is configured
   var hasDisplay = _getBuzzerDisplayConfig();
   if (hasDisplay) {
-    Blockly.Python.definitions_['import_i2c'] = 'from machine import I2C';
-    Blockly.Python.definitions_['import_ssd1306'] = 'from ssd1306 import SSD1306_I2C';
-    Blockly.Python.definitions_['setup_display'] = 'i2c = I2C(' + BitdogLabConfig.DISPLAY.I2C_BUS + ', scl=Pin(' + BitdogLabConfig.PINS.I2C_SCL + '), sda=Pin(' + BitdogLabConfig.PINS.I2C_SDA + '), freq=' + BitdogLabConfig.DISPLAY.I2C_FREQ + ')\noled = SSD1306_I2C(' + BitdogLabConfig.DISPLAY.WIDTH + ', ' + BitdogLabConfig.DISPLAY.HEIGHT + ', i2c)';
+    _setupDisplayForConfig(hasDisplay);
   }
 
   for (var i = 0; i < block.noteSteps_; i++) {
@@ -1410,53 +1412,4 @@ Blockly.Python["criar_trilha_sonora"] = function(block) {
     }
   }
   return code;
-};
-
-Blockly.Python["rtttl_play"] = function(block) {
-  var pin = Blockly.Python.valueToCode(block, 'pin', Blockly.Python.ORDER_ATOMIC);
-  var song = Blockly.Python.valueToCode(block, 'song', Blockly.Python.ORDER_ATOMIC);
-  Blockly.Python.definitions_['import_pin'] = 'from machine import Pin';
-  Blockly.Python.definitions_['import_rtttl'] = 'import rtttl, songs';
-  var code = 'play = rtttl.play(Pin(' + pin + ', Pin.OUT), songs.find(' + song + ')) \n';
-  return code;
-};
-
-Blockly.Python["tone"] = function(block) {
-  var value_pin = Blockly.Python.valueToCode(block, 'pin', Blockly.Python.ORDER_ATOMIC);
-  var value_frequency = Blockly.Python.valueToCode(block, 'frequency', Blockly.Python.ORDER_ATOMIC);
-  var d = Blockly.Python.valueToCode(block, 'duration', Blockly.Python.ORDER_ATOMIC);
-  Blockly.Python.definitions_['import_pin'] = 'from machine import Pin';
-  Blockly.Python.definitions_['import_pwm'] = 'from machine import PWM';
-  Blockly.Python.definitions_['import_time'] = 'import time';
-  var x = value_pin.replace('(', '').replace(')', '');
-  var code = 'pwm' + x + ' = PWM(Pin(' + x + '), freq=' + value_frequency + ', ' + ' duty=512)\n';
-  var d1 = parseFloat(d);
-  if (d1 == 0)
-    code += '';
-  else
-    code += 'time.sleep(' + d + ')\npwm' + x + '.deinit()\n';
-  return code;
-};
-
-Blockly.Python["note"] = function(block) {
-  var value_pin = Blockly.Python.valueToCode(block, 'pin', Blockly.Python.ORDER_ATOMIC);
-  var value_frequency = Blockly.Python.valueToCode(block, 'note', Blockly.Python.ORDER_ATOMIC);
-  var d = Blockly.Python.valueToCode(block, 'duration', Blockly.Python.ORDER_ATOMIC);
-  Blockly.Python.definitions_['import_pin'] = 'from machine import Pin';
-  Blockly.Python.definitions_['import_pwm'] = 'from machine import PWM';
-  Blockly.Python.definitions_['import_time'] = 'import time';
-  var x = value_pin.replace('(', '').replace(')', '');
-  var code = 'pwm' + x + ' = PWM(Pin(' + x + '), freq=' + value_frequency + ', ' + ' duty=512)\n';
-  var d1 = parseFloat(d);
-  if (d1 == 0)
-    code += '';
-  else
-    code += 'time.sleep(' + d + ')\npwm' + x + '.deinit()\n';
-  return code;
-};
-
-Blockly.Python["tone_type"] = function(block) {
-  var dropdown_tone = block.getFieldValue('tone');
-  var code = dropdown_tone;
-  return [code, Blockly.Python.ORDER_NONE]; // Fixed: was Blockly.JavaScript.ORDER_NONE
 };

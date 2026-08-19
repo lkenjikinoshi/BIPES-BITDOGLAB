@@ -16,6 +16,136 @@
 var SensorLibs = {
 
   // =============================================
+  // SSD1306 - Display OLED I2C pequeno
+  // Fonte: firmware/PyLibs/ssd1306.py
+  // =============================================
+  SSD1306: `from micropython import const
+import time
+import framebuf
+
+SET_CONTRAST        = const(0x81)
+SET_ENTIRE_ON       = const(0xa4)
+SET_NORM_INV        = const(0xa6)
+SET_DISP            = const(0xae)
+SET_MEM_ADDR        = const(0x20)
+SET_COL_ADDR        = const(0x21)
+SET_PAGE_ADDR       = const(0x22)
+SET_DISP_START_LINE = const(0x40)
+SET_SEG_REMAP       = const(0xa0)
+SET_MUX_RATIO       = const(0xa8)
+SET_COM_OUT_DIR     = const(0xc0)
+SET_DISP_OFFSET     = const(0xd3)
+SET_COM_PIN_CFG     = const(0xda)
+SET_DISP_CLK_DIV    = const(0xd5)
+SET_PRECHARGE       = const(0xd9)
+SET_VCOM_DESEL      = const(0xdb)
+SET_CHARGE_PUMP     = const(0x8d)
+
+class SSD1306:
+  def __init__(self, width, height, external_vcc):
+    self.width = width
+    self.height = height
+    self.external_vcc = external_vcc
+    self.pages = self.height // 8
+    self.poweron()
+    self.init_display()
+
+  def init_display(self):
+    for cmd in (
+      SET_DISP | 0x00,
+      SET_MEM_ADDR, 0x00,
+      SET_DISP_START_LINE | 0x00,
+      SET_SEG_REMAP | 0x01,
+      SET_MUX_RATIO, self.height - 1,
+      SET_COM_OUT_DIR | 0x08,
+      SET_DISP_OFFSET, 0x00,
+      SET_COM_PIN_CFG, 0x02 if self.height == 32 else 0x12,
+      SET_DISP_CLK_DIV, 0x80,
+      SET_PRECHARGE, 0x22 if self.external_vcc else 0xf1,
+      SET_VCOM_DESEL, 0x30,
+      SET_CONTRAST, 0xff,
+      SET_ENTIRE_ON,
+      SET_NORM_INV,
+      SET_CHARGE_PUMP, 0x10 if self.external_vcc else 0x14,
+      SET_DISP | 0x01):
+      self.write_cmd(cmd)
+    self.fill(0)
+    self.show()
+
+  def poweroff(self):
+    self.write_cmd(SET_DISP | 0x00)
+
+  def contrast(self, contrast):
+    self.write_cmd(SET_CONTRAST)
+    self.write_cmd(contrast)
+
+  def invert(self, invert):
+    self.write_cmd(SET_NORM_INV | (invert & 1))
+
+  def show(self):
+    x0 = 0
+    x1 = self.width - 1
+    if self.width == 64:
+      x0 += 32
+      x1 += 32
+    self.write_cmd(SET_COL_ADDR)
+    self.write_cmd(x0)
+    self.write_cmd(x1)
+    self.write_cmd(SET_PAGE_ADDR)
+    self.write_cmd(0)
+    self.write_cmd(self.pages - 1)
+    self.write_framebuf()
+
+  def fill(self, col):
+    self.framebuf.fill(col)
+
+  def fill_rect(self, x, y, w, h, col):
+    self.framebuf.fill_rect(x, y, w, h, col)
+
+  def pixel(self, x, y, col):
+    self.framebuf.pixel(x, y, col)
+
+  def hline(self, x, y, w, col):
+    self.framebuf.hline(x, y, w, col)
+
+  def vline(self, x, y, h, col):
+    self.framebuf.vline(x, y, h, col)
+
+  def line(self, x1, y1, x2, y2, col):
+    self.framebuf.line(x1, y1, x2, y2, col)
+
+  def rect(self, x, y, w, h, col):
+    self.framebuf.rect(x, y, w, h, col)
+
+  def scroll(self, dx, dy):
+    self.framebuf.scroll(dx, dy)
+
+  def text(self, string, x, y, col=1):
+    self.framebuf.text(string, x, y, col)
+
+class SSD1306_I2C(SSD1306):
+  def __init__(self, width, height, i2c, addr=0x3c, external_vcc=False):
+    self.i2c = i2c
+    self.addr = addr
+    self.temp = bytearray(2)
+    self.buffer = bytearray(((height // 8) * width) + 1)
+    self.buffer[0] = 0x40
+    self.framebuf = framebuf.FrameBuffer1(memoryview(self.buffer)[1:], width, height)
+    super().__init__(width, height, external_vcc)
+
+  def write_cmd(self, cmd):
+    self.temp[0] = 0x80
+    self.temp[1] = cmd
+    self.i2c.writeto(self.addr, self.temp)
+
+  def write_framebuf(self):
+    self.i2c.writeto(self.addr, self.buffer)
+
+  def poweron(self):
+    pass
+`,
+
+  // =============================================
   // AHT20 — Sensor de Temperatura e Umidade
   // Fonte: firmware/PyLibs/AHT20.py
   // =============================================
@@ -44,6 +174,89 @@ var SensorLibs = {
     '      t = (((d[3] & 0x0F) << 16) | (d[4] << 8) | d[5]) * 200 / 0x100000 - 50\n' +
     '      return round(t, 1), round(h, 1)\n' +
     '    except: return None, None\n',
+
+  // =============================================
+  // MPU6050 - Giroscopio/acelerometro do robo movel
+  // Fonte: firmware/PyLibs/MPU6050.py
+  // =============================================
+  MPU6050:
+    'MPU6050_ADDR = 0x68\n' +
+    'class MPU6050:\n' +
+    '  def __init__(self, i2c, addr=MPU6050_ADDR):\n' +
+    '    self.i2c = i2c\n' +
+    '    self.addr = addr\n' +
+    '    self.offset_z = 0.0\n' +
+    '    self.is_ready = False\n' +
+    '    try:\n' +
+    '      self.i2c.writeto_mem(self.addr, 0x6B, b"\\x00")\n' +
+    '      self.i2c.writeto_mem(self.addr, 0x1B, b"\\x00")\n' +
+    '      self.i2c.writeto_mem(self.addr, 0x1C, b"\\x00")\n' +
+    '      self.is_ready = True\n' +
+    '    except Exception as exc:\n' +
+    '      print("MPU6050: erro ao inicializar:", exc)\n' +
+    '  def _read_i16(self, reg):\n' +
+    '    data = self.i2c.readfrom_mem(self.addr, reg, 2)\n' +
+    '    value = (data[0] << 8) | data[1]\n' +
+    '    return value - 65536 if value > 32767 else value\n' +
+    '  def _gyro_dps(self, reg):\n' +
+    '    return self._read_i16(reg) / 131.0\n' +
+    '  def _accel_g(self, reg):\n' +
+    '    return self._read_i16(reg) / 16384.0\n' +
+    '  def gz(self):\n' +
+    '    if not self.is_ready: return 0.0\n' +
+    '    return self._gyro_dps(0x47) - self.offset_z\n' +
+    '  def ax(self):\n' +
+    '    return self._accel_g(0x3B) if self.is_ready else 0.0\n' +
+    '  def ay(self):\n' +
+    '    return self._accel_g(0x3D) if self.is_ready else 0.0\n' +
+    '  def az(self):\n' +
+    '    return self._accel_g(0x3F) if self.is_ready else 0.0\n' +
+    '  def calibrate(self, samples=300, delay=5):\n' +
+    '    if not self.is_ready: return False\n' +
+    '    total = 0.0\n' +
+    '    for _ in range(samples):\n' +
+    '      total += self._gyro_dps(0x47)\n' +
+    '      sleep_ms(delay)\n' +
+    '    self.offset_z = total / samples\n' +
+    '    return True\n',
+
+  // =============================================
+  // INA226 - Sensor de tensao/corrente do robo movel
+  // Fonte: firmware/PyLibs/INA226.py
+  // =============================================
+  INA226:
+    'INA226_ADDR = 0x40\n' +
+    'CONFIG_REG = 0x00\n' +
+    'SHUNT_VOLTAGE_REG = 0x01\n' +
+    'BUS_VOLTAGE_REG = 0x02\n' +
+    'class INA226:\n' +
+    '  def __init__(self, i2c, addr=0x40, shunt_resistor=0.1):\n' +
+    '    self.i2c = i2c\n' +
+    '    self.addr = addr\n' +
+    '    self.shunt_resistor = shunt_resistor\n' +
+    '    self.is_ready = False\n' +
+    '    try:\n' +
+    '      self.configure()\n' +
+    '      self.is_ready = True\n' +
+    '    except Exception as exc:\n' +
+    '      print("INA226: erro ao inicializar:", exc)\n' +
+    '  def _write_register(self, reg, value):\n' +
+    '    self.i2c.writeto_mem(self.addr, reg, bytearray([(value >> 8) & 0xFF, value & 0xFF]))\n' +
+    '  def _read_register(self, reg):\n' +
+    '    data = self.i2c.readfrom_mem(self.addr, reg, 2)\n' +
+    '    return (data[0] << 8) | data[1]\n' +
+    '  def _read_signed_register(self, reg):\n' +
+    '    value = self._read_register(reg)\n' +
+    '    return value - 65536 if value > 32767 else value\n' +
+    '  def configure(self):\n' +
+    '    self._write_register(CONFIG_REG, 0x4127)\n' +
+    '  def voltage(self):\n' +
+    '    if not self.is_ready: return 0.0\n' +
+    '    return self._read_register(BUS_VOLTAGE_REG) * 1.25 / 1000\n' +
+    '  def current(self):\n' +
+    '    if not self.is_ready or self.shunt_resistor == 0: return 0.0\n' +
+    '    shunt_voltage = self._read_signed_register(SHUNT_VOLTAGE_REG) * 2.5 / 1000000\n' +
+    '    return -(shunt_voltage / self.shunt_resistor)\n',
 
   // =============================================
   // SH1107 - Display OLED I2C
@@ -180,6 +393,179 @@ class SH1107_I2C(SH1107):
       time.sleep_ms(20)
       self.res(1)
       time.sleep_ms(20)
+`,
+
+  // =============================================
+  // DHT11 - Sensor digital de temperatura e umidade
+  // Protocolo validado na BitDogLab com o DHT11 externo.
+  // =============================================
+  DHT11: `from machine import Pin
+import time
+
+class DHT11:
+  def __init__(self, pin):
+    self.pin = pin
+    self.buf = bytearray(5)
+    self.pin.init(Pin.OUT)
+    self.pin.value(1)
+    time.sleep_ms(1000)
+
+  def measure(self):
+    pin = self.pin
+    buf = self.buf
+
+    for index in range(5):
+      buf[index] = 0
+
+    pin.init(Pin.OUT)
+    pin.value(0)
+    time.sleep_ms(20)
+    pin.value(1)
+    pin.init(Pin.IN, Pin.PULL_UP)
+
+    start = time.ticks_us()
+    while pin.value():
+      if time.ticks_diff(time.ticks_us(), start) > 150:
+        raise OSError("DHT11: sensor nao respondeu")
+
+    start = time.ticks_us()
+    while not pin.value():
+      if time.ticks_diff(time.ticks_us(), start) > 150:
+        raise OSError("DHT11: timeout na resposta LOW")
+
+    start = time.ticks_us()
+    while pin.value():
+      if time.ticks_diff(time.ticks_us(), start) > 150:
+        raise OSError("DHT11: timeout na resposta HIGH")
+
+    for index in range(40):
+      start = time.ticks_us()
+      while not pin.value():
+        if time.ticks_diff(time.ticks_us(), start) > 100:
+          raise OSError("DHT11: timeout LOW no bit {}".format(index))
+
+      start = time.ticks_us()
+      while pin.value():
+        if time.ticks_diff(time.ticks_us(), start) > 100:
+          raise OSError("DHT11: timeout HIGH no bit {}".format(index))
+
+      duration = time.ticks_diff(time.ticks_us(), start)
+      bit = 1 if duration > 40 else 0
+      byte_index = index // 8
+      buf[byte_index] = ((buf[byte_index] << 1) | bit) & 0xFF
+
+    checksum = (buf[0] + buf[1] + buf[2] + buf[3]) & 0xFF
+    if checksum != buf[4]:
+      raise OSError("DHT11: checksum incorreto {}".format(list(buf)))
+
+  def humidity(self):
+    return self.buf[0] + self.buf[1] / 10.0
+
+  def temperature(self):
+    return self.buf[2] + self.buf[3] / 10.0
+`,
+
+  // =============================================
+  // BMP280 - Sensor de temperatura e pressao via I2C
+  // Fonte: firmware/PyLibs/BMP280.py
+  // =============================================
+  BMP280: `from machine import I2C
+import time
+
+BMP280_ADDR = 0x77
+
+class BMP280:
+  def __init__(self, i2c, addr=BMP280_ADDR):
+    self.i2c = i2c
+    self.addr = addr
+    self.is_ready = False
+    self.cal_params = {}
+    self.t_fine = 0
+    self._initialize_sensor()
+
+  def _initialize_sensor(self):
+    try:
+      chip_id = self.i2c.readfrom_mem(self.addr, 0xD0, 1)[0]
+      if chip_id in (0x58, 0x60):
+        self._read_calibration_params()
+        self.i2c.writeto_mem(self.addr, 0xF4, b"\\x27")
+        self.is_ready = True
+        print("BMP/BME280: sensor pronto (ID: {})".format(hex(chip_id)))
+      else:
+        print("BMP280: ID de chip inesperado: {}".format(hex(chip_id)))
+    except OSError as exc:
+      print("BMP280: erro de comunicacao I2C:", exc)
+      self.is_ready = False
+
+  def _read_word_le(self, reg, signed=False):
+    data = self.i2c.readfrom_mem(self.addr, reg, 2)
+    value = data[0] | (data[1] << 8)
+    if signed and value > 32767:
+      value -= 65536
+    return value
+
+  def _read_calibration_params(self):
+    self.cal_params["dig_T1"] = self._read_word_le(0x88)
+    self.cal_params["dig_T2"] = self._read_word_le(0x8A, signed=True)
+    self.cal_params["dig_T3"] = self._read_word_le(0x8C, signed=True)
+    self.cal_params["dig_P1"] = self._read_word_le(0x8E)
+    self.cal_params["dig_P2"] = self._read_word_le(0x90, signed=True)
+    self.cal_params["dig_P3"] = self._read_word_le(0x92, signed=True)
+    self.cal_params["dig_P4"] = self._read_word_le(0x94, signed=True)
+    self.cal_params["dig_P5"] = self._read_word_le(0x96, signed=True)
+    self.cal_params["dig_P6"] = self._read_word_le(0x98, signed=True)
+    self.cal_params["dig_P7"] = self._read_word_le(0x9A, signed=True)
+    self.cal_params["dig_P8"] = self._read_word_le(0x9C, signed=True)
+    self.cal_params["dig_P9"] = self._read_word_le(0x9E, signed=True)
+
+  def _compensate_temperature(self, adc_t):
+    dig_t1 = self.cal_params["dig_T1"]
+    dig_t2 = self.cal_params["dig_T2"]
+    dig_t3 = self.cal_params["dig_T3"]
+    var1 = (adc_t / 16384.0 - dig_t1 / 1024.0) * dig_t2
+    var2 = ((adc_t / 131072.0 - dig_t1 / 8192.0) ** 2) * dig_t3
+    self.t_fine = int(var1 + var2)
+    return (var1 + var2) / 5120.0
+
+  def _compensate_pressure(self, adc_p):
+    dig_p1 = self.cal_params["dig_P1"]
+    dig_p2 = self.cal_params["dig_P2"]
+    dig_p3 = self.cal_params["dig_P3"]
+    dig_p4 = self.cal_params["dig_P4"]
+    dig_p5 = self.cal_params["dig_P5"]
+    dig_p6 = self.cal_params["dig_P6"]
+    dig_p7 = self.cal_params["dig_P7"]
+    dig_p8 = self.cal_params["dig_P8"]
+    dig_p9 = self.cal_params["dig_P9"]
+    var1 = self.t_fine / 2.0 - 64000.0
+    var2 = var1 * var1 * dig_p6 / 32768.0
+    var2 = var2 + var1 * dig_p5 * 2.0
+    var2 = var2 / 4.0 + dig_p4 * 65536.0
+    var1 = (dig_p3 * var1 * var1 / 524288.0 + dig_p2 * var1) / 524288.0
+    var1 = (1.0 + var1 / 32768.0) * dig_p1
+    if var1 == 0:
+      return 0
+    pressure = 1048576.0 - adc_p
+    pressure = ((pressure - var2 / 4096.0) * 6250.0) / var1
+    var1 = dig_p9 * pressure * pressure / 2147483648.0
+    var2 = pressure * dig_p8 / 32768.0
+    pressure = pressure + (var1 + var2 + dig_p7) / 16.0
+    return pressure / 100.0
+
+  def get_data(self):
+    if not self.is_ready:
+      return None, None
+    try:
+      self.i2c.writeto_mem(self.addr, 0xF4, b"\\x27")
+      time.sleep_ms(100)
+      temp_raw = self.i2c.readfrom_mem(self.addr, 0xFA, 3)
+      adc_t = (temp_raw[0] << 12) | (temp_raw[1] << 4) | (temp_raw[2] >> 4)
+      press_raw = self.i2c.readfrom_mem(self.addr, 0xF7, 3)
+      adc_p = (press_raw[0] << 12) | (press_raw[1] << 4) | (press_raw[2] >> 4)
+      return self._compensate_temperature(adc_t), self._compensate_pressure(adc_p)
+    except OSError as exc:
+      print("BMP280: erro na leitura:", exc)
+      return None, None
 `
 
 };

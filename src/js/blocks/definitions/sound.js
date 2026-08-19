@@ -1,14 +1,34 @@
 // ==========================================
 // Category: Musical Notes
 // ==========================================
+// Use international note names when English is active
+var __isEnglishNotes = (typeof Code !== 'undefined' && Code.LANG === 'en');
+var __noteLabel = {
+  do: __isEnglishNotes ? '🎵 C' : '🎵 Dó',
+  re: __isEnglishNotes ? '👑 D' : '👑 Ré',
+  mi: __isEnglishNotes ? '🐱 E' : '🐱 Mi',
+  fa: __isEnglishNotes ? '🧚‍♀️ F' : '🧚‍♀️ Fá',
+  sol: __isEnglishNotes ? '☀️ G' : '☀️ Sol',
+  la: __isEnglishNotes ? '⭐ A' : '⭐ Lá',
+  si: __isEnglishNotes ? '👍 B' : '👍 Si'
+};
+var __noteTooltip = {
+  do: __isEnglishNotes ? 'Note C' : 'Nota Dó',
+  re: __isEnglishNotes ? 'Note D' : 'Nota Ré',
+  mi: __isEnglishNotes ? 'Note E' : 'Nota Mi',
+  fa: __isEnglishNotes ? 'Note F' : 'Nota Fá',
+  sol: __isEnglishNotes ? 'Note G' : 'Nota Sol',
+  la: __isEnglishNotes ? 'Note A' : 'Nota Lá',
+  si: __isEnglishNotes ? 'Note B' : 'Nota Si'
+};
 // Do note block for musical notes
 Blockly.Blocks['nota_do'] = {
   init: function() {
     this.appendDummyInput()
-        .appendField("🎵 Dó");
+        .appendField(__noteLabel.do);
     this.setOutput(true, "Note");
     this.setColour("#EA2027");
-    this.setTooltip("Nota Dó");
+    this.setTooltip(__noteTooltip.do);
     this.setHelpUrl("");
   }
 };
@@ -16,10 +36,10 @@ Blockly.Blocks['nota_do'] = {
 Blockly.Blocks['nota_re'] = {
   init: function() {
     this.appendDummyInput()
-        .appendField("👑 Ré");
+        .appendField(__noteLabel.re);
     this.setOutput(true, "Note");
     this.setColour("#EE5A24");
-    this.setTooltip("Nota Ré");
+    this.setTooltip(__noteTooltip.re);
     this.setHelpUrl("");
   }
 };
@@ -27,10 +47,10 @@ Blockly.Blocks['nota_re'] = {
 Blockly.Blocks['nota_mi'] = {
   init: function() {
     this.appendDummyInput()
-        .appendField("🐱 Mi");
+        .appendField(__noteLabel.mi);
     this.setOutput(true, "Note");
     this.setColour("#FFC312");
-    this.setTooltip("Nota Mi");
+    this.setTooltip(__noteTooltip.mi);
     this.setHelpUrl("");
   }
 };
@@ -38,10 +58,10 @@ Blockly.Blocks['nota_mi'] = {
 Blockly.Blocks['nota_fa'] = {
   init: function() {
     this.appendDummyInput()
-        .appendField("🧚‍♀️ Fá");
+        .appendField(__noteLabel.fa);
     this.setOutput(true, "Note");
     this.setColour("#C4E538");
-    this.setTooltip("Nota Fá");
+    this.setTooltip(__noteTooltip.fa);
     this.setHelpUrl("");
   }
 };
@@ -49,10 +69,10 @@ Blockly.Blocks['nota_fa'] = {
 Blockly.Blocks['nota_sol'] = {
   init: function() {
     this.appendDummyInput()
-        .appendField("☀️ Sol");
+        .appendField(__noteLabel.sol);
     this.setOutput(true, "Note");
     this.setColour("#12CBC4");
-    this.setTooltip("Nota Sol");
+    this.setTooltip(__noteTooltip.sol);
     this.setHelpUrl("");
   }
 };
@@ -60,10 +80,10 @@ Blockly.Blocks['nota_sol'] = {
 Blockly.Blocks['nota_la'] = {
   init: function() {
     this.appendDummyInput()
-        .appendField("⭐ Lá");
+        .appendField(__noteLabel.la);
     this.setOutput(true, "Note");
     this.setColour("#833471");
-    this.setTooltip("Nota Lá");
+    this.setTooltip(__noteTooltip.la);
     this.setHelpUrl("");
   }
 };
@@ -71,13 +91,84 @@ Blockly.Blocks['nota_la'] = {
 Blockly.Blocks['nota_si'] = {
   init: function() {
     this.appendDummyInput()
-        .appendField("👍 Si");
+        .appendField(__noteLabel.si);
     this.setOutput(true, "Note");
     this.setColour("#FD7272");
-    this.setTooltip("Nota Si");
+    this.setTooltip(__noteTooltip.si);
     this.setHelpUrl("");
   }
 };
+// Interactive piano launcher block
+Blockly.Blocks['piano_interativo'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("🎹 Piano interativo");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour("#22c55e");
+    this.setTooltip("Abre um piano grande na tela. Ao clicar em uma tecla, o bloco da nota aparece na área de trabalho.");
+    this.setHelpUrl("");
+  }
+};
+// Timing launcher block (opens timing panel in the piano)
+Blockly.Blocks['temporizacao'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("♩ Temporização");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour("#f59e0b");
+    this.setTooltip("Abre as figuras rítmicas. Clique numa nota do piano e depois na figura para criar a nota com a duração certa.");
+    this.setHelpUrl("");
+  }
+};
+// Piano note block (simpler: just note + volume, no octave/duration)
+Blockly.Blocks['piano_nota'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("🎹 Tocar")
+        .appendField(new Blockly.FieldDropdown((__isEnglishNotes ? [
+          ["C", "C"], ["C#", "C#"],
+          ["D", "D"], ["D#", "D#"],
+          ["E", "E"],
+          ["F", "F"], ["F#", "F#"],
+          ["G", "G"], ["G#", "G#"],
+          ["A", "A"], ["A#", "A#"],
+          ["B", "B"]
+        ] : [
+          ["C (Dó)", "C"], ["C# (Dó#)", "C#"],
+          ["D (Ré)", "D"], ["D# (Ré#)", "D#"],
+          ["E (Mi)", "E"],
+          ["F (Fá)", "F"], ["F# (Fá#)", "F#"],
+          ["G (Sol)", "G"], ["G# (Sol#)", "G#"],
+          ["A (Lá)", "A"], ["A# (Lá#)", "A#"],
+          ["B (Si)", "B"]
+        ])), "NOTE")
+        .appendField("volume")
+        .appendField(new Blockly.FieldNumber(50, 0, 100), "VOLUME")
+        .appendField("%");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setInputsInline(true);
+    this.setColour("#22c55e");
+    this.setTooltip("Toca uma nota musical no buzzer (gerado pelo piano interativo)");
+    this.setHelpUrl("");
+  }
+};
+
+// Piano stop block
+Blockly.Blocks['parar_piano'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("🔇 Parar piano");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour("#22c55e");
+    this.setTooltip("Para o som do piano/buzzer.");
+    this.setHelpUrl("");
+  }
+};
+
 // ==========================================
 // Category: Sound
 // ==========================================
@@ -136,20 +227,6 @@ Blockly.Blocks['parar_som'] = {
     this.setNextStatement(true, null);
     this.setColour("#9a5ba5");
     this.setTooltip("Para o som do buzzer");
-    this.setHelpUrl("");
-  }
-};
-// Play repeatedly block
-Blockly.Blocks['tocar_repetidamente'] = {
-  init: function() {
-    this.appendDummyInput()
-        .appendField("🔁 Tocar repetidamente");
-    this.appendStatementInput("DO")
-        .setCheck(null);
-    this.setPreviousStatement(true, null);
-    this.setNextStatement(true, null);
-    this.setColour("#9a5ba5");
-    this.setTooltip("Toca os sons dentro deste bloco repetidamente em um loop infinito");
     this.setHelpUrl("");
   }
 };
@@ -691,7 +768,7 @@ Blockly.Blocks['criar_trilha_sonora'] = {
         }
         if (this.steps_[i] === 'action') {
           this.appendStatementInput('STEP' + i)
-              .setCheck(null)
+              .setCheck("SoundCommand")
               .appendField('🔊 Tocar:');
         } else {
           this.appendValueInput('STEP' + i)
@@ -702,3 +779,9 @@ Blockly.Blocks['criar_trilha_sonora'] = {
     }
   }
 };
+
+(function() {
+  if (Code.BlockTypeDomains) {
+    Code.BlockTypeDomains.applyPreviousCheck(Code.BlockTypeDomains.get('SOUND_COMMANDS'), 'SoundCommand');
+  }
+})();

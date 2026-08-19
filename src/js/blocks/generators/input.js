@@ -1,4 +1,4 @@
-// Auto-extracted from legacy generators.js into input.js
+// Generators for input blocks.
 'use strict';
 
 Blockly.Python["botao_enquanto_apertado"] = function(block) {
@@ -36,6 +36,8 @@ Blockly.Python["botao_enquanto_apertado"] = function(block) {
   }
   codigo_do = codigo_do.replace(/# SOUND_BLOCK_START|# SOUND_BLOCK_END/g, '');
   codigo_else = codigo_else.replace(/# SOUND_BLOCK_START|# SOUND_BLOCK_END/g, '');
+  codigo_do = codigo_do.replace(/# SETUP_BLOCK_START|# SETUP_BLOCK_END/g, '');
+  codigo_else = codigo_else.replace(/# SETUP_BLOCK_START|# SETUP_BLOCK_END/g, '');
   var code = '';
   code += 'if ' + variavel_botao + '.value() == 0:\n';
   if (codigo_do) {
@@ -101,6 +103,7 @@ Blockly.Python["botao_se_apertado"] = function(block) {
     codigo_do = codigo_do.replace(/^  /gm, '');
   }
   codigo_do = codigo_do.replace(/# SOUND_BLOCK_START|# SOUND_BLOCK_END/g, '');
+  codigo_do = codigo_do.replace(/# SETUP_BLOCK_START|# SETUP_BLOCK_END/g, '');
 
   // Inicializa flags e timestamp para debounce
   Blockly.Python.definitions_['flag_' + nome_botao] = 'flag_botao_' + nome_botao + ' = False';
@@ -140,15 +143,12 @@ Blockly.Python["botao_se_apertado"] = function(block) {
 
 Blockly.Python["microfone_testar"] = function(block) {
   var pins = BitdogLabConfig.PINS;
-  var display = BitdogLabConfig.DISPLAY;
+  _setupDisplayForBlock(block);
 
   Blockly.Python.definitions_['import_pin']       = 'from machine import Pin';
   Blockly.Python.definitions_['import_adc']       = 'from machine import ADC';
-  Blockly.Python.definitions_['import_i2c']       = 'from machine import I2C';
-  Blockly.Python.definitions_['import_ssd1306']   = 'from ssd1306 import SSD1306_I2C';
   Blockly.Python.definitions_['setup_mic']        = 'adc_mic = ADC(Pin(' + pins.MIC + '))';
   Blockly.Python.definitions_['setup_mic_offset'] = '_MIC_OFFSET = 32767';
-  Blockly.Python.definitions_['setup_display']    = 'i2c = I2C(' + display.I2C_BUS + ', scl=Pin(' + pins.I2C_SCL + '), sda=Pin(' + pins.I2C_SDA + '), freq=' + display.I2C_FREQ + ')\noled = SSD1306_I2C(' + display.WIDTH + ', ' + display.HEIGHT + ', i2c)';
 
   var code = '';
   // Pré-computar tudo antes dos comandos oled para evitar que o auto-inject
@@ -212,14 +212,11 @@ Blockly.Python["microfone_nivel_atual"] = function(_block) {
 
 Blockly.Python["microfone_barra_display"] = function(block) {
   var pins = BitdogLabConfig.PINS;
-  var display = BitdogLabConfig.DISPLAY;
+  _setupDisplayForBlock(block);
   Blockly.Python.definitions_['import_pin'] = 'from machine import Pin';
   Blockly.Python.definitions_['import_adc'] = 'from machine import ADC';
-  Blockly.Python.definitions_['import_i2c'] = 'from machine import I2C';
-  Blockly.Python.definitions_['import_ssd1306'] = 'from ssd1306 import SSD1306_I2C';
   Blockly.Python.definitions_['setup_mic'] = 'adc_mic = ADC(Pin(' + pins.MIC + '))';
   Blockly.Python.definitions_['setup_mic_offset'] = '_MIC_OFFSET = 32767';
-  Blockly.Python.definitions_['setup_display'] = 'i2c = I2C(' + display.I2C_BUS + ', scl=Pin(' + pins.I2C_SCL + '), sda=Pin(' + pins.I2C_SDA + '), freq=' + display.I2C_FREQ + ')\noled = SSD1306_I2C(' + display.WIDTH + ', ' + display.HEIGHT + ', i2c)';
   Blockly.Python.definitions_['setup_barra_pct'] = '_barra_pct = 0';
 
   var linha = block.getFieldValue('LINHA');
@@ -231,23 +228,20 @@ Blockly.Python["microfone_barra_display"] = function(block) {
   code += 'for _i in range(8):\n';
   code += '    _s = abs(adc_mic.read_u16() - _MIC_OFFSET)\n';
   code += '    if _s > _mic_peak: _mic_peak = _s\n';
-  code += '_barra_w = _mic_peak * 128 // 32767\n';
-  code += '_barra_pct = _barra_w * 100 // 128\n';
+  code += '_barra_w = _mic_peak * _display_width // 32767\n';
+  code += '_barra_pct = _barra_w * 100 // _display_width\n';
   code += 'oled.fill_rect(0, ' + y + ', _barra_w, 6, 1)\n';
-  code += 'oled.fill_rect(_barra_w, ' + y + ', 128 - _barra_w, 6, 0)\n';
+  code += 'oled.fill_rect(_barra_w, ' + y + ', _display_width - _barra_w, 6, 0)\n';
   return code;
 };
 
 Blockly.Python["microfone_contar_palmas"] = function(block) {
   var pins = BitdogLabConfig.PINS;
-  var display = BitdogLabConfig.DISPLAY;
+  _setupDisplayForBlock(block);
   Blockly.Python.definitions_['import_pin'] = 'from machine import Pin';
   Blockly.Python.definitions_['import_adc'] = 'from machine import ADC';
-  Blockly.Python.definitions_['import_i2c'] = 'from machine import I2C';
-  Blockly.Python.definitions_['import_ssd1306'] = 'from ssd1306 import SSD1306_I2C';
   Blockly.Python.definitions_['setup_mic'] = 'adc_mic = ADC(Pin(' + pins.MIC + '))';
   Blockly.Python.definitions_['setup_mic_offset'] = '_MIC_OFFSET = 32767';
-  Blockly.Python.definitions_['setup_display'] = 'i2c = I2C(' + display.I2C_BUS + ', scl=Pin(' + pins.I2C_SCL + '), sda=Pin(' + pins.I2C_SDA + '), freq=' + display.I2C_FREQ + ')\noled = SSD1306_I2C(' + display.WIDTH + ', ' + display.HEIGHT + ', i2c)';
   Blockly.Python.definitions_['import_time'] = 'import time';
   Blockly.Python.definitions_['setup_palmas'] = '_palmas = 0\n_mic_ultima_palma = 0';
 
@@ -267,7 +261,7 @@ Blockly.Python["microfone_contar_palmas"] = function(block) {
   code += 'if _mic_peak > 20000 and time.ticks_diff(_mic_agora_ms, _mic_ultima_palma) > 300:\n';
   code += '    _palmas += 1\n';
   code += '    _mic_ultima_palma = _mic_agora_ms\n';
-  code += 'oled.fill_rect(0, ' + y + ', ' + display.WIDTH + ', 8, 0)\n';
+  code += 'oled.fill_rect(0, ' + y + ', _display_width, 8, 0)\n';
   code += 'oled.text("Palmas: " + str(_palmas), 0, ' + y + ', 1)\n';
   return code;
 };

@@ -5,13 +5,7 @@ var LanguageManager = {};
 
 LanguageManager.LANGUAGE_NAME = {
   'en': 'English',
-  'pt-br': 'Português Brasileiro',
-  'es': 'Español',
-  'it': 'Italiano',
-  'fr': 'Français',
-  'de': 'Deutsch',
-  'zh-hans': 'Chinese (simplified)',
-  'zh-hant': 'Chinese (traditional)'
+  'pt-br': 'Português Brasileiro'
 };
 
 LanguageManager.LANGUAGE_RTL = ['ar', 'fa', 'he', 'lki'];
@@ -86,15 +80,12 @@ LanguageManager.initLanguage = function() {
 
   if (document.getElementById('tab_blocks')) document.getElementById('tab_blocks').textContent = MSG['blocks'];
   if (document.getElementById('tab_console')) document.getElementById('tab_console').textContent = MSG['console'] || 'Mensagens';
-  if (document.getElementById('tab_files')) document.getElementById('tab_files').textContent = MSG['files'];
   if (document.getElementById('tab_device')) document.getElementById('tab_device').textContent = MSG['device'];
-  if (document.getElementById('tab_databoard')) document.getElementById('tab_databoard').textContent = MSG['databoard'] || 'Dados';
 
-  if (document.getElementById('linkButton')) document.getElementById('linkButton').title = MSG['linkTooltip'];
   if (document.getElementById('runButton')) document.getElementById('runButton').title = MSG['runTooltip'];
   if (document.getElementById('saveButton')) document.getElementById('saveButton').title = MSG['saveTooltip'];
   if (document.getElementById('loadButton')) document.getElementById('loadButton').title = MSG['loadTooltip'];
-  if (document.getElementById('notificationButton')) document.getElementById('notificationButton').title = MSG['notificationTooltip'];
+  if (document.getElementById('trashButton')) document.getElementById('trashButton').title = MSG['trashTooltip'];
   if (document.getElementById('toolbarButton')) document.getElementById('toolbarButton').title = MSG['toolbarTooltip'];
 
   if (Code.translateDom) {
@@ -116,10 +107,6 @@ LanguageManager.initLanguage = function() {
   }
 };
 
-Code.LANGUAGE_NAME = LanguageManager.LANGUAGE_NAME;
-Code.LANGUAGE_RTL = LanguageManager.LANGUAGE_RTL;
-Code.getStringParamFromUrl = LanguageManager.getStringParamFromUrl;
-Code.getLang = LanguageManager.getLang;
 Code.isRtl = LanguageManager.isRtl;
 Code.changeLanguage = LanguageManager.changeLanguage;
 Code.initLanguage = LanguageManager.initLanguage;
@@ -127,7 +114,5 @@ Code.LANG = LanguageManager.getLang();
 
 if (!Code._translationScriptsInjected) {
   Code._translationScriptsInjected = true;
-  document.write('<script src="../translations/app/' + Code.LANG + '.js"></script>\n');
-  document.write('<script src="../translations/blockly/languages/' + Code.LANG + '.js"></script>\n');
-  document.write('<script src="../translations/custom/' + Code.LANG + '.js"></script>\n');
+  document.write('<script src="../translations/catalog.js?ver=20260817category2"></script>\n');
 }
