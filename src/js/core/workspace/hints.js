@@ -7,7 +7,10 @@ WorkspaceManager.ensureReminderStyle = function() {
   if (document.getElementById('runtime-reminder-style')) return;
   var style = document.createElement('style');
   style.id = 'runtime-reminder-style';
-  style.textContent = '@keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(400px); opacity: 0; } }';
+  style.textContent =
+    '@keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(400px); opacity: 0; } }' +
+    '@keyframes centeredReminderIn { from { transform: translate(-50%, -46%); opacity: 0; } to { transform: translate(-50%, -50%); opacity: 1; } }' +
+    '@keyframes centeredReminderOut { from { transform: translate(-50%, -50%); opacity: 1; } to { transform: translate(-50%, -46%); opacity: 0; } }';
   document.head.appendChild(style);
 };
 
@@ -22,8 +25,12 @@ WorkspaceManager.createReminder = function(options) {
   notification.id = options.id;
   notification.style.cssText = [
     'position: fixed',
-    'top: 20px',
-    'right: 20px',
+    options.centered
+      ? 'top: 50%'
+      : (options.bottom ? 'bottom: ' + options.bottom : 'top: ' + (options.top || '20px')),
+    options.centered
+      ? 'left: 50%'
+      : (options.left ? 'left: ' + options.left : 'right: ' + (options.right || '20px')),
     'background: ' + options.background,
     'color: white',
     'padding: 18px 45px 18px 20px',
@@ -31,10 +38,14 @@ WorkspaceManager.createReminder = function(options) {
     'box-shadow: 0 4px 12px rgba(0,0,0,0.3)',
     'z-index: 10000',
     'max-width: ' + (options.maxWidth || '450px'),
+    options.maxHeight ? 'max-height: ' + options.maxHeight : '',
+    options.maxHeight ? 'overflow-y: auto' : '',
+    options.maxHeight ? 'box-sizing: border-box' : '',
     'font-family: Arial, sans-serif',
     'font-size: 14px',
     'line-height: 1.6',
-    'animation: slideIn 0.3s ease-out'
+    options.centered ? 'transform: translate(-50%, -50%)' : '',
+    options.centered ? 'animation: centeredReminderIn 0.3s ease-out' : 'animation: slideIn 0.3s ease-out'
   ].join('; ');
   notification.innerHTML = options.html;
 
@@ -46,7 +57,9 @@ WorkspaceManager.createReminder = function(options) {
   var closeBtn = document.getElementById(options.closeId);
   closeBtn.addEventListener('click', function() {
     if (notification && notification.parentNode) {
-      notification.style.animation = 'slideOut 0.3s ease-in';
+      notification.style.animation = options.centered
+        ? 'centeredReminderOut 0.3s ease-in'
+        : 'slideOut 0.3s ease-in';
       setTimeout(function() {
         if (notification && notification.parentNode) {
           notification.parentNode.removeChild(notification);
@@ -143,17 +156,17 @@ WorkspaceManager.showServoConnectionReminder = function(block) {
   var boardImage = '../assets/images/devices/conexoes-externas.png';
   var servoImage = '../assets/images/devices/servo-motor.png';
   var wireRows = Code.LANG === 'en'
-    ? '<div style="margin:10px 0 6px;font-size:15px;font-weight:bold;">Servo wires</div>' +
+    ? '<div style="margin:10px 0 6px;font-size:15px;font-weight:bold;">Identify the servo wires</div>' +
       '<div style="display:grid; gap:7px; margin:0 0 10px;">' +
-      '<div style="background:#fff3e0;color:#4e342e;padding:8px;border-radius:5px;"><strong>Orange (signal)</strong> → V7: Connection 0 or 1 &nbsp;|&nbsp; V6: Connections 0, 1, 2 or 3</div>' +
-      '<div style="background:#ffebee;color:#7f0000;padding:8px;border-radius:5px;"><strong>Red — electrical power (VCC)</strong> → board 5V-VSYS contact (5 V power)</div>' +
-      '<div style="background:#efebe9;color:#3e2723;padding:8px;border-radius:5px;"><strong>Brown — negative/ground (GND)</strong> → board GND contact</div>' +
+      '<div style="background:#fff3e0;color:#4e342e;padding:8px;border-radius:5px;"><strong>Orange — signal:</strong> carries the movement command → BitDogLab V7: Connection 0 or Connection 1 &nbsp;|&nbsp; BitDogLab V6: Connection 0, 1, 2 or 3</div>' +
+      '<div style="background:#ffebee;color:#7f0000;padding:8px;border-radius:5px;"><strong>Red — VCC:</strong> electrical power → 5V-VSYS contact on the board</div>' +
+      '<div style="background:#efebe9;color:#3e2723;padding:8px;border-radius:5px;"><strong>Brown — GND:</strong> negative/ground → GND contact on the board</div>' +
       '</div>'
-    : '<div style="margin:10px 0 6px;font-size:15px;font-weight:bold;">Cabos do servo</div>' +
+    : '<div style="margin:10px 0 6px;font-size:15px;font-weight:bold;">Identifique os fios do servo</div>' +
       '<div style="display:grid; gap:7px; margin:0 0 10px;">' +
-      '<div style="background:#fff3e0;color:#4e342e;padding:8px;border-radius:5px;"><strong>Laranja — sinal do servo</strong> → placa V7: Conexão 0 ou 1 &nbsp;|&nbsp; placa V6: Conexão 0, 1, 2 ou 3</div>' +
-      '<div style="background:#ffebee;color:#7f0000;padding:8px;border-radius:5px;"><strong>Vermelho — alimentação elétrica (VCC)</strong> → contato 5V-VSYS da placa — alimentação de 5 V</div>' +
-      '<div style="background:#efebe9;color:#3e2723;padding:8px;border-radius:5px;"><strong>Marrom — negativo/terra (GND)</strong> → contato GND da placa</div>' +
+      '<div style="background:#fff3e0;color:#4e342e;padding:8px;border-radius:5px;"><strong>Laranja — sinal:</strong> leva o comando de movimento → BitDogLab V7: Conexão 0 ou Conexão 1 &nbsp;|&nbsp; BitDogLab V6: Conexão 0, 1, 2 ou 3</div>' +
+      '<div style="background:#ffebee;color:#7f0000;padding:8px;border-radius:5px;"><strong>Vermelho — VCC:</strong> alimentação elétrica → contato 5V-VSYS da placa</div>' +
+      '<div style="background:#efebe9;color:#3e2723;padding:8px;border-radius:5px;"><strong>Marrom — GND:</strong> negativo/terra → contato GND da placa</div>' +
       '</div>';
   var html = Code.LANG === 'en'
     ? WorkspaceManager.closeButton(closeId) +
@@ -164,10 +177,10 @@ WorkspaceManager.showServoConnectionReminder = function(block) {
       '<img src="' + servoImage + '" alt="SG90 servo motor" style="width:42%;max-height:180px;object-fit:contain;background:white;border-radius:6px;">' +
       '</div>' + wireRows +
       '<div style="background:rgba(0,0,0,.16);padding:10px;border-radius:5px;">' +
-      '<strong>Build this connection sequence:</strong> servo plug → male-to-male jumper → alligator clip → board contact.<br>' +
-      'Turn the board off first and keep neighboring clips from touching.<br>' +
-      '<strong>Insulate the jumper-to-alligator connection with electrical tape</strong> so exposed metal cannot cause a short circuit.</div>' +
-      '<div style="margin-top:9px;"><strong>Important:</strong> do not connect the red wire to the board 3V3 contact (3.3 V power). Ask a teacher to check the wires before powering the board.</div>' +
+      '<strong>Connect in this order:</strong><br>1. Turn the board off and disconnect the USB cable.<br>2. For each wire: servo plug → male-to-male jumper → alligator clip → correct board contact.<br>3. Check that every colour reaches the contact shown above.<br>4. Insulate each jumper-to-clip joint with electrical tape.</div>' +
+      '<div style="margin-top:9px;background:#fff3e0;color:#4e342e;padding:9px;border-radius:5px;"><strong>Important:</strong> connect the red wire only to 5V-VSYS. Never connect it to 3V3.</div>' +
+      '<div style="margin-top:9px;background:#ffebee;color:#7f0000;padding:9px;border-radius:5px;"><strong>⚠️ Safety:</strong> do not let neighbouring clips touch. Cover every exposed metal part to prevent a short circuit.</div>' +
+      '<div style="margin-top:9px;"><strong>Before powering the board, ask a teacher to check all three wires.</strong></div>' +
       '</div>'
     : WorkspaceManager.closeButton(closeId) +
       '<div style="max-height:calc(100vh - 90px);overflow-y:auto;padding-right:4px;">' +
@@ -177,10 +190,10 @@ WorkspaceManager.showServoConnectionReminder = function(block) {
       '<img src="' + servoImage + '" alt="Servo motor SG90" style="width:42%;max-height:180px;object-fit:contain;background:white;border-radius:6px;">' +
       '</div>' + wireRows +
       '<div style="background:rgba(0,0,0,.16);padding:10px;border-radius:5px;">' +
-      '<strong>Monte esta sequência de ligação:</strong> plugue do servo → jumper macho-macho → garra jacaré → contato da placa.<br>' +
-      'Primeiro desligue a placa e não deixe garras vizinhas se encostarem.<br>' +
-      '<strong>Isole a união do jumper com a garra jacaré usando fita isolante</strong> para nenhum metal exposto causar curto-circuito.</div>' +
-      '<div style="margin-top:9px;"><strong>Importante:</strong> não ligue o fio vermelho no contato 3V3 da placa — alimentação de 3,3 V. Peça a um professor para conferir os fios antes de ligar a placa.</div>' +
+      '<strong>Monte nesta ordem:</strong><br>1. Desligue a placa e retire o cabo USB.<br>2. Para cada fio: plugue do servo → jumper macho-macho → garra jacaré → contato correto da placa.<br>3. Confira se cada cor chegou ao contato indicado acima.<br>4. Isole com fita isolante a união entre cada jumper e sua garra jacaré.</div>' +
+      '<div style="margin-top:9px;background:#fff3e0;color:#4e342e;padding:9px;border-radius:5px;"><strong>Importante:</strong> ligue o fio vermelho somente ao contato 5V-VSYS. Nunca ligue esse fio ao contato 3V3.</div>' +
+      '<div style="margin-top:9px;background:#ffebee;color:#7f0000;padding:9px;border-radius:5px;"><strong>⚠️ Segurança:</strong> não deixe garras vizinhas se encostarem. Cubra todo metal exposto para evitar curto-circuito.</div>' +
+      '<div style="margin-top:9px;"><strong>Antes de ligar a placa, peça ao professor para conferir os três fios.</strong></div>' +
       '</div>';
 
   WorkspaceManager.createReminder({
@@ -209,8 +222,94 @@ WorkspaceManager.bindServoCategoryHint = function() {
 
     var item = toolbox.getToolboxItemById(clickTarget.id);
     var categoryName = item && item.getName ? item.getName() : '';
-    if (categoryName === 'Servo externo' || categoryName === 'External Servo') {
+    if (categoryName === 'Servo Motor' || categoryName === 'External Servo') {
       Code.showServoConnectionReminder();
+    }
+  });
+};
+
+WorkspaceManager.showExternalContactReminder = function(block) {
+  var closeId = 'closeExternalContactNotification';
+  var boardImage = '../assets/images/devices/conexoes-externas.png';
+  var contactImage = '../assets/images/devices/external-contacts.png';
+  var warningText = block && block.__bitdoglabContractWarningText
+    ? String(block.__bitdoglabContractWarningText)
+    : '';
+  var problemLine = warningText
+    ? (Code.LANG === 'en'
+      ? '<div style="background:#ffebee;color:#7f0000;padding:9px;border-radius:6px;margin-bottom:10px;"><strong>Why the program was blocked:</strong><br>' + warningText + '</div>'
+      : '<div style="background:#ffebee;color:#7f0000;padding:9px;border-radius:6px;margin-bottom:10px;"><strong>Por que o programa foi bloqueado:</strong><br>' + warningText + '</div>')
+    : '';
+  var html = Code.LANG === 'en'
+    ? WorkspaceManager.closeButton(closeId) +
+      '<div style="max-height:calc(100vh - 90px);overflow-y:auto;padding-right:4px;">' +
+      '<strong style="font-size:18px;">🔌 How to build touch contacts</strong>' +
+      '<div style="display:flex;gap:12px;align-items:center;margin:12px 0;">' +
+      '<img src="' + boardImage + '" alt="External Connections" style="width:55%;max-height:180px;object-fit:contain;background:white;border-radius:6px;">' +
+      '<img src="' + contactImage + '" alt="Alligator clips making contact" style="width:40%;max-height:180px;object-fit:contain;background:white;border-radius:6px;">' +
+      '</div>' + problemLine +
+      '<div style="background:#fff3e0;color:#4e342e;padding:10px;border-radius:6px;margin-bottom:10px;"><strong>1. Prepare the project</strong><br>Start with <strong>Set up contacts</strong> near the beginning of the project. The other Contact blocks will not compile without it.</div>' +
+      '<div style="display:grid;gap:7px;margin-bottom:10px;">' +
+      '<div style="background:#e8f5e9;color:#1b5e20;padding:9px;border-radius:6px;"><strong>2. Choose the shared contact — GND is recommended.</strong><br>GND is the board reference contact. Connect the conductive part shared by every touch contact to GND.</div>' +
+      '<div style="background:#fff8e1;color:#5d4037;padding:9px;border-radius:6px;"><strong>3V3 — alternative:</strong> choose 3.3 V in Set up contacts and connect the shared conductive part to the board 3V3 contact.</div>' +
+      '</div>' +
+      '<div style="background:rgba(0,0,0,.16);padding:10px;border-radius:6px;margin-bottom:10px;">' +
+      '<strong>3. Build the connection</strong><br>Shared conductive part → board GND or 3V3 contact<br>Each separate touch piece → Connection 0, Connection 1, Connection 2, or Connection 3<br><br>You can use aluminium foil, conductive dough, fruit, graphite, or alligator clips. The board senses when the shared part touches one of the separate pieces.' +
+      '</div>' +
+      '<div style="background:#fff3e0;color:#4e342e;padding:10px;border-radius:6px;margin-bottom:10px;"><strong>Important:</strong><br>• Use only one shared mode in the project: GND or 3V3.<br>• Each Connection can have only one job. Do not share a number with an external LED, servo, or DHT11.<br>• The LED Matrix contact test uses all four Connections and must be used by itself.<br>• On BitDogLab V7, the Display uses Connections 2 and 3. With the Display active, use only Connection 0 or Connection 1 for Contacts.</div>' +
+      '<div style="background:#e0f2f1;color:#004d40;padding:10px;border-radius:6px;margin-bottom:10px;"><strong>Example:</strong><br>1️⃣ Set up contacts using GND<br>2️⃣ When contact is made on Connection 0 → play a beep</div>' +
+      '<div style="background:#ffebee;color:#7f0000;padding:10px;border-radius:6px;margin-bottom:10px;"><strong>⚠️ Safety:</strong> turn the board off and disconnect the USB cable before changing any wire. Never let 3V3 touch GND.</div>' +
+      '<strong>Before powering the board, ask a teacher to check the complete circuit.</strong>' +
+      '</div>'
+    : WorkspaceManager.closeButton(closeId) +
+      '<div style="max-height:calc(100vh - 90px);overflow-y:auto;padding-right:4px;">' +
+      '<strong style="font-size:18px;">🔌 Como criar contatos de toque</strong>' +
+      '<div style="display:flex;gap:12px;align-items:center;margin:12px 0;">' +
+      '<img src="' + boardImage + '" alt="Conexões externas" style="width:55%;max-height:180px;object-fit:contain;background:white;border-radius:6px;">' +
+      '<img src="' + contactImage + '" alt="Garras jacaré fazendo contato" style="width:40%;max-height:180px;object-fit:contain;background:white;border-radius:6px;">' +
+      '</div>' + problemLine +
+      '<div style="background:#fff3e0;color:#4e342e;padding:10px;border-radius:6px;margin-bottom:10px;"><strong>1. Prepare o projeto</strong><br>Comece com o bloco <strong>Preparar contatos</strong> perto do início do projeto. Sem ele, os outros blocos de Contatos não serão compilados.</div>' +
+      '<div style="display:grid;gap:7px;margin-bottom:10px;">' +
+      '<div style="background:#e8f5e9;color:#1b5e20;padding:9px;border-radius:6px;"><strong>2. Escolha o contato compartilhado — GND é recomendado.</strong><br>GND é o contato de referência da placa. Ligue ao GND a parte condutora compartilhada por todos os contatos de toque.</div>' +
+      '<div style="background:#fff8e1;color:#5d4037;padding:9px;border-radius:6px;"><strong>3V3 — alternativa:</strong> escolha 3,3 V em Preparar contatos e ligue a parte condutora compartilhada ao contato 3V3 da placa.</div>' +
+      '</div>' +
+      '<div style="background:rgba(0,0,0,.16);padding:10px;border-radius:6px;margin-bottom:10px;">' +
+      '<strong>3. Monte a ligação</strong><br>Parte condutora compartilhada → contato GND ou 3V3 da placa<br>Cada peça de toque separada → Conexão 0, Conexão 1, Conexão 2 ou Conexão 3<br><br>Você pode usar papel-alumínio, massinha condutiva, frutas, grafite ou garras jacaré. A placa percebe quando a parte compartilhada encosta em uma das peças separadas.' +
+      '</div>' +
+      '<div style="background:#fff3e0;color:#4e342e;padding:10px;border-radius:6px;margin-bottom:10px;"><strong>Importante:</strong><br>• Use somente um modo compartilhado no projeto: GND ou 3V3.<br>• Cada Conexão pode ter apenas uma função. Não compartilhe o mesmo número com LED externo, servo ou DHT11.<br>• O teste de contatos na Matriz usa as quatro Conexões e deve ser usado sozinho.<br>• Na BitDogLab V7, o Display usa as Conexões 2 e 3. Com o Display ativo, use somente a Conexão 0 ou a Conexão 1 para Contatos.</div>' +
+      '<div style="background:#e0f2f1;color:#004d40;padding:10px;border-radius:6px;margin-bottom:10px;"><strong>Exemplo:</strong><br>1️⃣ Preparar contatos usando GND<br>2️⃣ Quando houver contato na Conexão 0 → tocar um bipe</div>' +
+      '<div style="background:#ffebee;color:#7f0000;padding:10px;border-radius:6px;margin-bottom:10px;"><strong>⚠️ Segurança:</strong> desligue a placa e retire o cabo USB antes de mudar qualquer fio. Nunca deixe o contato 3V3 encostar no GND.</div>' +
+      '<strong>Antes de ligar a placa, peça ao professor para conferir toda a montagem.</strong>' +
+      '</div>';
+
+  WorkspaceManager.createReminder({
+    id: 'externalContactNotification',
+    closeId: closeId,
+    background: '#0f9d8a',
+    maxWidth: '720px',
+    html: html
+  });
+};
+
+WorkspaceManager.bindExternalContactCategoryHint = function() {
+  var toolbox = Code.workspace && Code.workspace.getToolbox ? Code.workspace.getToolbox() : null;
+  var toolboxDiv = toolbox && toolbox.HtmlDiv;
+  if (!toolboxDiv || toolboxDiv.__bitdoglabExternalContactHintBound) return;
+
+  toolboxDiv.__bitdoglabExternalContactHintBound = true;
+  toolboxDiv.addEventListener('click', function(event) {
+    var clickTarget = event.target;
+    var item = null;
+    while (clickTarget && clickTarget !== toolboxDiv) {
+      if (clickTarget.id && toolbox.getToolboxItemById) {
+        item = toolbox.getToolboxItemById(clickTarget.id);
+        if (item) break;
+      }
+      clickTarget = clickTarget.parentNode;
+    }
+    var categoryName = item && item.getName ? item.getName() : '';
+    if (categoryName === 'Contatos' || categoryName === 'Contacts') {
+      Code.showExternalContactReminder();
     }
   });
 };
@@ -228,6 +327,29 @@ WorkspaceManager.externalLedChannelInfo = function(channel) {
 // and teachers who may not know that the letters are physical LED pins.
 WorkspaceManager.showExternalLedConnectionReminder = function(block) {
   WorkspaceManager.showExternalLedWarningReminder(block || null);
+};
+
+WorkspaceManager.showExternalLedDisplayNotice = function() {
+  var closeId = 'closeExternalLedDisplayNotice';
+  var html = Code.LANG === 'en'
+    ? WorkspaceManager.closeButton(closeId) +
+      '<strong style="font-size:17px;">⚠️ Display and external LED</strong><br><br>' +
+      'Before powering the board, check the KY-016 wires. On BitDogLab V7, the Display uses Connections 2 and 3 and sends signals through them.<br><br>' +
+      '<div style="background:#fff3e0;color:#4e342e;padding:10px;border-radius:6px;"><strong>Even if the blocks use only Connection 0 or 1, no R, G, or B wire may remain connected to Connection 2 or 3.</strong> A colour connected there may blink when the screen is updated.</div><br>' +
+      '<strong>With the Display in the project, use only Connections 0 and 1 for external LEDs.</strong>'
+    : WorkspaceManager.closeButton(closeId) +
+      '<strong style="font-size:17px;">⚠️ Display e LED externo</strong><br><br>' +
+      'Antes de ligar a placa, confira os fios do KY-016. Na BitDogLab V7, o Display usa as Conexões 2 e 3 e envia sinais por elas.<br><br>' +
+      '<div style="background:#fff3e0;color:#4e342e;padding:10px;border-radius:6px;"><strong>Mesmo que os blocos usem somente a Conexão 0 ou 1, nenhum fio R, G ou B pode ficar conectado às Conexões 2 ou 3.</strong> Uma cor ligada nelas pode piscar junto com a atualização da tela.</div><br>' +
+      '<strong>Com o Display no projeto, use somente as Conexões 0 e 1 para LEDs externos.</strong>';
+
+  WorkspaceManager.createReminder({
+    id: 'externalLedDisplayNotice',
+    closeId: closeId,
+    background: '#d97706',
+    maxWidth: '560px',
+    html: html
+  });
 };
 
 WorkspaceManager.showExternalLedWarningReminder = function(block) {
@@ -278,15 +400,15 @@ WorkspaceManager.showExternalLedWarningReminder = function(block) {
     var channelConnections = channelConnectionMap[channel] || [];
     if (channelConnections.length > 1) {
       issue = Code.LANG === 'en'
-        ? 'The ' + (channelLabels[channel] || channel) + ' channel appears on Connections ' + channelConnections.join(' and ') + '. Use only one Connection for each colour.'
-        : 'O canal ' + (channelLabels[channel] || channel) + ' aparece nas Conexões ' + channelConnections.join(' e ') + '. Use somente uma Conexão para cada cor.';
+        ? 'The ' + (channelLabels[channel] || channel) + ' channel appears on more than one Connection. Choose only one Connection for this colour.'
+        : 'O canal ' + (channelLabels[channel] || channel) + ' aparece em mais de uma Conexão. Escolha somente uma Conexão para essa cor.';
     } else {
       var selectedConnection = String(block.getFieldValue('DIG') || '');
       var selectedChannels = connectionChannels[selectedConnection] || [];
       if (selectedChannels.length > 1) {
         issue = Code.LANG === 'en'
-          ? 'Connections ' + selectedConnection + ' is being used by ' + selectedChannels.join(' and ') + '. Put each colour on a different Connection.'
-          : 'A Conexão ' + selectedConnection + ' está sendo usada por ' + selectedChannels.join(' e ') + '. Coloque cada cor em uma Conexão diferente.';
+          ? 'Connection ' + selectedConnection + ' is being used by more than one colour. Choose a different Connection for each colour.'
+          : 'A Conexão ' + selectedConnection + ' está sendo usada por mais de uma cor. Escolha uma Conexão diferente para cada cor.';
       }
     }
   }
@@ -295,8 +417,8 @@ WorkspaceManager.showExternalLedWarningReminder = function(block) {
     var connections = channelConnectionMap[channelName] || [];
     if (!connections.length) {
       return Code.LANG === 'en'
-        ? 'choose one of the 4 board Connections: 0, 1, 2 or 3. Do not reuse another colour\'s Connection'
-        : 'escolha uma das 4 Conexões da placa: 0, 1, 2 ou 3. Cada cor deve usar um número diferente';
+        ? 'choose Connection 0, Connection 1, Connection 2, or Connection 3. Do not reuse another colour\'s Connection'
+        : 'escolha Conexão 0, Conexão 1, Conexão 2 ou Conexão 3. Cada cor deve usar um número diferente';
     }
     if (connections.length === 1) {
       var selected = connections[0];
@@ -320,23 +442,23 @@ WorkspaceManager.showExternalLedWarningReminder = function(block) {
   }
 
   var wireRows = Code.LANG === 'en'
-    ? '<div style="margin:10px 0 6px;font-size:15px;font-weight:bold;">Where to connect each colour LED pin</div>' +
+    ? '<div style="margin:10px 0 6px;font-size:15px;font-weight:bold;">Identify the KY-016 module pins</div>' +
       '<div style="display:grid;gap:7px;margin:0 0 10px;">' +
-      '<div style="background:#fff3e0;color:#4e342e;padding:8px;border-radius:5px;"><strong>- (negative/ground)</strong> &rarr; board GND contact</div>' +
-      '<div style="background:#ffebee;color:#7f0000;padding:8px;border-radius:5px;"><strong>R — red</strong> &rarr; ' + connectionDescription('R') + '</div>' +
-      '<div style="background:#f8f9fa;color:#263238;padding:8px;border-radius:5px;"><strong>G — green</strong> &rarr; ' + connectionDescription('G') + '</div>' +
-      '<div style="background:#efebe9;color:#3e2723;padding:8px;border-radius:5px;"><strong>B — blue</strong> &rarr; ' + connectionDescription('B') + '</div>' +
+      '<div style="background:#fff3e0;color:#4e342e;padding:8px;border-radius:5px;"><strong>- — GND:</strong> negative/ground → board GND contact</div>' +
+      '<div style="background:#ffebee;color:#7f0000;padding:8px;border-radius:5px;"><strong>R — red:</strong> controls the red light → ' + connectionDescription('R') + '</div>' +
+      '<div style="background:#f8f9fa;color:#263238;padding:8px;border-radius:5px;"><strong>G — green:</strong> controls the green light → ' + connectionDescription('G') + '</div>' +
+      '<div style="background:#efebe9;color:#3e2723;padding:8px;border-radius:5px;"><strong>B — blue:</strong> controls the blue light → ' + connectionDescription('B') + '</div>' +
       '</div>'
-    : '<div style="margin:10px 0 6px;font-size:15px;font-weight:bold;">Onde ligar cada pino do LED colorido</div>' +
+    : '<div style="margin:10px 0 6px;font-size:15px;font-weight:bold;">Identifique os pinos do módulo KY-016</div>' +
       '<div style="display:grid;gap:7px;margin:0 0 10px;">' +
-      '<div style="background:#fff3e0;color:#4e342e;padding:8px;border-radius:5px;"><strong>- (negativo/terra)</strong> &rarr; contato GND da placa</div>' +
-      '<div style="background:#ffebee;color:#7f0000;padding:8px;border-radius:5px;"><strong>R — vermelho</strong> &rarr; ' + connectionDescription('R') + '</div>' +
-      '<div style="background:#f8f9fa;color:#263238;padding:8px;border-radius:5px;"><strong>G — verde</strong> &rarr; ' + connectionDescription('G') + '</div>' +
-      '<div style="background:#efebe9;color:#3e2723;padding:8px;border-radius:5px;"><strong>B — azul</strong> &rarr; ' + connectionDescription('B') + '</div>' +
+      '<div style="background:#fff3e0;color:#4e342e;padding:8px;border-radius:5px;"><strong>- — GND:</strong> negativo/terra → contato GND da placa</div>' +
+      '<div style="background:#ffebee;color:#7f0000;padding:8px;border-radius:5px;"><strong>R — vermelho:</strong> controla a luz vermelha → ' + connectionDescription('R') + '</div>' +
+      '<div style="background:#f8f9fa;color:#263238;padding:8px;border-radius:5px;"><strong>G — verde:</strong> controla a luz verde → ' + connectionDescription('G') + '</div>' +
+      '<div style="background:#efebe9;color:#3e2723;padding:8px;border-radius:5px;"><strong>B — azul:</strong> controla a luz azul → ' + connectionDescription('B') + '</div>' +
       '</div>';
   var colourIntro = Code.LANG === 'en'
-    ? '<div style="background:#fff3e0;color:#4e342e;padding:9px;border-radius:6px;margin-bottom:10px;"><strong>Each pin controls one colour.</strong> Choose R, G, or B in the block.</div>'
-    : '<div style="background:#fff3e0;color:#4e342e;padding:9px;border-radius:6px;margin-bottom:10px;"><strong>Cada pino controla uma cor.</strong> Escolha R, G ou B no bloco.</div>';
+    ? '<div style="background:#fff3e0;color:#4e342e;padding:9px;border-radius:6px;margin-bottom:10px;"><strong>Each letter is a physical module pin.</strong> Choose R, G, or B in the block. The Connection number selected in the block must match the board contact used by that colour.</div>'
+    : '<div style="background:#fff3e0;color:#4e342e;padding:9px;border-radius:6px;margin-bottom:10px;"><strong>Cada letra indica um pino físico do módulo.</strong> Escolha R, G ou B no bloco. O número escolhido no bloco deve ser o mesmo contato da placa usado por essa cor.</div>';
   var problemLine = block
     ? (Code.LANG === 'en'
       ? '<strong>Problem found:</strong> ' + issue + '<br>'
@@ -352,10 +474,10 @@ WorkspaceManager.showExternalLedWarningReminder = function(block) {
       '<img src="' + ledImage + '" alt="KY-016 RGB LED module" style="width:42%;max-height:180px;object-fit:contain;background:white;border-radius:6px;">' +
       '</div>' + colourIntro + wireRows +
       '<div style="background:rgba(0,0,0,.16);padding:10px;border-radius:5px;">' +
-      '<strong>Build this connection sequence:</strong> KY-016 pin &rarr; female end of the male-to-female jumper &rarr; male end held by the alligator clip &rarr; board contact.<br>' +
-      'Turn the board off and remove the USB cable before touching the wires. Keep neighbouring clips from touching.<br>' +
-      '<strong>Insulate the jumper-to-alligator connection with electrical tape</strong> so exposed metal cannot cause a short circuit.</div>' +
-      '<div style="margin-top:9px;">' + problemLine + '<strong>Important:</strong> each colour uses one Connection and different colours cannot share the same number. On board V7, use Connections 0 and 1 when the board display is active. Ask a teacher to check the wires before powering the board.</div>' +
+      '<strong>Connect in this order:</strong><br>1. Turn the board off and disconnect the USB cable.<br>2. For each pin: KY-016 pin → female end of a male-to-female jumper → male end held by an alligator clip → correct board contact.<br>3. Connect - to GND and connect R, G, and B to different Connections.<br>4. Insulate every jumper-to-clip joint with electrical tape.</div>' +
+      '<div style="margin-top:9px;background:#fff3e0;color:#4e342e;padding:9px;border-radius:5px;">' + problemLine + '<strong>Important:</strong><br>• Different colours cannot share the same Connection number.<br>• On BitDogLab V7, the Display uses Connections 2 and 3. With the Display active, use only Connection 0 and Connection 1 for the KY-016.<br>• Correct every reported problem before running the project.</div>' +
+      '<div style="margin-top:9px;background:#ffebee;color:#7f0000;padding:9px;border-radius:5px;"><strong>⚠️ Safety:</strong> do not let neighbouring clips touch. Cover every exposed metal part to prevent a short circuit.</div>' +
+      '<div style="margin-top:9px;"><strong>Before powering the board, ask a teacher to check GND and the Connections used by R, G, and B.</strong></div>' +
       '</div>'
     : WorkspaceManager.closeButton(closeId) +
       '<div style="max-height:calc(100vh - 90px);overflow-y:auto;padding-right:4px;">' +
@@ -365,10 +487,10 @@ WorkspaceManager.showExternalLedWarningReminder = function(block) {
       '<img src="' + ledImage + '" alt="Módulo LED RGB KY-016" style="width:42%;max-height:180px;object-fit:contain;background:white;border-radius:6px;">' +
       '</div>' + colourIntro + wireRows +
       '<div style="background:rgba(0,0,0,.16);padding:10px;border-radius:5px;">' +
-      '<strong>Monte esta sequência de ligação:</strong> pino do KY-016 &rarr; ponta fêmea do jumper macho-fêmea &rarr; ponta macho presa à garra jacaré &rarr; contato da placa.<br>' +
-      'Desligue a placa e retire o cabo USB antes de mexer nos fios. Não deixe garras vizinhas se encostarem.<br>' +
-      '<strong>Isole a união do jumper com a garra jacaré usando fita isolante</strong> para nenhum metal exposto causar curto-circuito.</div>' +
-      '<div style="margin-top:9px;">' + problemLine + '<strong>Importante:</strong> cada cor usa uma Conexão e cores diferentes não podem usar o mesmo número. Na placa V7, use as Conexões 0 e 1 quando o Display (tela da placa) estiver ativo. Peça a um professor para conferir os fios antes de ligar a placa.</div>' +
+      '<strong>Monte nesta ordem:</strong><br>1. Desligue a placa e retire o cabo USB.<br>2. Para cada pino: pino do KY-016 → ponta fêmea do jumper macho-fêmea → ponta macho presa à garra jacaré → contato correto da placa.<br>3. Ligue - ao GND e ligue R, G e B a Conexões diferentes.<br>4. Isole com fita isolante a união entre cada jumper e sua garra jacaré.</div>' +
+      '<div style="margin-top:9px;background:#fff3e0;color:#4e342e;padding:9px;border-radius:5px;">' + problemLine + '<strong>Importante:</strong><br>• Cores diferentes não podem compartilhar o mesmo número de Conexão.<br>• Na BitDogLab V7, o Display usa as Conexões 2 e 3. Com o Display ativo, use somente a Conexão 0 e a Conexão 1 para o KY-016.<br>• Corrija todo problema indicado antes de executar o projeto.</div>' +
+      '<div style="margin-top:9px;background:#ffebee;color:#7f0000;padding:9px;border-radius:5px;"><strong>⚠️ Segurança:</strong> não deixe garras vizinhas se encostarem. Cubra todo metal exposto para evitar curto-circuito.</div>' +
+      '<div style="margin-top:9px;"><strong>Antes de ligar a placa, peça ao professor para conferir o GND e as Conexões usadas por R, G e B.</strong></div>' +
       '</div>';
 
   WorkspaceManager.createReminder({
@@ -392,10 +514,18 @@ WorkspaceManager.showExternalLedChannelReminder = function(channel) {
   var html = Code.LANG === 'en'
     ? WorkspaceManager.closeButton(closeId) +
       '<strong style="font-size:17px;">You chose ' + label + '</strong><br><br>' +
-      'Connect the <strong>' + label + '</strong> pin on the KY-016 to one of the <strong>4 board Connections: 0, 1, 2 or 3</strong>, using the number selected in the block. Each colour must use a different number. Connect <strong>-</strong> to the negative/ground (GND) contact.'
+      '<strong>Identify the pin:</strong> find the <strong>' + label + '</strong> pin on the KY-016 module.<br><br>' +
+      '<strong>Connect in this order:</strong><br>1. Turn the board off and disconnect the USB cable.<br>2. KY-016 ' + label + ' pin → board Connection selected in the block.<br>3. KY-016 <strong>-</strong> pin → board GND contact.<br><br>' +
+      '<div style="background:#fff3e0;color:#4e342e;padding:9px;border-radius:5px;"><strong>Important:</strong> each colour needs a different Connection number.</div>' +
+      '<div style="margin-top:9px;background:#ffebee;color:#7f0000;padding:9px;border-radius:5px;"><strong>⚠️ Safety:</strong> do not change wires while the board is powered and do not let alligator clips touch.</div>' +
+      '<div style="margin-top:9px;"><strong>Before powering the board, ask a teacher to check the selected channel and Connection.</strong></div>'
     : WorkspaceManager.closeButton(closeId) +
       '<strong style="font-size:17px;">Você escolheu ' + label + '</strong><br><br>' +
-      'Ligue o pino <strong>' + label + '</strong> do módulo de LED colorido KY-016 a uma das <strong>4 Conexões da placa: 0, 1, 2 ou 3</strong>, usando o número escolhido no bloco. Cada cor precisa usar um número diferente. Ligue <strong>-</strong> ao contato negativo/terra (GND).';
+      '<strong>Identifique o pino:</strong> encontre o pino <strong>' + label + '</strong> no módulo KY-016.<br><br>' +
+      '<strong>Monte nesta ordem:</strong><br>1. Desligue a placa e retire o cabo USB.<br>2. Pino ' + label + ' do KY-016 → Conexão da placa escolhida no bloco.<br>3. Pino <strong>-</strong> do KY-016 → contato GND da placa.<br><br>' +
+      '<div style="background:#fff3e0;color:#4e342e;padding:9px;border-radius:5px;"><strong>Importante:</strong> cada cor precisa usar um número de Conexão diferente.</div>' +
+      '<div style="margin-top:9px;background:#ffebee;color:#7f0000;padding:9px;border-radius:5px;"><strong>⚠️ Segurança:</strong> não mude os fios com a placa ligada e não deixe as garras jacaré se encostarem.</div>' +
+      '<div style="margin-top:9px;"><strong>Antes de ligar a placa, peça ao professor para conferir o canal e a Conexão escolhidos.</strong></div>';
 
   WorkspaceManager.createReminder({
     id: 'externalLedChannelNotification_' + String(channel || 'R'),
@@ -437,17 +567,17 @@ WorkspaceManager.showDht11ConnectionReminder = function(block) {
   var hasSensorConflict = warningText.indexOf('dois sensores') !== -1 ||
     warningText.indexOf('two sensors') !== -1;
   var wireRows = Code.LANG === 'en'
-    ? '<div style="margin:10px 0 6px;font-size:15px;font-weight:bold;">DHT11 wires</div>' +
+    ? '<div style="margin:10px 0 6px;font-size:15px;font-weight:bold;">Identify the DHT11 module pins</div>' +
       '<div style="display:grid; gap:7px; margin:0 0 10px;">' +
-      '<div style="background:#fff3e0;color:#4e342e;padding:8px;border-radius:5px;"><strong>Orange arrow — sensor reading (pin S)</strong> → left pin &nbsp;|&nbsp; board V7: Connection 0 or 1 &nbsp;|&nbsp; board V6: Connection 0, 1, 2 or 3</div>' +
-      '<div style="background:#ffebee;color:#7f0000;padding:8px;border-radius:5px;"><strong>Red arrow — 3.3 V electrical power</strong> → center pin and board 3V3 contact</div>' +
-      '<div style="background:#efebe9;color:#3e2723;padding:8px;border-radius:5px;"><strong>Black arrow — negative/ground (GND)</strong> → right pin, next to -, and board GND contact</div>' +
+      '<div style="background:#fff3e0;color:#4e342e;padding:8px;border-radius:5px;"><strong>Left pin — data (S):</strong> carries temperature and humidity readings → BitDogLab V7: Connection 0 or Connection 1 &nbsp;|&nbsp; BitDogLab V6: Connection 0, 1, 2 or 3</div>' +
+      '<div style="background:#ffebee;color:#7f0000;padding:8px;border-radius:5px;"><strong>Centre pin — electrical power:</strong> → 3V3 contact on the board</div>' +
+      '<div style="background:#efebe9;color:#3e2723;padding:8px;border-radius:5px;"><strong>Right pin — GND:</strong> next to the - mark → GND contact on the board</div>' +
       '</div>'
-    : '<div style="margin:10px 0 6px;font-size:15px;font-weight:bold;">Fios do DHT11</div>' +
+    : '<div style="margin:10px 0 6px;font-size:15px;font-weight:bold;">Identifique os pinos do módulo DHT11</div>' +
       '<div style="display:grid; gap:7px; margin:0 0 10px;">' +
-      '<div style="background:#fff3e0;color:#4e342e;padding:8px;border-radius:5px;"><strong>Seta laranja — sinal/leitura do sensor (pino S)</strong> → pino da esquerda. Esse fio leva a leitura até a placa.<br>Placa V7: Conexão 0 ou 1 &nbsp;|&nbsp; placa V6: Conexão 0, 1, 2 ou 3</div>' +
-      '<div style="background:#ffebee;color:#7f0000;padding:8px;border-radius:5px;"><strong>Seta vermelha — alimentação elétrica de 3,3 V</strong> → pino do meio e contato 3V3 da placa</div>' +
-      '<div style="background:#efebe9;color:#3e2723;padding:8px;border-radius:5px;"><strong>Seta preta — negativo/terra (GND)</strong> → pino da direita, ao lado de -, e contato GND da placa</div>' +
+      '<div style="background:#fff3e0;color:#4e342e;padding:8px;border-radius:5px;"><strong>Pino da esquerda — dados (S):</strong> leva as leituras de temperatura e umidade → BitDogLab V7: Conexão 0 ou Conexão 1 &nbsp;|&nbsp; BitDogLab V6: Conexão 0, 1, 2 ou 3</div>' +
+      '<div style="background:#ffebee;color:#7f0000;padding:8px;border-radius:5px;"><strong>Pino do meio — alimentação elétrica:</strong> → contato 3V3 da placa</div>' +
+      '<div style="background:#efebe9;color:#3e2723;padding:8px;border-radius:5px;"><strong>Pino da direita — GND:</strong> fica ao lado do sinal - → contato GND da placa</div>' +
       '</div>';
   var conflictGuide = !hasSensorConflict ? '' : (Code.LANG === 'en'
     ? '<div style="margin:10px 0;background:#fff;padding:9px;border-radius:6px;color:#4e342e;"><strong>The two sensors need separate inputs.</strong><br>Ask your teacher to use the other Greenhouse sensor input shown in this guide.</div>' +
@@ -463,10 +593,10 @@ WorkspaceManager.showDht11ConnectionReminder = function(block) {
       '<img src="' + dht11Image + '" alt="DHT11 sensor module" style="width:42%;max-height:180px;object-fit:contain;background:white;border-radius:6px;">' +
       '</div>' + wireRows + conflictGuide +
       '<div style="background:rgba(0,0,0,.16);padding:10px;border-radius:5px;">' +
-      '<strong>Build this connection sequence:</strong> DHT11 pin → female end of the male-to-female jumper → male end held by the alligator clip → board contact.<br>' +
-      'Turn the board off and remove the USB cable before touching the wires. Keep neighboring clips from touching.<br>' +
-      '<strong>Insulate the jumper-to-alligator connection with electrical tape</strong> so exposed metal cannot cause a short circuit.</div>' +
-      '<div style="margin-top:9px;"><strong>Important:</strong> use the board 3V3 contact (3.3 V power), never 5V-VSYS (5 V power).<br><strong>If the temperature and humidity blocks use the same physical sensor:</strong> choose the same Connection in both blocks. Different numbers mean two separate sensors.<br>On board V7, the sensor reading can use only Connection 0 or 1. On board V6, use 0, 1, 2 or 3.<br>Ask a teacher to check the wires before powering the board.</div>' +
+      '<strong>Connect in this order:</strong><br>1. Turn the board off and disconnect the USB cable.<br>2. For each pin: DHT11 pin → female end of a male-to-female jumper → male end held by an alligator clip → correct board contact.<br>3. Insulate every jumper-to-clip joint with electrical tape.</div>' +
+      '<div style="margin-top:9px;background:#fff3e0;color:#4e342e;padding:9px;border-radius:5px;"><strong>Important:</strong><br>• Power the DHT11 only from 3V3. Never use 5V-VSYS.<br>• If the temperature and humidity blocks use the same physical sensor, choose the same Connection in both blocks.<br>• Different numbers tell the program that there are two separate sensors.<br>• If the two-sensor warning appears, ask the teacher to use the other Greenhouse input shown in the guide.</div>' +
+      '<div style="margin-top:9px;background:#ffebee;color:#7f0000;padding:9px;border-radius:5px;"><strong>⚠️ Safety:</strong> do not let neighbouring clips touch. Cover every exposed metal part to prevent a short circuit.</div>' +
+      '<div style="margin-top:9px;"><strong>Before powering the board, ask a teacher to check all three wires and the Connection selected in the blocks.</strong></div>' +
       '</div>'
     : WorkspaceManager.closeButton(closeId) +
       '<div style="max-height:calc(100vh - 90px);overflow-y:auto;padding-right:4px;">' +
@@ -476,10 +606,10 @@ WorkspaceManager.showDht11ConnectionReminder = function(block) {
       '<img src="' + dht11Image + '" alt="Módulo sensor DHT11" style="width:42%;max-height:180px;object-fit:contain;background:white;border-radius:6px;">' +
       '</div>' + wireRows + conflictGuide +
       '<div style="background:rgba(0,0,0,.16);padding:10px;border-radius:5px;">' +
-      '<strong>Monte esta sequência de ligação:</strong> pino do DHT11 → ponta fêmea do jumper macho-fêmea → ponta macho presa à garra jacaré → contato da placa.<br>' +
-      'Desligue a placa e retire o cabo USB antes de mexer nos fios. Não deixe garras vizinhas se encostarem.<br>' +
-      '<strong>Isole a união do jumper com a garra jacaré usando fita isolante</strong> para nenhum metal exposto causar curto-circuito.</div>' +
-      '<div style="margin-top:9px;"><strong>Importante:</strong> use o contato 3V3 da placa — alimentação de 3,3 V. Nunca use o contato 5V-VSYS — alimentação de 5 V.<br><strong>Se os blocos de temperatura e umidade usam o mesmo sensor físico:</strong> escolha a mesma Conexão nos dois blocos. Números diferentes significam dois sensores separados.<br>Na placa V7, o fio de leitura do sensor só pode usar a Conexão 0 ou 1. Na placa V6, use 0, 1, 2 ou 3.<br>Peça a um professor para conferir os fios antes de ligar a placa.</div>' +
+      '<strong>Monte nesta ordem:</strong><br>1. Desligue a placa e retire o cabo USB.<br>2. Para cada pino: pino do DHT11 → ponta fêmea do jumper macho-fêmea → ponta macho presa à garra jacaré → contato correto da placa.<br>3. Isole com fita isolante a união entre cada jumper e sua garra jacaré.</div>' +
+      '<div style="margin-top:9px;background:#fff3e0;color:#4e342e;padding:9px;border-radius:5px;"><strong>Importante:</strong><br>• Alimente o DHT11 somente pelo contato 3V3. Nunca use 5V-VSYS.<br>• Se os blocos de temperatura e umidade usam o mesmo sensor físico, escolha a mesma Conexão nos dois blocos.<br>• Números diferentes informam ao programa que existem dois sensores separados.<br>• Se aparecer o aviso de dois sensores, peça ao professor para usar a outra entrada da Estufa indicada no guia.</div>' +
+      '<div style="margin-top:9px;background:#ffebee;color:#7f0000;padding:9px;border-radius:5px;"><strong>⚠️ Segurança:</strong> não deixe garras vizinhas se encostarem. Cubra todo metal exposto para evitar curto-circuito.</div>' +
+      '<div style="margin-top:9px;"><strong>Antes de ligar a placa, peça ao professor para conferir os três fios e a Conexão escolhida nos blocos.</strong></div>' +
       '</div>';
 
   WorkspaceManager.createReminder({
@@ -508,8 +638,414 @@ WorkspaceManager.bindDht11CategoryHint = function() {
 
     var item = toolbox.getToolboxItemById(clickTarget.id);
     var categoryName = item && item.getName ? item.getName() : '';
-    if (categoryName === 'Temperatura e umidade externo' || categoryName === 'External temperature and humidity') {
+    if (categoryName === 'Temperatura e Umidade Externas' || categoryName === 'External temperature and humidity') {
       Code.showDht11ConnectionReminder();
+    }
+  });
+};
+
+WorkspaceManager.showDistanceSensorConnectionReminder = function() {
+  var closeId = 'closeDistanceSensorConnectionNotification';
+  var boardImage = '../assets/images/devices/conexoes-externas.png';
+  var sensorImage = '../assets/images/devices/hc-sr04-pinout.png?ver=20260822distance2';
+  var wireRows = Code.LANG === 'en'
+    ? '<div style="margin:10px 0 6px;font-size:15px;font-weight:bold;">Identify the ultrasonic sensor pins</div>' +
+      '<div style="display:grid;gap:7px;margin:0 0 10px;">' +
+      '<div style="background:#ffebee;color:#7f0000;padding:8px;border-radius:5px;"><strong>VCC pin:</strong> electrical power → 3V3 contact on the board</div>' +
+      '<div style="background:#e3f2fd;color:#0d47a1;padding:8px;border-radius:5px;"><strong>TRIG/SCL pin:</strong> synchronization signal → Connection 3 on the board</div>' +
+      '<div style="background:#e8f5e9;color:#1b5e20;padding:8px;border-radius:5px;"><strong>ECHO/SDA pin:</strong> data signal → Connection 2 on the board</div>' +
+      '<div style="background:#efebe9;color:#3e2723;padding:8px;border-radius:5px;"><strong>GND pin:</strong> negative/ground → GND contact on the board</div>' +
+      '</div>'
+    : '<div style="margin:10px 0 6px;font-size:15px;font-weight:bold;">Identifique os pinos do sensor ultrassônico</div>' +
+      '<div style="display:grid;gap:7px;margin:0 0 10px;">' +
+      '<div style="background:#ffebee;color:#7f0000;padding:8px;border-radius:5px;"><strong>Pino VCC:</strong> alimentação elétrica → contato 3V3 da placa</div>' +
+      '<div style="background:#e3f2fd;color:#0d47a1;padding:8px;border-radius:5px;"><strong>Pino TRIG/SCL:</strong> sinal de sincronização → Conexão 3 da placa</div>' +
+      '<div style="background:#e8f5e9;color:#1b5e20;padding:8px;border-radius:5px;"><strong>Pino ECHO/SDA:</strong> sinal de dados → Conexão 2 da placa</div>' +
+      '<div style="background:#efebe9;color:#3e2723;padding:8px;border-radius:5px;"><strong>Pino GND:</strong> negativo/terra → contato GND da placa</div>' +
+      '</div>';
+  var html = Code.LANG === 'en'
+    ? WorkspaceManager.closeButton(closeId) +
+      '<div style="max-height:calc(100vh - 90px);overflow-y:auto;padding-right:4px;">' +
+      '<strong style="font-size:17px;">🔌 How to connect the ultrasonic sensor</strong><br>' +
+      '<div style="display:flex;gap:12px;align-items:center;margin:12px 0;">' +
+      '<img src="' + boardImage + '" alt="BitDogLab external connections" style="width:54%;max-height:210px;object-fit:contain;background:white;border-radius:6px;">' +
+      '<img src="' + sensorImage + '" alt="Ultrasonic distance sensor" style="width:42%;max-height:210px;object-fit:contain;background:white;border-radius:6px;">' +
+      '</div>' + wireRows +
+      '<div style="background:rgba(0,0,0,.16);padding:10px;border-radius:5px;"><strong>Connect in this order:</strong><br>1. Turn the board off and disconnect the USB cable.<br>2. Connect VCC to 3V3 and GND to GND.<br>3. Connect ECHO/SDA to Connection 2.<br>4. Connect TRIG/SCL to Connection 3.<br>5. Insulate every exposed jumper-to-clip joint.</div>' +
+      '<div style="margin-top:9px;background:#fff3e0;color:#4e342e;padding:9px;border-radius:5px;"><strong>Important:</strong><br>• Use the 3.3 V-compatible sensor specified for this project.<br>• Connection 2 is always ECHO/SDA and Connection 3 is always TRIG/SCL; do not swap them.<br>• The sensor and board display can use Connections 2 and 3 together.<br>• Connections 0 and 1 remain free for other external components.</div>' +
+      '<div style="margin-top:9px;background:#ffebee;color:#7f0000;padding:9px;border-radius:5px;"><strong>⚠️ Safety:</strong> never connect VCC to 5V-VSYS, do not change wires while the board is powered, and do not let neighbouring clips touch.</div>' +
+      '<div style="margin-top:9px;"><strong>Before powering the board, ask a teacher to check all four wires.</strong></div>' +
+      '</div>'
+    : WorkspaceManager.closeButton(closeId) +
+      '<div style="max-height:calc(100vh - 90px);overflow-y:auto;padding-right:4px;">' +
+      '<strong style="font-size:17px;">🔌 Como conectar o sensor ultrassônico</strong><br>' +
+      '<div style="display:flex;gap:12px;align-items:center;margin:12px 0;">' +
+      '<img src="' + boardImage + '" alt="Conexões externas da BitDogLab" style="width:54%;max-height:210px;object-fit:contain;background:white;border-radius:6px;">' +
+      '<img src="' + sensorImage + '" alt="Sensor ultrassônico de distância" style="width:42%;max-height:210px;object-fit:contain;background:white;border-radius:6px;">' +
+      '</div>' + wireRows +
+      '<div style="background:rgba(0,0,0,.16);padding:10px;border-radius:5px;"><strong>Monte nesta ordem:</strong><br>1. Desligue a placa e retire o cabo USB.<br>2. Ligue VCC em 3V3 e GND em GND.<br>3. Ligue ECHO/SDA na Conexão 2.<br>4. Ligue TRIG/SCL na Conexão 3.<br>5. Isole toda união exposta entre jumper e garra jacaré.</div>' +
+      '<div style="margin-top:9px;background:#fff3e0;color:#4e342e;padding:9px;border-radius:5px;"><strong>Importante:</strong><br>• Use o sensor compatível com 3,3 V indicado para este projeto.<br>• A Conexão 2 é sempre ECHO/SDA e a Conexão 3 é sempre TRIG/SCL; não troque os dois fios.<br>• O sensor e o Display da placa podem usar juntos as Conexões 2 e 3.<br>• As Conexões 0 e 1 continuam livres para outros componentes externos.</div>' +
+      '<div style="margin-top:9px;background:#ffebee;color:#7f0000;padding:9px;border-radius:5px;"><strong>⚠️ Segurança:</strong> nunca ligue VCC em 5V-VSYS, não mude os fios com a placa ligada e não deixe garras vizinhas se encostarem.</div>' +
+      '<div style="margin-top:9px;"><strong>Antes de ligar a placa, peça ao professor para conferir os quatro fios.</strong></div>' +
+      '</div>';
+
+  WorkspaceManager.createReminder({
+    id: 'distanceSensorConnectionNotification',
+    closeId: closeId,
+    background: '#2980b9',
+    maxWidth: '700px',
+    html: html
+  });
+};
+
+WorkspaceManager.showDistanceSensorSolderReminder = function() {
+  var closeId = 'closeDistanceSensorSolderNotification';
+  var solderImage = '../assets/images/devices/hc-sr04-m1-solder.png?ver=20260822distance1';
+  var html = Code.LANG === 'en'
+    ? WorkspaceManager.closeButton(closeId) +
+      '<div style="max-height:calc(100vh - 90px);overflow-y:auto;padding-right:4px;">' +
+      '<strong style="font-size:17px;">👩‍🏫 Teacher only — solder M1 before class</strong>' +
+      '<div style="margin-top:9px;background:#fff3cd;color:#4e342e;padding:9px;border-radius:6px;"><strong>The teacher must prepare the sensor before the activity.</strong> Students must not use the soldering iron.</div>' +
+      '<img src="' + solderImage + '" alt="Rear of the ultrasonic sensor showing where the teacher must solder M1" style="display:block;width:100%;max-height:48vh;object-fit:contain;background:white;border-radius:6px;margin:12px 0;">' +
+      '<div style="background:rgba(0,0,0,.16);padding:10px;border-radius:6px;"><strong>Do this before class:</strong><br>1. Disconnect the sensor from the BitDogLab and every power source.<br>2. Turn the sensor over and find <strong>R2 M1</strong>, indicated by the red arrow.<br>3. With suitable soldering equipment, place a small amount of solder joining the <strong>two metal points at M1</strong>.<br>4. Do not solder <strong>M2</strong>.<br>5. Check that the solder did not touch nearby parts.<br>6. Let the sensor cool completely before connecting it.</div>' +
+      '<div style="margin-top:9px;background:#ffebee;color:#7f0000;padding:9px;border-radius:6px;"><strong>Safety:</strong> only the teacher should do this, in a ventilated place, on a heat-resistant surface and wearing eye protection.</div>' +
+      '<div style="margin-top:9px;font-size:13px;"><a href="https://ptsolns.com/blogs/tinker-thoughts/ttb22-the-i2c-mode-of-the-hc-sr04-ultrasonic-sensor" target="_blank" rel="noopener noreferrer" style="color:white;font-weight:bold;">Technical reference: M1 soldered and M2 open</a></div>' +
+      '</div>'
+    : WorkspaceManager.closeButton(closeId) +
+      '<div style="max-height:calc(100vh - 90px);overflow-y:auto;padding-right:4px;">' +
+      '<strong style="font-size:17px;">👩‍🏫 Somente para o professor — solde M1 antes da aula</strong>' +
+      '<div style="margin-top:9px;background:#fff3cd;color:#4e342e;padding:9px;border-radius:6px;"><strong>O professor deve preparar o sensor antes da atividade.</strong> Os alunos não devem usar o ferro de solda.</div>' +
+      '<img src="' + solderImage + '" alt="Parte traseira do sensor ultrassônico mostrando onde o professor deve soldar M1" style="display:block;width:100%;max-height:48vh;object-fit:contain;background:white;border-radius:6px;margin:12px 0;">' +
+      '<div style="background:rgba(0,0,0,.16);padding:10px;border-radius:6px;"><strong>Faça isto antes da aula:</strong><br>1. Desconecte o sensor da BitDogLab e de qualquer fonte de energia.<br>2. Vire o sensor e encontre <strong>R2 M1</strong>, indicado pela seta vermelha.<br>3. Com o equipamento de soldagem adequado, coloque uma pequena quantidade de solda unindo os <strong>dois pontos metálicos de M1</strong>.<br>4. Não coloque solda em <strong>M2</strong>.<br>5. Confira se a solda não encostou nas peças próximas.<br>6. Espere o sensor esfriar completamente antes de conectá-lo.</div>' +
+      '<div style="margin-top:9px;background:#ffebee;color:#7f0000;padding:9px;border-radius:6px;"><strong>Segurança:</strong> somente o professor deve fazer essa preparação, em local ventilado, sobre superfície resistente ao calor e usando proteção para os olhos.</div>' +
+      '<div style="margin-top:9px;font-size:13px;"><a href="https://ptsolns.com/blogs/tinker-thoughts/ttb22-the-i2c-mode-of-the-hc-sr04-ultrasonic-sensor" target="_blank" rel="noopener noreferrer" style="color:white;font-weight:bold;">Referência técnica: M1 com solda e M2 aberto</a></div>' +
+      '</div>';
+
+  WorkspaceManager.createReminder({
+    id: 'distanceSensorSolderNotification',
+    closeId: closeId,
+    background: '#2980b9',
+    maxWidth: '400px',
+    right: '805px',
+    html: html
+  });
+};
+
+WorkspaceManager.bindDistanceSensorCategoryHint = function() {
+  var toolbox = Code.workspace && Code.workspace.getToolbox
+    ? Code.workspace.getToolbox()
+    : null;
+  var toolboxDiv = toolbox && toolbox.HtmlDiv;
+  if (!toolboxDiv || toolboxDiv.__bitdoglabDistanceSensorHintBound) return;
+
+  toolboxDiv.__bitdoglabDistanceSensorHintBound = true;
+  toolboxDiv.addEventListener('click', function(event) {
+    var clickTarget = event.target;
+    while (clickTarget && clickTarget !== toolboxDiv && !clickTarget.id) {
+      clickTarget = clickTarget.parentNode;
+    }
+    if (!clickTarget || !clickTarget.id || !toolbox.getToolboxItemById) return;
+
+    var item = toolbox.getToolboxItemById(clickTarget.id);
+    var categoryName = item && item.getName ? item.getName() : '';
+    if (categoryName === 'Sensor de Distância' || categoryName === 'Distance and presence sensor') {
+      Code.showDistanceSensorConnectionReminder();
+      WorkspaceManager.showDistanceSensorSolderReminder();
+    }
+  });
+};
+
+WorkspaceManager.showMpu6050ConnectionReminder = function() {
+  var closeId = 'closeMpu6050ConnectionNotification';
+  var boardImage = '../assets/images/devices/conexoes-externas.png';
+  var sensorImage = '../assets/images/devices/mpu6050-eixos.png?ver=20260828mpu1';
+  var profile = window.BitdogLabConfig || {};
+  var mpuConfig = profile.EXTERNAL && profile.EXTERNAL.MPU6050 || {};
+
+  if (mpuConfig.SUPPORTED !== true) {
+    var unavailableHtml = Code.LANG === 'en'
+      ? WorkspaceManager.closeButton(closeId) +
+        '<strong style="font-size:17px;">Movement and Tilt is unavailable on this board</strong><br>' +
+        '<div style="margin-top:10px;background:rgba(255,255,255,.16);padding:11px;border-radius:6px;">The external MPU6050 uses Connections 2 and 3, but this board version routes its Display through a different I2C arrangement. Select <strong>BitDogLab V7</strong> before using these blocks.</div>'
+      : WorkspaceManager.closeButton(closeId) +
+        '<strong style="font-size:17px;">Movimento e Inclinação não está disponível nesta placa</strong><br>' +
+        '<div style="margin-top:10px;background:rgba(255,255,255,.16);padding:11px;border-radius:6px;">O MPU6050 externo usa as Conexões 2 e 3, mas esta versão da placa liga o Display por outra organização I2C. Selecione a <strong>BitDogLab V7</strong> antes de usar estes blocos.</div>';
+
+    WorkspaceManager.createReminder({
+      id: 'mpu6050ConnectionNotification',
+      closeId: closeId,
+      background: '#c2185b',
+      maxWidth: '560px',
+      html: unavailableHtml
+    });
+    return;
+  }
+
+  var wireRows = Code.LANG === 'en'
+    ? '<div style="margin:10px 0 6px;font-size:15px;font-weight:bold;">Identify the MPU6050 pins</div>' +
+      '<div style="display:grid;gap:7px;margin:0 0 10px;">' +
+      '<div style="background:#ffebee;color:#7f0000;padding:8px;border-radius:5px;"><strong>VCC pin:</strong> electrical power → 3V3 contact on the board</div>' +
+      '<div style="background:#efebe9;color:#3e2723;padding:8px;border-radius:5px;"><strong>GND pin:</strong> negative/ground → GND contact on the board</div>' +
+      '<div style="background:#e8f5e9;color:#1b5e20;padding:8px;border-radius:5px;"><strong>SDA pin:</strong> motion data → Connection 2 on the board</div>' +
+      '<div style="background:#e3f2fd;color:#0d47a1;padding:8px;border-radius:5px;"><strong>SCL pin:</strong> synchronization signal → Connection 3 on the board</div>' +
+      '<div style="background:#f3e5f5;color:#4a148c;padding:8px;border-radius:5px;"><strong>INT, AD0, XCL and XDA pins:</strong> leave disconnected</div>' +
+      '</div>'
+    : '<div style="margin:10px 0 6px;font-size:15px;font-weight:bold;">Identifique os pinos do MPU6050</div>' +
+      '<div style="display:grid;gap:7px;margin:0 0 10px;">' +
+      '<div style="background:#ffebee;color:#7f0000;padding:8px;border-radius:5px;"><strong>Pino VCC:</strong> alimentação elétrica → contato 3V3 da placa</div>' +
+      '<div style="background:#efebe9;color:#3e2723;padding:8px;border-radius:5px;"><strong>Pino GND:</strong> negativo/terra → contato GND da placa</div>' +
+      '<div style="background:#e8f5e9;color:#1b5e20;padding:8px;border-radius:5px;"><strong>Pino SDA:</strong> dados do movimento → Conexão 2 da placa</div>' +
+      '<div style="background:#e3f2fd;color:#0d47a1;padding:8px;border-radius:5px;"><strong>Pino SCL:</strong> sinal de sincronização → Conexão 3 da placa</div>' +
+      '<div style="background:#f3e5f5;color:#4a148c;padding:8px;border-radius:5px;"><strong>Pinos INT, AD0, XCL e XDA:</strong> deixe sem conectar</div>' +
+      '</div>';
+  var html = Code.LANG === 'en'
+    ? WorkspaceManager.closeButton(closeId) +
+      '<div style="max-height:calc(100vh - 90px);overflow-y:auto;padding-right:4px;">' +
+      '<strong style="font-size:17px;">🧭 How to connect the MPU6050 motion sensor</strong><br>' +
+      '<div style="display:flex;gap:12px;align-items:center;margin:12px 0;">' +
+      '<img src="' + boardImage + '" alt="BitDogLab external connections" style="width:46%;max-height:230px;object-fit:contain;background:white;border-radius:6px;">' +
+      '<img src="' + sensorImage + '" alt="MPU6050 board with its movement axes" style="width:50%;max-height:230px;object-fit:contain;background:white;border-radius:6px;">' +
+      '</div>' + wireRows +
+      '<div style="background:rgba(0,0,0,.16);padding:10px;border-radius:5px;"><strong>Connect in this order:</strong><br>1. Turn the board off and disconnect the USB cable.<br>2. Connect VCC to 3V3 and GND to GND.<br>3. Connect SDA to Connection 2.<br>4. Connect SCL to Connection 3.<br>5. Leave INT, AD0, XCL and XDA disconnected.<br>6. Insulate every exposed jumper-to-clip joint.</div>' +
+      '<div style="margin-top:9px;background:#fff3e0;color:#4e342e;padding:9px;border-radius:5px;"><strong>Important:</strong><br>• Connection 2 is always SDA and Connection 3 is always SCL; do not swap them.<br>• The MPU6050, the board Display, and the ultrasonic sensor can use Connections 2 and 3 together.<br>• Connections 0 and 1 remain free for other external components.<br>• The X, Y and Z arrows in the image show the directions measured by the sensor.</div>' +
+      '<div style="margin-top:9px;background:#ffebee;color:#7f0000;padding:9px;border-radius:5px;"><strong>⚠️ Safety:</strong> never connect VCC to 5V-VSYS, do not change wires while the board is powered, and do not let neighbouring clips touch.</div>' +
+      '<div style="margin-top:9px;"><strong>Before powering the board, ask a teacher to check all four wires.</strong></div>' +
+      '</div>'
+    : WorkspaceManager.closeButton(closeId) +
+      '<div style="max-height:calc(100vh - 90px);overflow-y:auto;padding-right:4px;">' +
+      '<strong style="font-size:17px;">🧭 Como conectar o sensor de movimento MPU6050</strong><br>' +
+      '<div style="display:flex;gap:12px;align-items:center;margin:12px 0;">' +
+      '<img src="' + boardImage + '" alt="Conexões externas da BitDogLab" style="width:46%;max-height:230px;object-fit:contain;background:white;border-radius:6px;">' +
+      '<img src="' + sensorImage + '" alt="Placa MPU6050 com os eixos de movimento" style="width:50%;max-height:230px;object-fit:contain;background:white;border-radius:6px;">' +
+      '</div>' + wireRows +
+      '<div style="background:rgba(0,0,0,.16);padding:10px;border-radius:5px;"><strong>Monte nesta ordem:</strong><br>1. Desligue a placa e retire o cabo USB.<br>2. Ligue VCC em 3V3 e GND em GND.<br>3. Ligue SDA na Conexão 2.<br>4. Ligue SCL na Conexão 3.<br>5. Deixe INT, AD0, XCL e XDA sem conectar.<br>6. Isole toda união exposta entre jumper e garra jacaré.</div>' +
+      '<div style="margin-top:9px;background:#fff3e0;color:#4e342e;padding:9px;border-radius:5px;"><strong>Importante:</strong><br>• A Conexão 2 é sempre SDA e a Conexão 3 é sempre SCL; não troque os dois fios.<br>• O MPU6050, o Display da placa e o sensor ultrassônico podem usar juntos as Conexões 2 e 3.<br>• As Conexões 0 e 1 continuam livres para outros componentes externos.<br>• As setas X, Y e Z da imagem mostram as direções medidas pelo sensor.</div>' +
+      '<div style="margin-top:9px;background:#ffebee;color:#7f0000;padding:9px;border-radius:5px;"><strong>⚠️ Segurança:</strong> nunca ligue VCC em 5V-VSYS, não mude os fios com a placa ligada e não deixe garras vizinhas se encostarem.</div>' +
+      '<div style="margin-top:9px;"><strong>Antes de ligar a placa, peça ao professor para conferir os quatro fios.</strong></div>' +
+      '</div>';
+
+  WorkspaceManager.createReminder({
+    id: 'mpu6050ConnectionNotification',
+    closeId: closeId,
+    background: '#c2185b',
+    maxWidth: '740px',
+    html: html
+  });
+};
+
+WorkspaceManager.bindMpu6050CategoryHint = function() {
+  var toolbox = Code.workspace && Code.workspace.getToolbox
+    ? Code.workspace.getToolbox()
+    : null;
+  var toolboxDiv = toolbox && toolbox.HtmlDiv;
+  if (!toolboxDiv || toolboxDiv.__bitdoglabMpu6050HintBound) return;
+
+  toolboxDiv.__bitdoglabMpu6050HintBound = true;
+  toolboxDiv.addEventListener('click', function(event) {
+    var clickTarget = event.target;
+    while (clickTarget && clickTarget !== toolboxDiv && !clickTarget.id) {
+      clickTarget = clickTarget.parentNode;
+    }
+    if (!clickTarget || !clickTarget.id || !toolbox.getToolboxItemById) return;
+
+    var item = toolbox.getToolboxItemById(clickTarget.id);
+    var categoryName = item && item.getName ? item.getName() : '';
+    if (categoryName === 'Movimento e Inclinação' || categoryName === 'Movement and Tilt') {
+      Code.showMpu6050ConnectionReminder();
+    }
+  });
+};
+
+WorkspaceManager.showLdrConnectionReminder = function() {
+  var closeId = 'closeLdrConnectionNotification';
+  var boardImage = '../assets/images/devices/conexoes-externas.png';
+  var ldrImage = '../assets/images/devices/ldr-pinout.png?ver=20260820ldr2';
+  var wireRows = Code.LANG === 'en'
+    ? '<div style="margin:10px 0 6px;font-size:15px;font-weight:bold;">Identify the LDR module pins</div>' +
+      '<div style="display:grid;gap:7px;margin:0 0 10px;">' +
+      '<div style="background:#efebe9;color:#3e2723;padding:8px;border-radius:5px;"><strong>Left pin — GND:</strong> negative/ground → GND contact on the board</div>' +
+      '<div style="background:#ffebee;color:#7f0000;padding:8px;border-radius:5px;"><strong>Centre pin — VCC:</strong> electrical power → 3V3 contact on the board</div>' +
+      '<div style="background:#fff3e0;color:#4e342e;padding:8px;border-radius:5px;"><strong>Right pin — S:</strong> light signal → ANA-IN contact on the board. ANA-IN is the analogue input that reads changes in light</div>' +
+      '</div>'
+    : '<div style="margin:10px 0 6px;font-size:15px;font-weight:bold;">Identifique os pinos do módulo LDR</div>' +
+      '<div style="display:grid;gap:7px;margin:0 0 10px;">' +
+      '<div style="background:#efebe9;color:#3e2723;padding:8px;border-radius:5px;"><strong>Pino da esquerda — GND:</strong> negativo/terra → contato GND da placa</div>' +
+      '<div style="background:#ffebee;color:#7f0000;padding:8px;border-radius:5px;"><strong>Pino do meio — VCC:</strong> alimentação elétrica → contato 3V3 da placa</div>' +
+      '<div style="background:#fff3e0;color:#4e342e;padding:8px;border-radius:5px;"><strong>Pino da direita — S:</strong> sinal de luz → contato ANA-IN da placa. ANA-IN é a entrada analógica que lê as variações de luz</div>' +
+      '</div>';
+  var html = Code.LANG === 'en'
+    ? WorkspaceManager.closeButton(closeId) +
+      '<div style="max-height:calc(100vh - 90px);overflow-y:auto;padding-right:4px;">' +
+      '<strong style="font-size:17px;">🔌 How to connect the LDR light sensor</strong><br>' +
+      '<div style="display:flex;gap:12px;align-items:center;margin:12px 0;">' +
+      '<img src="' + boardImage + '" alt="BitDogLab external connections" style="width:54%;max-height:220px;object-fit:contain;background:white;border-radius:6px;">' +
+      '<img src="' + ldrImage + '" alt="LDR module pinout" style="width:42%;max-height:220px;object-fit:contain;background:white;border-radius:6px;">' +
+      '</div>' + wireRows +
+      '<div style="background:rgba(0,0,0,.16);padding:10px;border-radius:5px;">' +
+      '<strong>Connect in this order:</strong><br>1. Turn the board off and disconnect the USB cable.<br>2. For each pin: LDR pin → female end of a male-to-female jumper → male end held by an alligator clip → correct board contact.<br>3. Insulate every jumper-to-clip joint with electrical tape.</div>' +
+      '<div style="margin-top:9px;background:#fff3e0;color:#4e342e;padding:9px;border-radius:5px;"><strong>Important:</strong><br>• Power the LDR only from 3V3. Never use 5V-VSYS.<br>• Connect pin S only to ANA-IN. Never connect it to Connection 0, Connection 1, Connection 2, or Connection 3.<br>• Follow the separate JP1 warning to enable ANA-IN.</div>' +
+      '<div style="margin-top:9px;background:#ffebee;color:#7f0000;padding:9px;border-radius:5px;"><strong>⚠️ Safety:</strong> do not let neighbouring clips touch. Cover every exposed metal part to prevent a short circuit.</div>' +
+      '<div style="margin-top:9px;"><strong>Before powering the board, ask a teacher to check all three wires and the JP1 jumper.</strong></div>' +
+      '</div>'
+    : WorkspaceManager.closeButton(closeId) +
+      '<div style="max-height:calc(100vh - 90px);overflow-y:auto;padding-right:4px;">' +
+      '<strong style="font-size:17px;">🔌 Como conectar o sensor de luz LDR</strong><br>' +
+      '<div style="display:flex;gap:12px;align-items:center;margin:12px 0;">' +
+      '<img src="' + boardImage + '" alt="Conexões externas da BitDogLab" style="width:54%;max-height:220px;object-fit:contain;background:white;border-radius:6px;">' +
+      '<img src="' + ldrImage + '" alt="Pinos do módulo LDR" style="width:42%;max-height:220px;object-fit:contain;background:white;border-radius:6px;">' +
+      '</div>' + wireRows +
+      '<div style="background:rgba(0,0,0,.16);padding:10px;border-radius:5px;">' +
+      '<strong>Monte nesta ordem:</strong><br>1. Desligue a placa e retire o cabo USB.<br>2. Para cada pino: pino do LDR → ponta fêmea do jumper macho-fêmea → ponta macho presa à garra jacaré → contato correto da placa.<br>3. Isole com fita isolante a união entre cada jumper e sua garra jacaré.</div>' +
+      '<div style="margin-top:9px;background:#fff3e0;color:#4e342e;padding:9px;border-radius:5px;"><strong>Importante:</strong><br>• Alimente o LDR somente pelo contato 3V3. Nunca use 5V-VSYS.<br>• Ligue o pino S somente ao contato ANA-IN. Nunca ligue esse pino à Conexão 0, Conexão 1, Conexão 2 ou Conexão 3.<br>• Siga também o aviso separado do JP1 para liberar a entrada ANA-IN.</div>' +
+      '<div style="margin-top:9px;background:#ffebee;color:#7f0000;padding:9px;border-radius:5px;"><strong>⚠️ Segurança:</strong> não deixe garras vizinhas se encostarem. Cubra todo metal exposto para evitar curto-circuito.</div>' +
+      '<div style="margin-top:9px;"><strong>Antes de ligar a placa, peça ao professor para conferir os três fios e o jumper JP1.</strong></div>' +
+      '</div>';
+
+  WorkspaceManager.createReminder({
+    id: 'ldrConnectionNotification',
+    closeId: closeId,
+    background: '#8e7cc3',
+    maxWidth: '700px',
+    html: html
+  });
+};
+
+WorkspaceManager.showLdrScaleReminder = function() {
+  var closeId = 'closeLdrScaleNotification';
+  var invertButtonId = 'invertLdrScaleButton';
+  var scaleStatusId = 'ldrScaleStatus';
+  var scaleFeedbackId = 'ldrScaleFeedback';
+  var ldrSettings = Code.LdrSettings;
+  var standardDirection = !ldrSettings || ldrSettings.isInverted();
+  var scaleStatus = Code.LANG === 'en'
+    ? (standardDirection ? 'Current direction: standard' : 'Current direction: inverted')
+    : (standardDirection ? 'Direção atual: padrão' : 'Direção atual: invertida');
+  var html = Code.LANG === 'en'
+    ? WorkspaceManager.closeButton(closeId) +
+      '<strong style="font-size:17px;">☀️ Check the light direction</strong><br><br>' +
+      'Your program with the light sensor was sent to the board.<br><br>' +
+      '<div style="background:white;color:#4527a0;padding:10px;border-radius:6px;margin-bottom:9px;">' +
+      '<strong>Why can the number work backwards?</strong><br>Light sensors can be built in two different ways. On some of them, more light makes the number go down. Do not worry: this does not mean you connected it incorrectly!' +
+      '</div>' +
+      '<div style="background:#e8f5e9;color:#1b5e20;padding:10px;border-radius:6px;">' +
+      '<strong>Try it:</strong><br>1. Cover the sensor or leave it with very little light.<br>2. Then shine plenty of light on it.<br><br>' +
+      'If little light shows a high number, between <strong>80 and 100</strong>, and plenty of light shows a low number, between <strong>0 and 20</strong>, the scale is backwards. Click <strong>Invert scale</strong>.' +
+      '</div>' +
+      '<div id="' + scaleStatusId + '" style="margin:11px 0 8px;font-weight:bold;font-size:15px;">' + scaleStatus + '</div>' +
+      'If your number does the opposite, use this button:<br>' +
+      '<button id="' + invertButtonId + '" type="button" style="margin-top:8px;background:#5e35b1;color:white;border:0;border-radius:6px;padding:10px 16px;font-size:15px;font-weight:bold;cursor:pointer;">🔄 Invert scale</button>' +
+      '<div style="margin-top:11px;background:#fff3cd;color:#4e342e;padding:9px;border-radius:6px;"><strong>Important:</strong> after changing the direction, click Run again to send the change to the board.</div>' +
+      '<div id="' + scaleFeedbackId + '" role="status" aria-live="polite" style="display:none;margin-top:9px;background:white;color:#1b5e20;padding:9px;border-radius:6px;font-weight:bold;"></div>'
+    : WorkspaceManager.closeButton(closeId) +
+      '<strong style="font-size:17px;">☀️ Confira a direção da luz</strong><br><br>' +
+      'Seu programa com o sensor de luz foi enviado para a placa.<br><br>' +
+      '<div style="background:white;color:#4527a0;padding:10px;border-radius:6px;margin-bottom:9px;">' +
+      '<strong>Por que o número pode funcionar ao contrário?</strong><br>Os sensores de luz podem ser montados de dois jeitos. Em alguns deles, quando chega mais luz, o número diminui. Fique tranquilo: isso não quer dizer que você ligou o sensor errado!' +
+      '</div>' +
+      '<div style="background:#e8f5e9;color:#1b5e20;padding:10px;border-radius:6px;">' +
+      '<strong>Faça um teste:</strong><br>1. Cubra o sensor ou deixe-o com bem pouca luz.<br>2. Depois, ilumine bastante o sensor.<br><br>' +
+      'Se com pouca luz aparecer um número alto, entre <strong>80 e 100</strong>, e com muita luz aparecer um número baixo, entre <strong>0 e 20</strong>, a escala está ao contrário. Clique em <strong>Inverter escala</strong>.' +
+      '</div>' +
+      '<div id="' + scaleStatusId + '" style="margin:11px 0 8px;font-weight:bold;font-size:15px;">' + scaleStatus + '</div>' +
+      'Se o seu número fizer o contrário, use este botão:<br>' +
+      '<button id="' + invertButtonId + '" type="button" style="margin-top:8px;background:#5e35b1;color:white;border:0;border-radius:6px;padding:10px 16px;font-size:15px;font-weight:bold;cursor:pointer;">🔄 Inverter escala</button>' +
+      '<div style="margin-top:11px;background:#fff3cd;color:#4e342e;padding:9px;border-radius:6px;"><strong>Importante:</strong> depois de mudar a direção, clique em Executar novamente para enviar a mudança à placa.</div>' +
+      '<div id="' + scaleFeedbackId + '" role="status" aria-live="polite" style="display:none;margin-top:9px;background:white;color:#1b5e20;padding:9px;border-radius:6px;font-weight:bold;"></div>';
+
+  WorkspaceManager.createReminder({
+    id: 'ldrScaleNotification',
+    closeId: closeId,
+    background: '#8e7cc3',
+    maxWidth: '440px',
+    maxHeight: 'calc(100vh - 40px)',
+    centered: true,
+    html: html
+  });
+
+  var invertButton = document.getElementById(invertButtonId);
+  if (invertButton && !invertButton.__bitdoglabLdrScaleBound) {
+    invertButton.__bitdoglabLdrScaleBound = true;
+    invertButton.addEventListener('click', function() {
+      if (!Code.LdrSettings) return;
+
+      var orientation = Code.LdrSettings.toggle();
+      var isInverted = orientation === Code.LdrSettings.INVERTED;
+      var status = document.getElementById(scaleStatusId);
+      var feedback = document.getElementById(scaleFeedbackId);
+      var statusText = Code.LANG === 'en'
+        ? (isInverted ? 'Current direction: standard' : 'Current direction: inverted')
+        : (isInverted ? 'Direção atual: padrão' : 'Direção atual: invertida');
+      var feedbackText = Code.LANG === 'en'
+        ? 'Done! The direction changed. Click Run again to send the change to the board.'
+        : 'Pronto! A direção mudou. Clique em Executar novamente para enviar a mudança à placa.';
+
+      if (status) status.textContent = statusText;
+      if (feedback) {
+        feedback.textContent = feedbackText;
+        feedback.style.display = 'block';
+      }
+      if (typeof UI !== 'undefined' && UI.notify && UI.notify.send) {
+        UI.notify.send(feedbackText);
+      }
+    });
+  }
+};
+
+WorkspaceManager.showLdrJumperReminder = function() {
+  var closeId = 'closeLdrJumperNotification';
+  var jumperImage = '../assets/images/devices/ldr-jumper-jp1.png?ver=20260820jp2';
+  var html = Code.LANG === 'en'
+    ? WorkspaceManager.closeButton(closeId) +
+      '<div style="max-height:calc(100vh - 90px);overflow-y:auto;padding-right:4px;">' +
+      '<strong style="font-size:17px;">⚠️ Enable the analogue input ANA-IN</strong>' +
+      '<div style="margin-top:9px;background:#fff3cd;color:#4e342e;padding:9px;border-radius:6px;"><strong>JP1 is on the underside of the board.</strong> The jumper is the small piece that connects two pins.</div>' +
+      '<img src="' + jumperImage + '" alt="How to move the JP1 jumper to enable ANA-IN" style="display:block;width:100%;max-height:62vh;object-fit:contain;background:white;border-radius:6px;margin:12px 0;">' +
+      '<div style="background:rgba(0,0,0,.16);padding:10px;border-radius:5px;"><strong>Move the jumper in this order:</strong><br>1. Call the teacher. This change must be made or supervised by them.<br>2. Turn the board off and disconnect the USB cable.<br>3. Find JP1 on the underside of the board.<br>4. Remove the jumper from its current position.<br>5. Place it on the MIC side, as shown in the image.<br>6. Check that JP1 is free. ANA-IN is now enabled for the LDR.</div>' +
+      '<div style="margin-top:9px;background:#fff3cd;color:#4e342e;padding:10px;border:2px solid #f9b900;border-radius:6px;"><strong>Important:</strong> the microphone and LDR use the same board resource, so they cannot be used at the same time.</div>' +
+      '<div style="margin-top:9px;background:#ffebee;color:#7f0000;padding:9px;border-radius:5px;"><strong>⚠️ Safety:</strong> never move the jumper while the board is powered or connected by USB. Do not force the piece.</div>' +
+      '<div style="margin-top:9px;"><strong>Ask the teacher to check the final position before powering the board.</strong></div>' +
+      '</div>'
+    : WorkspaceManager.closeButton(closeId) +
+      '<div style="max-height:calc(100vh - 90px);overflow-y:auto;padding-right:4px;">' +
+      '<strong style="font-size:17px;">⚠️ Libere a entrada analógica ANA-IN</strong>' +
+      '<div style="margin-top:9px;background:#fff3cd;color:#4e342e;padding:9px;border-radius:6px;"><strong>O JP1 fica na parte de baixo da placa.</strong> O jumper é a pequena peça que conecta dois pinos.</div>' +
+      '<img src="' + jumperImage + '" alt="Como mover o jumper JP1 para liberar a entrada ANA-IN" style="display:block;width:100%;max-height:62vh;object-fit:contain;background:white;border-radius:6px;margin:12px 0;">' +
+      '<div style="background:rgba(0,0,0,.16);padding:10px;border-radius:5px;"><strong>Mude o jumper nesta ordem:</strong><br>1. Chame o professor. Esta alteração deve ser feita ou supervisionada por ele.<br>2. Desligue a placa e retire o cabo USB.<br>3. Localize o JP1 na parte de baixo da placa.<br>4. Retire o jumper da posição atual.<br>5. Coloque-o no lado MIC, como mostra a imagem.<br>6. Confira se o JP1 ficou livre. Assim, a entrada ANA-IN estará liberada para o LDR.</div>' +
+      '<div style="margin-top:9px;background:#fff3cd;color:#4e342e;padding:10px;border:2px solid #f9b900;border-radius:6px;"><strong>Importante:</strong> o microfone e o LDR usam o mesmo recurso da placa. Por isso, eles não podem ser usados ao mesmo tempo.</div>' +
+      '<div style="margin-top:9px;background:#ffebee;color:#7f0000;padding:9px;border-radius:5px;"><strong>⚠️ Segurança:</strong> nunca mova o jumper com a placa ligada ou com o cabo USB conectado. Não force a peça.</div>' +
+      '<div style="margin-top:9px;"><strong>Peça ao professor para conferir a posição final antes de ligar a placa.</strong></div>' +
+      '</div>';
+
+  WorkspaceManager.createReminder({
+    id: 'ldrJumperNotification',
+    closeId: closeId,
+    background: '#8e7cc3',
+    maxWidth: '400px',
+    right: '805px',
+    html: html
+  });
+};
+
+WorkspaceManager.bindLdrCategoryHint = function() {
+  var toolbox = Code.workspace && Code.workspace.getToolbox
+    ? Code.workspace.getToolbox()
+    : null;
+  var toolboxDiv = toolbox && toolbox.HtmlDiv;
+  if (!toolboxDiv || toolboxDiv.__bitdoglabLdrHintBound) return;
+
+  toolboxDiv.__bitdoglabLdrHintBound = true;
+  toolboxDiv.addEventListener('click', function(event) {
+    var clickTarget = event.target;
+    while (clickTarget && clickTarget !== toolboxDiv && !clickTarget.id) {
+      clickTarget = clickTarget.parentNode;
+    }
+    if (!clickTarget || !clickTarget.id || !toolbox.getToolboxItemById) return;
+
+    var item = toolbox.getToolboxItemById(clickTarget.id);
+    var categoryName = item && item.getName ? item.getName() : '';
+    if (categoryName === 'Sensor de Luz' || categoryName === 'Light and shadow sensor (LDR)') {
+      Code.showLdrConnectionReminder();
+      WorkspaceManager.showLdrJumperReminder();
     }
   });
 };
@@ -932,10 +1468,245 @@ WorkspaceManager.showGraficoReminder = function() {
   });
 };
 
+/*
+ * The inclination value block needs a short, hands-on explanation before the
+ * child starts using it.  This panel is intentionally independent from the
+ * regular reminders: it is modal, sits above every other hint, and temporarily
+ * hides the reminders that are already open so the instruction is unambiguous.
+ */
+WorkspaceManager.closeMpu6050TiltTutorial = function() {
+  var state = WorkspaceManager._mpu6050TiltTutorialState;
+  if (!state) return;
+
+  if (state.panel && state.panel.parentNode) {
+    state.panel.parentNode.removeChild(state.panel);
+  }
+  if (state.backdrop && state.backdrop.parentNode) {
+    state.backdrop.parentNode.removeChild(state.backdrop);
+  }
+
+  (state.hiddenElements || []).forEach(function(item) {
+    if (!item.element) return;
+    if (item.style === null) {
+      item.element.removeAttribute('style');
+    } else {
+      item.element.setAttribute('style', item.style);
+    }
+    item.element.hidden = item.hidden;
+  });
+
+  if (document.body) {
+    document.body.classList.remove('bitdoglab-mpu6050-tilt-tutorial-open');
+  }
+  if (state.onKeyDown) {
+    document.removeEventListener('keydown', state.onKeyDown);
+  }
+  WorkspaceManager._mpu6050TiltTutorialState = null;
+};
+
+WorkspaceManager.showMpu6050TiltTutorial = function(block) {
+  var active = WorkspaceManager._mpu6050TiltTutorialState;
+  if (active) {
+    WorkspaceManager.closeMpu6050TiltTutorial();
+  }
+
+  var tutorialId = 'mpu6050TiltTutorial';
+  var backdrop = document.createElement('div');
+  backdrop.className = 'bitdoglab-mpu6050-tilt-backdrop';
+  backdrop.setAttribute('aria-hidden', 'true');
+
+  var panel = document.createElement('section');
+  panel.id = tutorialId;
+  panel.className = 'bitdoglab-mpu6050-tilt-tutorial';
+  panel.setAttribute('role', 'dialog');
+  panel.setAttribute('aria-modal', 'true');
+  panel.setAttribute('aria-labelledby', 'mpu6050TiltTutorialTitle');
+
+  var hiddenElements = [];
+  var selectors = [
+    '[id$="Notification"]',
+    '#project-hardware-notice',
+    '#tutorial-steps',
+    '#partnership-notice'
+  ];
+  var elementsToHide = document.querySelectorAll(selectors.join(','));
+  elementsToHide.forEach(function(element) {
+    if (element.id === tutorialId) return;
+    hiddenElements.push({
+      element: element,
+      hidden: element.hidden,
+      style: element.getAttribute('style')
+    });
+    element.hidden = true;
+    element.style.setProperty('display', 'none', 'important');
+  });
+
+  var state = {
+    panel: panel,
+    backdrop: backdrop,
+    hiddenElements: hiddenElements,
+    onKeyDown: null
+  };
+  WorkspaceManager._mpu6050TiltTutorialState = state;
+
+  var direction = block && block.getFieldValue && block.getFieldValue('DIRECTION') === 'LEFT'
+    ? 'left'
+    : 'right';
+  var directionText = Code.LANG === 'en'
+    ? (direction === 'left' ? 'left' : 'right')
+    : (direction === 'left' ? 'esquerda' : 'direita');
+  var directionArticle = Code.LANG === 'en' ? 'the ' : 'a ';
+
+  panel.innerHTML = Code.LANG === 'en'
+    ? '<header class="bitdoglab-mpu6050-tilt-header">' +
+      '<div><span class="bitdoglab-mpu6050-tilt-kicker">MPU6050</span>' +
+      '<h2 id="mpu6050TiltTutorialTitle">How to use the tilt block</h2></div>' +
+      '<button type="button" class="bitdoglab-mpu6050-tilt-close" aria-label="Close">&times;</button>' +
+      '</header>' +
+      '<img class="bitdoglab-mpu6050-tilt-image" src="../assets/images/devices/mpu6050-inclinacao.png?ver=20260830tilt1" alt="MPU6050 tilted to the left or right">' +
+      '<div class="bitdoglab-mpu6050-tilt-copy">' +
+      '<p><strong>1. Fix the accelerometer level</strong><br>Keep the MPU6050 firmly in the position shown in the picture.</p>' +
+      '<p><strong>2. Move it to <span class="bitdoglab-mpu6050-tilt-direction">' + directionText + '</span></strong><br>Use the same side selected in your block: <strong>Tilt to ' + directionArticle + directionText + '</strong>.</p>' +
+      '<p><strong>3. Read the value</strong><br>The block returns the tilt angle in degrees. You can compare it in a condition or show it on the Display.</p>' +
+      '</div>' +
+      '<button type="button" class="bitdoglab-mpu6050-tilt-ok">Got it!</button>'
+    : '<header class="bitdoglab-mpu6050-tilt-header">' +
+      '<div><span class="bitdoglab-mpu6050-tilt-kicker">MPU6050</span>' +
+      '<h2 id="mpu6050TiltTutorialTitle">Como usar o bloco de inclinação</h2></div>' +
+      '<button type="button" class="bitdoglab-mpu6050-tilt-close" aria-label="Fechar">&times;</button>' +
+      '</header>' +
+      '<img class="bitdoglab-mpu6050-tilt-image" src="../assets/images/devices/mpu6050-inclinacao.png?ver=20260830tilt1" alt="MPU6050 inclinado para a esquerda ou para a direita">' +
+      '<div class="bitdoglab-mpu6050-tilt-copy">' +
+      '<p><strong>1. Fixe o acelerômetro reto</strong><br>Prenda o MPU6050 firmemente na posição mostrada na imagem.</p>' +
+      '<p><strong>2. Mova para <span class="bitdoglab-mpu6050-tilt-direction">' + directionText + '</span></strong><br>Use o mesmo lado escolhido no bloco: <strong>Inclinação para ' + directionText + '</strong>.</p>' +
+      '<p><strong>3. Leia o valor</strong><br>O bloco informa o ângulo de inclinação em graus. Você pode compará-lo em uma condição ou mostrá-lo no Display.</p>' +
+      '</div>' +
+      '<button type="button" class="bitdoglab-mpu6050-tilt-ok">Entendi!</button>';
+
+  document.body.appendChild(backdrop);
+  document.body.appendChild(panel);
+  document.body.classList.add('bitdoglab-mpu6050-tilt-tutorial-open');
+
+  var close = function() {
+    WorkspaceManager.closeMpu6050TiltTutorial();
+  };
+  panel.querySelector('.bitdoglab-mpu6050-tilt-close').addEventListener('click', close);
+  panel.querySelector('.bitdoglab-mpu6050-tilt-ok').addEventListener('click', close);
+  state.onKeyDown = function(event) {
+    if (event.key === 'Escape') close();
+  };
+  document.addEventListener('keydown', state.onKeyDown);
+  panel.querySelector('.bitdoglab-mpu6050-tilt-ok').focus();
+};
+
+/*
+ * The acceleration value block gets the same priority treatment as the tilt
+ * block, but uses the axis illustration and explains the selected axis.
+ */
+WorkspaceManager.showMpu6050AccelerationTutorial = function(block) {
+  var active = WorkspaceManager._mpu6050TiltTutorialState;
+  if (active) {
+    WorkspaceManager.closeMpu6050TiltTutorial();
+  }
+
+  var tutorialId = 'mpu6050AccelerationTutorial';
+  var titleId = 'mpu6050AccelerationTutorialTitle';
+  var backdrop = document.createElement('div');
+  backdrop.className = 'bitdoglab-mpu6050-tilt-backdrop';
+  backdrop.setAttribute('aria-hidden', 'true');
+
+  var panel = document.createElement('section');
+  panel.id = tutorialId;
+  panel.className = 'bitdoglab-mpu6050-tilt-tutorial';
+  panel.setAttribute('role', 'dialog');
+  panel.setAttribute('aria-modal', 'true');
+  panel.setAttribute('aria-labelledby', titleId);
+
+  var hiddenElements = [];
+  var selectors = [
+    '[id$="Notification"]',
+    '#project-hardware-notice',
+    '#tutorial-steps',
+    '#partnership-notice'
+  ];
+  var elementsToHide = document.querySelectorAll(selectors.join(','));
+  elementsToHide.forEach(function(element) {
+    if (element.id === tutorialId) return;
+    hiddenElements.push({
+      element: element,
+      hidden: element.hidden,
+      style: element.getAttribute('style')
+    });
+    element.hidden = true;
+    element.style.setProperty('display', 'none', 'important');
+  });
+
+  var state = {
+    panel: panel,
+    backdrop: backdrop,
+    hiddenElements: hiddenElements,
+    onKeyDown: null
+  };
+  WorkspaceManager._mpu6050TiltTutorialState = state;
+
+  var axis = block && block.getFieldValue && block.getFieldValue('AXIS');
+  if (axis !== 'Y' && axis !== 'Z') axis = 'X';
+
+  var axisDescription = Code.LANG === 'en'
+    ? (axis === 'X' ? 'left and right' : axis === 'Y' ? 'front and back' : 'up and down')
+    : (axis === 'X' ? 'esquerda e direita' : axis === 'Y' ? 'frente e tr&aacute;s' : 'cima e baixo');
+  var axisName = Code.LANG === 'en' ? 'axis ' + axis : 'eixo ' + axis;
+
+  panel.innerHTML = Code.LANG === 'en'
+    ? '<header class="bitdoglab-mpu6050-tilt-header">' +
+      '<div><span class="bitdoglab-mpu6050-tilt-kicker">MPU6050</span>' +
+      '<h2 id="' + titleId + '">How to use the acceleration block</h2></div>' +
+      '<button type="button" class="bitdoglab-mpu6050-tilt-close" aria-label="Close">&times;</button>' +
+      '</header>' +
+      '<img class="bitdoglab-mpu6050-tilt-image" src="../assets/images/devices/mpu6050-eixos-aceleracao.png?ver=20260830accel1" alt="MPU6050 with the X, Y and Z axes">' +
+      '<div class="bitdoglab-mpu6050-tilt-copy">' +
+      '<p><strong>1. Fix the accelerometer</strong><br>Keep the MPU6050 firmly in the position shown in the picture.</p>' +
+      '<p><strong>2. Choose ' + axisName + '</strong><br>The selected axis measures movement ' + axisDescription + '.</p>' +
+      '<p><strong>3. Read the value</strong><br>The block returns acceleration in m/s². Store it in a variable, compare it in a condition, or show it on the Display.</p>' +
+      '</div>' +
+      '<button type="button" class="bitdoglab-mpu6050-tilt-ok">Got it!</button>'
+    : '<header class="bitdoglab-mpu6050-tilt-header">' +
+      '<div><span class="bitdoglab-mpu6050-tilt-kicker">MPU6050</span>' +
+      '<h2 id="' + titleId + '">Como usar o bloco de acelera&ccedil;&atilde;o</h2></div>' +
+      '<button type="button" class="bitdoglab-mpu6050-tilt-close" aria-label="Fechar">&times;</button>' +
+      '</header>' +
+      '<img class="bitdoglab-mpu6050-tilt-image" src="../assets/images/devices/mpu6050-eixos-aceleracao.png?ver=20260830accel1" alt="MPU6050 com os eixos X, Y e Z">' +
+      '<div class="bitdoglab-mpu6050-tilt-copy">' +
+      '<p><strong>1. Fixe o aceler&ocirc;metro</strong><br>Prenda o MPU6050 firmemente na posi&ccedil;&atilde;o mostrada na imagem.</p>' +
+      '<p><strong>2. Escolha o ' + axisName + '</strong><br>Esse eixo mede o movimento para ' + axisDescription + '.</p>' +
+      '<p><strong>3. Leia o valor</strong><br>O bloco informa a acelera&ccedil;&atilde;o em m/s&sup2;. Guarde em uma vari&aacute;vel, compare em uma condi&ccedil;&atilde;o ou mostre no Display.</p>' +
+      '</div>' +
+      '<button type="button" class="bitdoglab-mpu6050-tilt-ok">Entendi!</button>';
+
+  document.body.appendChild(backdrop);
+  document.body.appendChild(panel);
+  document.body.classList.add('bitdoglab-mpu6050-tilt-tutorial-open');
+
+  var close = function() {
+    WorkspaceManager.closeMpu6050TiltTutorial();
+  };
+  panel.querySelector('.bitdoglab-mpu6050-tilt-close').addEventListener('click', close);
+  panel.querySelector('.bitdoglab-mpu6050-tilt-ok').addEventListener('click', close);
+  state.onKeyDown = function(event) {
+    if (event.key === 'Escape') close();
+  };
+  document.addEventListener('keydown', state.onKeyDown);
+  panel.querySelector('.bitdoglab-mpu6050-tilt-ok').focus();
+};
+
 WorkspaceManager.bindWorkspaceHints = function() {
+  WorkspaceManager.bindExternalContactCategoryHint();
   WorkspaceManager.bindServoCategoryHint();
   WorkspaceManager.bindDht11CategoryHint();
   WorkspaceManager.bindExternalLedCategoryHint();
+  WorkspaceManager.bindLdrCategoryHint();
+  WorkspaceManager.bindDistanceSensorCategoryHint();
+  WorkspaceManager.bindMpu6050CategoryHint();
 
   Code.workspace.addChangeListener(function(event) {
     if (event.type === Blockly.Events.BLOCK_CREATE) {
@@ -943,6 +1714,14 @@ WorkspaceManager.bindWorkspaceHints = function() {
       if (!block) return;
 
       var blockType = block.type;
+
+      if (blockType === 'mpu6050_inclinacao') {
+        Code.showMpu6050TiltTutorial(block);
+      }
+      if (blockType === 'mpu6050_aceleracao') {
+        Code.showMpu6050AccelerationTutorial(block);
+      }
+
       var servoControllerBlocks = [
         'servo_mover',
         'servo_joystick_controlar',
@@ -1011,6 +1790,12 @@ WorkspaceManager.bindWorkspaceHints = function() {
       }
       if (blockType === 'display_mostrar_valor') {
         var valorBlock = block.getInputTargetBlock && block.getInputTargetBlock('VALOR');
+        if (valorBlock && valorBlock.type === 'mpu6050_inclinacao') {
+          Code.showMpu6050TiltTutorial(valorBlock);
+        }
+        if (valorBlock && valorBlock.type === 'mpu6050_aceleracao') {
+          Code.showMpu6050AccelerationTutorial(valorBlock);
+        }
         if (valorBlock && valorBlock.type === 'robo_giro_valor') {
           Code.showRobotInstrumentDisplayReminder();
         }
@@ -1042,6 +1827,18 @@ WorkspaceManager.bindWorkspaceHints = function() {
       }
       if (blockType === 'temporizacao') {
         Code.showTimingPanel();
+      }
+    } else if (event.type === Blockly.Events.BLOCK_MOVE &&
+               event.oldParentId !== event.newParentId) {
+      var movedBlock = Code.workspace.getBlockById(event.blockId);
+      var movedParent = movedBlock && movedBlock.getParent ? movedBlock.getParent() : null;
+      if (movedBlock && movedBlock.type === 'mpu6050_inclinacao' &&
+          movedParent && movedParent.type === 'display_mostrar_valor') {
+        Code.showMpu6050TiltTutorial(movedBlock);
+      }
+      if (movedBlock && movedBlock.type === 'mpu6050_aceleracao' &&
+          movedParent && movedParent.type === 'display_mostrar_valor') {
+        Code.showMpu6050AccelerationTutorial(movedBlock);
       }
     }
   });

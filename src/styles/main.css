@@ -727,6 +727,12 @@ button.icon.medium:before  {
 #saveButton:before, #downloadIcon:before  {
   background-position: left calc(-1.5rem*1) top;
 }
+#captureBlocksButton:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h3l2-2h6l2 2h3v12H4z'/%3E%3Ccircle cx='12' cy='13' r='3.5'/%3E%3C/svg%3E");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 1.5rem 1.5rem;
+}
 #loadButton:before {
   background-position: left calc(-1.5rem*2) top;
 }
@@ -752,17 +758,23 @@ button.icon.medium:before  {
 #toolbarButton.on:before {
   background-position: left calc(-2.5rem*11) bottom;
 }
-/* White icons */
-#saveButton,
-#loadButton,
-#trashButton,
-#connectButton,
-#serialButton,
+/* Connection icon */
 #connectButton:before {
   background-position: left calc(-1.5rem*13) top;
 }
 #connectButton.on:before {
   background-position: left calc(-1.5rem*13) bottom;
+}
+
+/* Keep the main toolbar actions visible over every visual theme. */
+@media (min-width: 60em) {
+  .top-menu #connectButton:before,
+  .top-menu #saveButton:before,
+  .top-menu #captureBlocksButton:before,
+  .top-menu #loadButton:before,
+  .top-menu #trashButton:before {
+    filter: brightness(0) invert(1) drop-shadow(0 1px 1px rgba(0, 0, 0, .55));
+  }
 }
 @media (max-width: 710px) {
   .tab_collapse {
@@ -941,6 +953,396 @@ button.icon.medium:before  {
   }
 }
 
+/* Choice shown before entering the existing Mobile Robot project. */
+body.bitdoglab-robot-mode-selector-open {
+  overflow: hidden;
+}
+
+.robot-mode-selector {
+  position: fixed;
+  inset: 0;
+  z-index: 100004;
+  display: grid;
+  box-sizing: border-box;
+  place-items: center;
+  overflow-y: auto;
+  padding: 28px 18px;
+  background: rgba(20, 13, 39, 0.9);
+}
+
+.robot-mode-selector[hidden] {
+  display: none;
+}
+
+.robot-mode-selector-card {
+  position: relative;
+  width: min(820px, 100%);
+  box-sizing: border-box;
+  padding: 34px;
+  border: 3px solid #7c3aed;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
+}
+
+.robot-mode-selector-card > h2 {
+  margin: 0 44px 26px;
+  color: var(--bitdoglab-primary);
+  font-family: var(--font-primary);
+  font-size: clamp(1.5rem, 4vw, 2.1rem);
+  line-height: 1.2;
+  text-align: center;
+}
+
+.robot-mode-selector-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--bitdoglab-primary);
+  cursor: pointer;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.robot-mode-selector-close:hover,
+.robot-mode-selector-close:focus-visible {
+  background: #ede9fe;
+  outline: 3px solid #f59e0b;
+}
+
+.robot-mode-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.robot-mode-option {
+  display: flex;
+  min-height: 220px;
+  box-sizing: border-box;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 28px 24px;
+  border: 4px solid transparent;
+  border-radius: 20px;
+  background: #f8fafc;
+  color: #334155;
+  cursor: pointer;
+  font-family: var(--font-primary);
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.robot-mode-option.is-complete {
+  border-color: #e67e22;
+}
+
+.robot-mode-option.is-complete:hover,
+.robot-mode-option.is-complete:focus-visible {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 30px rgba(230, 126, 34, 0.24);
+  outline: none;
+}
+
+.robot-mode-option.is-arrows {
+  border-color: #2980b9;
+}
+
+.robot-mode-option.is-arrows:hover,
+.robot-mode-option.is-arrows:focus-visible {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 30px rgba(41, 128, 185, 0.24);
+  outline: none;
+}
+
+.robot-mode-option strong {
+  color: var(--bitdoglab-primary);
+  font-size: 1.55rem;
+}
+
+.robot-mode-option span {
+  max-width: 30rem;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .robot-mode-selector-card {
+    padding: 30px 18px 20px;
+  }
+
+  .robot-mode-selector-card > h2 {
+    margin: 0 38px 20px 0;
+    text-align: left;
+  }
+
+  .robot-mode-options {
+    grid-template-columns: 1fr;
+  }
+
+  .robot-mode-option {
+    min-height: 170px;
+  }
+}
+
+/* Short visual example shown only when Arrow Mode is selected. */
+body.bitdoglab-arrow-mode-intro-open {
+  overflow: hidden;
+}
+
+.arrow-mode-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 100005;
+  display: grid;
+  box-sizing: border-box;
+  place-items: center;
+  overflow-y: auto;
+  padding: 18px;
+  background: rgba(20, 13, 39, 0.88);
+}
+
+.arrow-mode-intro[hidden] {
+  display: none;
+}
+
+.arrow-mode-intro-card {
+  width: min(430px, 100%);
+  box-sizing: border-box;
+  padding: 16px;
+  border: 3px solid #2563eb;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
+  color: #334155;
+  text-align: center;
+}
+
+.arrow-mode-intro-image {
+  display: block;
+  width: 100%;
+  max-height: 62vh;
+  border-radius: 12px;
+  object-fit: contain;
+}
+
+.arrow-mode-intro-card h2 {
+  margin: 12px 0 4px;
+  color: var(--bitdoglab-primary);
+  font-family: var(--font-primary);
+  font-size: 1.45rem;
+}
+
+.arrow-mode-intro-card p {
+  margin: 0 0 12px;
+  font-size: 1rem;
+}
+
+.arrow-mode-intro-card button {
+  min-width: 150px;
+  padding: 11px 24px;
+  border: 0;
+  border-radius: 12px;
+  background: #2563eb;
+  color: #fff;
+  cursor: pointer;
+  font-family: var(--font-primary);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.arrow-mode-intro-card button:hover,
+.arrow-mode-intro-card button:focus-visible {
+  background: #1d4ed8;
+  outline: 3px solid #f59e0b;
+  outline-offset: 2px;
+}
+
+/* Confirmation shown before entering the External Connections project. */
+body.bitdoglab-external-project-warning-open {
+  overflow: hidden;
+}
+
+.external-project-warning {
+  position: fixed;
+  inset: 0;
+  z-index: 100005;
+  display: grid;
+  box-sizing: border-box;
+  place-items: center;
+  overflow-y: auto;
+  padding: 28px 18px;
+  background: rgba(20, 13, 39, 0.86);
+}
+
+.external-project-warning[hidden] {
+  display: none;
+}
+
+.external-project-warning-card {
+  width: min(880px, 100%);
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 3px solid #7c3aed;
+  border-radius: 20px;
+  background: #fff;
+  color: #253247;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
+}
+
+.external-project-warning-header {
+  padding: 24px 28px 20px;
+  background: linear-gradient(135deg, #4c1d95, #6d28d9);
+  color: #fff;
+  text-align: left;
+}
+
+.external-project-warning-eyebrow {
+  margin: 0 0 6px;
+  color: #ddd6fe;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.external-project-warning-header h2 {
+  margin: 0;
+  font-size: clamp(1.45rem, 4vw, 2rem);
+  line-height: 1.2;
+}
+
+.external-project-warning-header > p:last-child {
+  margin: 10px 0 0;
+  color: #f5f3ff;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.external-project-warning-grid {
+  display: grid;
+  grid-template-columns: 1.08fr 0.92fr;
+  gap: 18px;
+  padding: 22px 28px 10px;
+  text-align: left;
+}
+
+.external-project-warning-grid section {
+  border: 1px solid #ddd6fe;
+  border-radius: 14px;
+  background: #faf8ff;
+  padding: 16px 18px;
+}
+
+.external-project-warning-grid h3 {
+  margin: 0 0 10px;
+  color: #4c1d95;
+  font-size: 1rem;
+}
+
+.external-project-warning-grid ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.external-project-warning-grid li {
+  margin: 7px 0;
+  line-height: 1.35;
+}
+
+.external-project-sensor-note,
+.external-project-safety {
+  margin: 12px 28px 0;
+  border-radius: 12px;
+  padding: 13px 15px;
+  text-align: left;
+  font-size: 0.94rem;
+  line-height: 1.48;
+}
+
+.external-project-sensor-note {
+  border-left: 5px solid #2563eb;
+  background: #eff6ff;
+  color: #1e3a8a;
+}
+
+.external-project-safety {
+  border-left: 5px solid #d97706;
+  background: #fff7ed;
+  color: #7c2d12;
+  font-weight: 650;
+}
+
+.external-project-warning-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px 28px 24px;
+}
+
+.external-project-warning-actions button {
+  min-height: 44px;
+  border-radius: 10px;
+  padding: 10px 17px;
+  cursor: pointer;
+  font-size: 0.94rem;
+  font-weight: 800;
+}
+
+.external-project-cancel {
+  border: 1px solid #a8b2c1;
+  background: #fff;
+  color: #344054;
+}
+
+.external-project-confirm {
+  border: 1px solid #5b21b6;
+  background: #6d28d9;
+  color: #fff;
+}
+
+.external-project-warning-actions button:hover,
+.external-project-warning-actions button:focus-visible {
+  filter: brightness(0.94);
+  outline: 3px solid rgba(109, 40, 217, 0.25);
+  outline-offset: 2px;
+}
+
+@media (max-width: 720px) {
+  .external-project-warning {
+    place-items: start center;
+    padding: 14px 10px;
+  }
+
+  .external-project-warning-grid {
+    grid-template-columns: 1fr;
+    padding: 16px 16px 6px;
+  }
+
+  .external-project-warning-header {
+    padding: 20px 18px 17px;
+  }
+
+  .external-project-sensor-note,
+  .external-project-safety {
+    margin-right: 16px;
+    margin-left: 16px;
+  }
+
+  .external-project-warning-actions {
+    align-items: stretch;
+    flex-direction: column-reverse;
+    padding: 18px 16px 20px;
+  }
+}
+
 /* Hardware guide notice shown after selecting a project. */
 .project-hardware-notice {
   position: fixed;
@@ -1042,6 +1444,141 @@ button.icon.medium:before  {
     align-self: flex-start;
     white-space: normal;
   }
+}
+
+/* Priority tutorial shown when the MPU6050 inclination value block is added. */
+.bitdoglab-mpu6050-tilt-backdrop {
+  position: fixed;
+  z-index: 100010;
+  inset: 0;
+  background: rgba(24, 17, 42, 0.58);
+}
+
+.bitdoglab-mpu6050-tilt-tutorial {
+  position: fixed;
+  z-index: 100011;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  width: min(430px, calc(100% - 32px));
+  max-height: calc(100vh - 32px);
+  box-sizing: border-box;
+  flex-direction: column;
+  overflow-y: auto;
+  border: 3px solid #c2185b;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 20px 60px rgba(15, 8, 32, 0.48);
+  color: #263244;
+  transform: translate(-50%, -50%);
+  animation: bitdoglabMpuTiltTutorialIn 0.2s ease-out;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.bitdoglab-mpu6050-tilt-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px 10px;
+  background: #c2185b;
+  color: #fff;
+}
+
+.bitdoglab-mpu6050-tilt-kicker {
+  display: block;
+  margin-bottom: 2px;
+  color: #ffd6e5;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.bitdoglab-mpu6050-tilt-header h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  line-height: 1.2;
+}
+
+.bitdoglab-mpu6050-tilt-close {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.18);
+  color: #fff;
+  cursor: pointer;
+  font-size: 1.45rem;
+  line-height: 1;
+}
+
+.bitdoglab-mpu6050-tilt-close:hover,
+.bitdoglab-mpu6050-tilt-close:focus-visible {
+  background: rgba(0, 0, 0, 0.34);
+  outline: 2px solid #fff;
+  outline-offset: 1px;
+}
+
+.bitdoglab-mpu6050-tilt-image {
+  display: block;
+  width: calc(100% - 24px);
+  max-height: 220px;
+  margin: 12px auto 4px;
+  border-radius: 10px;
+  object-fit: contain;
+}
+
+.bitdoglab-mpu6050-tilt-copy {
+  padding: 0 18px 4px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.bitdoglab-mpu6050-tilt-copy p {
+  margin: 9px 0;
+}
+
+.bitdoglab-mpu6050-tilt-direction {
+  color: #c2185b;
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
+.bitdoglab-mpu6050-tilt-ok {
+  align-self: flex-end;
+  margin: 4px 18px 16px;
+  padding: 9px 18px;
+  border: 0;
+  border-radius: 9px;
+  background: #c2185b;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.bitdoglab-mpu6050-tilt-ok:hover,
+.bitdoglab-mpu6050-tilt-ok:focus-visible {
+  background: #8e1243;
+  outline: 3px solid rgba(194, 24, 91, 0.26);
+  outline-offset: 2px;
+}
+
+body.bitdoglab-mpu6050-tilt-tutorial-open .bitdoglab-contract-warning-bubble {
+  visibility: hidden !important;
+}
+
+body.bitdoglab-mpu6050-tilt-tutorial-open [id$="Notification"],
+body.bitdoglab-mpu6050-tilt-tutorial-open #project-hardware-notice,
+body.bitdoglab-mpu6050-tilt-tutorial-open #tutorial-steps {
+  visibility: hidden !important;
+}
+
+@keyframes bitdoglabMpuTiltTutorialIn {
+  from { opacity: 0; transform: translate(-50%, -47%) scale(0.98); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
 
 /* Device selector */
@@ -1281,7 +1818,7 @@ button.icon.medium:before  {
 .blocklyToolboxDiv {
   background: linear-gradient(135deg, #f0f9ff 0%, #e6e6fa 100%);
   border-right: 2px solid #d1c4e9;
-  width: 300px;
+  width: 320px;
 }
 
 .blocklyTreeRow {
@@ -1370,12 +1907,66 @@ button.icon.medium:before  {
   vertical-align: middle;
 }
 
+/* Ícone visual da categoria do sensor de luz LDR. */
+.bitdoglab-ldr-category-icon {
+  width: 2.1rem;
+  height: 2.1rem;
+  margin-inline-end: 0.35rem;
+  background-image: url('../assets/images/devices/ldr.png?ver=20260820ldr3');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  visibility: visible !important;
+  vertical-align: middle;
+}
+
+/* Ícone visual da categoria do sensor ultrassônico HC-SR04. */
+.bitdoglab-distance-sensor-category-icon {
+  width: 2.1rem;
+  height: 2.1rem;
+  margin-inline-end: 0.35rem;
+  background-image: url('../assets/images/devices/hc-sr04.png?ver=20260822distance1');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  visibility: visible !important;
+  vertical-align: middle;
+}
+
+/* Ícone visual da categoria do acelerômetro e giroscópio MPU6050. */
+.bitdoglab-mpu6050-category-icon {
+  width: 2.1rem;
+  height: 2.1rem;
+  margin-inline-end: 0.35rem;
+  background-image: url('../assets/images/devices/mpu6050.png?ver=20260828mpu2');
+  background-color: white;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  border-radius: 0.25rem;
+  visibility: visible !important;
+  vertical-align: middle;
+}
+
 /* Ícone visual da categoria de LEDs externos. */
 .bitdoglab-external-led-category-icon {
   width: 2.1rem;
   height: 2.1rem;
   margin-inline-end: 0.35rem;
   background-image: url('../assets/images/devices/ky-016.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  visibility: visible !important;
+  vertical-align: middle;
+}
+
+/* Visual icon for the child-friendly external contacts category. */
+.bitdoglab-external-contact-category-icon {
+  width: 2.1rem;
+  height: 2.1rem;
+  margin-inline-end: 0.35rem;
+  background-image: url('../assets/images/devices/external-contacts.png');
   background-position: center;
   background-repeat: no-repeat;
   background-size: contain;

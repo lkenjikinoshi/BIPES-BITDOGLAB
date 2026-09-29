@@ -1,8 +1,13 @@
 // Generators for display blocks.
 'use strict';
 
+function _displaySetupDefinition(code) {
+  return BitdogLabConfig.MARKERS.SETUP_START + '\n' +
+    code + '\n' +
+    BitdogLabConfig.MARKERS.SETUP_END;
+}
+
 function _setupDisplayDefinitions(displayType) {
-  var pins = BitdogLabConfig.PINS;
   var display = BitdogLabConfig.DISPLAY;
   displayType = displayType || DEFAULT_DISPLAY_TYPE;
 
@@ -17,27 +22,35 @@ function _setupDisplayDefinitions(displayType) {
   }
   Blockly.Python.activeDisplayType = displayType;
 
-  Blockly.Python.definitions_['import_pin'] = 'from machine import Pin';
-  Blockly.Python.definitions_['import_i2c'] = 'from machine import I2C';
+  var busPolicy = _resolveSharedExternalI2cPolicy();
+  _setupSharedExternalI2c(busPolicy);
+  var transport = BitdogLabDisplayTransport.select(
+    BitdogLabConfig,
+    displayType,
+    busPolicy
+  );
 
   if (displayType === 'LARGE') {
     Blockly.Python.definitions_['lib_sh1107'] = SensorLibs.SH1107;
-    Blockly.Python.definitions_['setup_display'] =
-      'i2c = I2C(' + display.I2C_BUS + ', scl=Pin(' + pins.I2C_SCL + '), sda=Pin(' + pins.I2C_SDA + '), freq=' + display.I2C_FREQ + ')\n' +
+    Blockly.Python.definitions_['setup_display'] = _displaySetupDefinition(
       '_sh1107_scan = i2c.scan()\n' +
       '_sh1107_addr = 0x3C if 0x3C in _sh1107_scan else (0x3D if 0x3D in _sh1107_scan else 0x3C)\n' +
-      'oled = SH1107_I2C(128, 128, i2c, address=_sh1107_addr, rotate=90)\n' +
+      'oled = ' + transport.driverClass + '(128, 128, i2c, address=_sh1107_addr, rotate=90)\n' +
       '_display_width = 128\n' +
-      '_display_height = 128';
+      '_display_height = 128'
+    );
   } else {
     Blockly.Python.definitions_['lib_ssd1306'] = SensorLibs.SSD1306;
-    Blockly.Python.definitions_['setup_display'] =
-      'i2c = I2C(' + display.I2C_BUS + ', scl=Pin(' + pins.I2C_SCL + '), sda=Pin(' + pins.I2C_SDA + '), freq=' + display.I2C_FREQ + ')\n' +
+    if (transport.pythonDefinition) {
+      Blockly.Python.definitions_[transport.definitionKey] = transport.pythonDefinition;
+    }
+    Blockly.Python.definitions_['setup_display'] = _displaySetupDefinition(
       '_ssd1306_scan = i2c.scan()\n' +
       '_ssd1306_addr = 0x3C if 0x3C in _ssd1306_scan else (0x3D if 0x3D in _ssd1306_scan else 0x3C)\n' +
-      'oled = SSD1306_I2C(' + display.WIDTH + ', ' + display.HEIGHT + ', i2c, addr=_ssd1306_addr)\n' +
+      'oled = ' + transport.driverClass + '(' + display.WIDTH + ', ' + display.HEIGHT + ', i2c, addr=_ssd1306_addr)\n' +
       '_display_width = ' + display.WIDTH + '\n' +
-      '_display_height = ' + display.HEIGHT;
+      '_display_height = ' + display.HEIGHT
+    );
   }
 }
 
@@ -222,15 +235,22 @@ Blockly.Python["display_mostrar_calculo"] = function(block) {
   // Calcular posição X baseado no alinhamento e tamanho do texto
   if (alinhamento === 'LEFT') {
     code += '_calc_x = 3\n';
+    code += '_calc_clear_x = 0\n';
+    code += '_calc_clear_width = 64\n';
   } else if (alinhamento === 'CENTER') {
     code += '_calc_x = max(3, (128 - len(_calc_result) * 8) // 2)\n';
+    code += '_calc_clear_x = 0\n';
+    code += '_calc_clear_width = 128\n';
   } else { // RIGHT
-    code += '_calc_x = max(3, 125 - len(_calc_result) * 8)\n';
+    // Keep the value in the right half so a label on the left is preserved.
+    code += '_calc_x = max(64, 128 - len(_calc_result) * 8)\n';
+    code += '_calc_clear_x = 64\n';
+    code += '_calc_clear_width = 64\n';
   }
 
   // Limpar a linha inteira antes de escrever: resultados que mudam de tamanho
   // (por exemplo, 9 -> 10 ou 100 -> 5) não deixam pixels antigos no OLED.
-  code += 'oled.fill_rect(0, ' + y + ', 128, 8, 0)\n';
+  code += 'oled.fill_rect(_calc_clear_x, ' + y + ', _calc_clear_width, 8, 0)\n';
 
   // Mostrar o resultado no display
   code += 'oled.text(_calc_result, _calc_x, ' + y + ', 1)\n';
@@ -335,6 +355,19 @@ Blockly.Python["display_mostrar_valor"] = function(block) {
     code += '_display_value = "{:.2f} V".format(' + valor + ')\n';
   } else if (valueBlock && valueBlock.type === 'robo_corrente_robo') {
     code += '_display_value = "{:.2f} A".format(' + valor + ')\n';
+  } else if (valueBlock && valueBlock.type === 'ultrassonico_distancia') {
+    code += '_display_value = _ultrassonico_formatar(' + valor + ')\n';
+  } else if (valueBlock && valueBlock.type === 'mpu6050_inclinacao') {
+    code += '_display_value = _mpu6050_formatar(' + valor + ', " deg")\n';
+  } else if (valueBlock && valueBlock.type === 'mpu6050_aceleracao') {
+    code += '_display_value = _mpu6050_formatar(' + valor + ', " m/s2")\n';
+  } else if (valueBlock && (
+    valueBlock.type === 'robo_aceleracao_x' ||
+    valueBlock.type === 'robo_aceleracao_y' ||
+    valueBlock.type === 'robo_aceleracao_z'
+  )) {
+    // Keep robot acceleration compact enough for the right half of the OLED.
+    code += '_display_value = str(round(' + valor + ', 1)) + "m/s2"\n';
   } else if (isRobotNumericValue) {
     code += '_display_value = str(round(' + valor + ', 4))' + sufixoUnidade + '\n';
   } else {
@@ -344,18 +377,22 @@ Blockly.Python["display_mostrar_valor"] = function(block) {
   // Calcular posição X baseado no alinhamento e tamanho do texto
   if (alinhamento === 'LEFT') {
     code += '_display_x = 3\n';
-    code += '_display_x_clear = 3\n';
+    code += '_display_x_clear = 0\n';
+    code += '_display_clear_width = 64\n';
   } else if (alinhamento === 'CENTER') {
     code += '_display_x = max(3, (128 - len(_display_value) * 8) // 2)\n';
-    code += '_display_x_clear = max(3, _display_x - 16)\n';
+    code += '_display_x_clear = 0\n';
+    code += '_display_clear_width = 128\n';
   } else { // RIGHT
-    code += '_display_x = max(3, 125 - len(_display_value) * 8)\n';
-    // 32px extras à esquerda: cobre transição de até 4 chars (ex: "100%" → "1%")
-    code += '_display_x_clear = max(3, _display_x - 32)\n';
+    // Keep the value in the right half so a label on the left is preserved.
+    code += '_display_x = max(64, 128 - len(_display_value) * 8)\n';
+    // Preserve a label written on the left of the same line.
+    code += '_display_x_clear = 64\n';
+    code += '_display_clear_width = 64\n';
   }
 
   // Limpar área do valor antes de escrever (evita sobreposição de pixels antigos)
-  code += 'oled.fill_rect(_display_x_clear, ' + y + ', 128 - _display_x_clear, 8, 0)\n';
+  code += 'oled.fill_rect(_display_x_clear, ' + y + ', _display_clear_width, 8, 0)\n';
 
   // Mostrar o valor no display
   code += 'oled.text(_display_value, _display_x, ' + y + ', 1)\n';
@@ -442,6 +479,17 @@ Blockly.Python["display_limpar"] = function(block) {
   var code = 'oled.fill(0)\n';
   code += 'oled.show()\n';
   return code;
+};
+
+Blockly.Python["display_limpar_linha"] = function(block) {
+  _setupDisplayForBlock(block);
+
+  var linha = block.getFieldValue('LINHA');
+  var yPositions = {'1': 8, '2': 18, '3': 28, '4': 38, '5': 48};
+  var y = yPositions[linha];
+
+  // The Python organizer batches this clear with following OLED drawing commands.
+  return 'oled.fill_rect(0, ' + y + ', 128, 8, 0)\n';
 };
 
 Blockly.Python["display_mostrar_estado_botao"] = function(block) {

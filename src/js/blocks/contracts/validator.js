@@ -716,6 +716,158 @@
     }
   }
 
+  var EXTERNAL_CONTACT_CONNECTION_TYPES = [
+    'external_contact_when_closed',
+    'external_contact_is_closed'
+  ];
+  var EXTERNAL_CONTACT_USAGE_TYPES = EXTERNAL_CONTACT_CONNECTION_TYPES.concat([
+    'external_contact_test_matrix'
+  ]);
+
+  function validateExternalContactRules(blocks, warnings, notices) {
+    var config = global.BitdogLabConfig || {};
+    var external = config.EXTERNAL || {};
+    var contactConfig = external.EXTERNAL_CONTACT || {};
+    var allowed = (contactConfig.ALLOWED_DIG || Object.keys(external.DIG_PINS || {})).map(String);
+    var preparations = [];
+    var preparationModes = {};
+    var contactBlocks = [];
+
+    for (var i = 0; i < blocks.length; i++) {
+      var block = blocks[i];
+      if (!block || !block.getFieldValue) continue;
+
+      if (block.type === 'external_contact_prepare') {
+        var common = block.getFieldValue('COMMON') === '3V3' ? '3V3' : 'GND';
+        preparations.push(block);
+        preparationModes[common] = true;
+        continue;
+      }
+
+      if (EXTERNAL_CONTACT_USAGE_TYPES.indexOf(block.type) !== -1) {
+        contactBlocks.push(block);
+      }
+
+      if (EXTERNAL_CONTACT_CONNECTION_TYPES.indexOf(block.type) === -1) continue;
+      var dig = String(block.getFieldValue('DIG') || '');
+      if (allowed.indexOf(dig) === -1) {
+        addWarning(warnings, block, msg('externalContactInvalidConnection'));
+      }
+    }
+
+    if (!preparations.length) {
+      for (var missingIndex = 0; missingIndex < contactBlocks.length; missingIndex++) {
+        addWarning(warnings, contactBlocks[missingIndex], msg('externalContactMissingPrepare'));
+      }
+    }
+
+    if (Object.keys(preparationModes).length > 1) {
+      for (var preparationIndex = 0; preparationIndex < preparations.length; preparationIndex++) {
+        addWarning(warnings, preparations[preparationIndex], msg('externalContactPrepareConflict'));
+      }
+    } else if (preparations.length > 1) {
+      for (var duplicateIndex = 1; duplicateIndex < preparations.length; duplicateIndex++) {
+        addNotice(notices, preparations[duplicateIndex], msg('externalContactPrepareDuplicate'));
+      }
+    }
+
+    if (config.VERSION !== 'v7') return;
+    var hasOledBlock = blocks.some(isOledBlock);
+    var has3V3Preparation = !!preparationModes['3V3'];
+    if (!hasOledBlock && !has3V3Preparation) return;
+    if (hasOledBlock && contactBlocks.length) {
+      addNotice(notices, contactBlocks[0], msg('externalContactOledV7Notice'));
+    }
+    var reserved = (contactConfig.OLED_RESERVED_DIG || ['2', '3']).map(String);
+    for (var oledIndex = 0; oledIndex < blocks.length; oledIndex++) {
+      var contactBlock = blocks[oledIndex];
+      if (!contactBlock || !contactBlock.getFieldValue) continue;
+
+      if (contactBlock.type === 'external_contact_test_matrix') {
+        addWarning(
+          warnings,
+          contactBlock,
+          msg(has3V3Preparation
+            ? 'externalContactTest3V3OledV7Conflict'
+            : 'externalContactTestOledV7Conflict')
+        );
+        continue;
+      }
+
+      if (EXTERNAL_CONTACT_CONNECTION_TYPES.indexOf(contactBlock.type) === -1) continue;
+      var contactDig = String(contactBlock.getFieldValue('DIG') || '');
+      if (reserved.indexOf(contactDig) !== -1) {
+        addWarning(
+          warnings,
+          contactBlock,
+          format(msg(has3V3Preparation
+            ? 'externalContact3V3OledV7Conflict'
+            : 'externalContactOledV7Conflict'), contactDig)
+        );
+      }
+    }
+  }
+
+  function isDht11Aht20Conflict(left, right) {
+    return (left.peripheralId === 'dht11' && right.peripheralId === 'aht20-i2c') ||
+      (right.peripheralId === 'dht11' && left.peripheralId === 'aht20-i2c');
+  }
+
+  function isLdrMicrophoneConflict(left, right) {
+    return (left.peripheralId === 'ldr' && right.peripheralId === 'microphone') ||
+      (right.peripheralId === 'ldr' && left.peripheralId === 'microphone');
+  }
+
+  function addPhysicalResourceConflict(warnings, left, right) {
+    if (isLdrMicrophoneConflict(left, right)) {
+      addWarning(warnings, left.block, msg('ldrMicrophoneConflict'));
+      addWarning(warnings, right.block, msg('ldrMicrophoneConflict'));
+      return;
+    }
+
+    var leftIsContact = left.peripheralId === 'external-contact';
+    var rightIsContact = right.peripheralId === 'external-contact';
+
+    if (leftIsContact && right.internalI2c) {
+      addWarning(
+        warnings,
+        left.block,
+        format2(msg('externalContactI2cConflict'), left.connection, right.peripheralLabel)
+      );
+      addWarning(
+        warnings,
+        right.block,
+        format2(msg('externalContactI2cConflict'), left.connection, right.peripheralLabel)
+      );
+      return;
+    }
+
+    if (rightIsContact && left.internalI2c) {
+      addWarning(
+        warnings,
+        left.block,
+        format2(msg('externalContactI2cConflict'), right.connection, left.peripheralLabel)
+      );
+      addWarning(
+        warnings,
+        right.block,
+        format2(msg('externalContactI2cConflict'), right.connection, left.peripheralLabel)
+      );
+      return;
+    }
+
+    addWarning(
+      warnings,
+      left.block,
+      format2(msg('externalConnectionConflict'), left.connection, right.peripheralLabel)
+    );
+    addWarning(
+      warnings,
+      right.block,
+      format2(msg('externalConnectionConflict'), right.connection, left.peripheralLabel)
+    );
+  }
+
   function validateExternalResourceConflicts(blocks, warnings) {
     var config = global.BitdogLabConfig;
     var registry = Code.ExternalResources;
@@ -741,17 +893,170 @@
           var right = resourceClaims[rightIndex];
           if (left.peripheralId === right.peripheralId) continue;
 
-          addWarning(
-            warnings,
-            left.block,
-            format2(msg('externalConnectionConflict'), left.connection, right.peripheralLabel)
-          );
-          addWarning(
-            warnings,
-            right.block,
-            format2(msg('externalConnectionConflict'), right.connection, left.peripheralLabel)
-          );
+          // Different I2C devices may share SDA/SCL. They must still conflict
+          // with a GPIO peripheral, such as an external contact or LED.
+          if (left.internalI2c && right.internalI2c) continue;
+
+          // Keep the more didactic, existing DHT11/AHT20 explanation instead
+          // of adding a second generic resource warning for the same pair.
+          if (isDht11Aht20Conflict(left, right)) continue;
+
+          addPhysicalResourceConflict(warnings, left, right);
         }
+      }
+    }
+  }
+
+  function validateLdrRules(blocks, warnings) {
+    var config = global.BitdogLabConfig || {};
+    var ldrConfig = config.EXTERNAL && config.EXTERNAL.LDR || {};
+    var expectedConnection = String(ldrConfig.CONNECTION || 'ANA-IN');
+
+    for (var i = 0; i < blocks.length; i++) {
+      var block = blocks[i];
+      if (block.type !== 'ldr_valor' || !block.getFieldValue) continue;
+
+      if (String(block.getFieldValue('CONNECTION') || '') !== expectedConnection) {
+        addWarning(warnings, block, msg('ldrInvalidConnection'));
+      }
+    }
+  }
+
+  function validateUltrassonicoRules(blocks, warnings) {
+    var config = global.BitdogLabConfig || {};
+    var ultrasonic = config.EXTERNAL && config.EXTERNAL.ULTRASSONICO || {};
+    var expectedTrig = String(ultrasonic.TRIG_CONNECTION || '3');
+    var expectedEcho = String(ultrasonic.ECHO_CONNECTION || '2');
+    var ultrasonicTypes = [
+      'ultrassonico_distancia'
+    ];
+
+    for (var i = 0; i < blocks.length; i++) {
+      var block = blocks[i];
+      if (ultrasonicTypes.indexOf(block.type) === -1 || !block.getFieldValue) continue;
+
+      var trig = String(block.getFieldValue('TRIG') || '');
+      var echo = String(block.getFieldValue('ECHO') || '');
+      if (trig !== expectedTrig || echo !== expectedEcho) {
+        addWarning(warnings, block, msg('ultrassonicoInvalidConnection'));
+      }
+    }
+  }
+
+  function validateMpu6050Rules(blocks, warnings) {
+    var mpu6050Types = [
+      'mpu6050_inclinacao',
+      'mpu6050_foi_movimentado',
+      'mpu6050_aceleracao',
+      'mpu6050_bolinha_display'
+    ];
+    var robotMpu6050Types = [
+      'robo_inicializar',
+      'robo_frente',
+      'robo_tras',
+      'robo_girar',
+      'robo_parar',
+      'robo_joystick',
+      'robo_giro_valor',
+      'robo_aceleracao_x',
+      'robo_aceleracao_y',
+      'robo_aceleracao_z',
+      'robo_transferidor_360'
+    ];
+    var mpuBlocks = [];
+    var robotBlocks = [];
+    var ballBlocks = [];
+    var otherDisplayBlocks = [];
+
+    for (var i = 0; i < blocks.length; i++) {
+      if (mpu6050Types.indexOf(blocks[i].type) !== -1) {
+        mpuBlocks.push(blocks[i]);
+        if (blocks[i].type === 'mpu6050_bolinha_display') ballBlocks.push(blocks[i]);
+      }
+      if (robotMpu6050Types.indexOf(blocks[i].type) !== -1) robotBlocks.push(blocks[i]);
+      if (blocks[i].type !== 'mpu6050_bolinha_display' && isOledBlock(blocks[i])) {
+        otherDisplayBlocks.push(blocks[i]);
+      }
+    }
+
+    if (mpuBlocks.length === 0) return;
+
+    var profile = global.BitdogLabConfig || {};
+    var mpuConfig = profile.EXTERNAL && profile.EXTERNAL.MPU6050;
+    var requiredNumericFields = [
+      'I2C_BUS',
+      'I2C_FREQ',
+      'I2C_SDA',
+      'I2C_SCL',
+      'ADDRESS'
+    ];
+    var validProfile = Boolean(mpuConfig) &&
+      (mpuConfig.SUPPORTED === true || mpuConfig.SUPPORTED === false) &&
+      String(mpuConfig.SDA_CONNECTION || '') !== '' &&
+      String(mpuConfig.SCL_CONNECTION || '') !== '';
+
+    for (var numericIndex = 0; numericIndex < requiredNumericFields.length; numericIndex++) {
+      if (!mpuConfig || !isFinite(Number(mpuConfig[requiredNumericFields[numericIndex]]))) {
+        validProfile = false;
+      }
+    }
+
+    var expectedSda = String(mpuConfig && mpuConfig.SDA_CONNECTION || '2');
+    var expectedScl = String(mpuConfig && mpuConfig.SCL_CONNECTION || '3');
+
+    for (var blockIndex = 0; blockIndex < mpuBlocks.length; blockIndex++) {
+      var block = mpuBlocks[blockIndex];
+
+      if (!validProfile) {
+        addWarning(warnings, block, msg('mpu6050InvalidProfile'));
+      } else if (mpuConfig.SUPPORTED !== true) {
+        addWarning(warnings, block, msg('mpu6050UnsupportedProfile'));
+      }
+
+      if (!block.getFieldValue) continue;
+
+      if (String(block.getFieldValue('SDA') || '') !== expectedSda ||
+          String(block.getFieldValue('SCL') || '') !== expectedScl) {
+        addWarning(warnings, block, msg('mpu6050InvalidConnection'));
+      }
+
+      if (block.type === 'mpu6050_inclinacao' &&
+          ['RIGHT', 'LEFT'].indexOf(block.getFieldValue('DIRECTION')) === -1) {
+        addWarning(warnings, block, msg('mpu6050InvalidDirection'));
+      }
+
+      if (block.type === 'mpu6050_aceleracao' &&
+          ['X', 'Y', 'Z'].indexOf(block.getFieldValue('AXIS')) === -1) {
+        addWarning(warnings, block, msg('mpu6050InvalidAxis'));
+      }
+
+      if (block.type === 'mpu6050_bolinha_display' &&
+          ['SMALL', 'LARGE'].indexOf(block.getFieldValue('DISPLAY_TYPE')) === -1) {
+        addWarning(warnings, block, msg('mpu6050InvalidDisplayType'));
+      }
+    }
+
+    if (robotBlocks.length > 0) {
+      for (var externalIndex = 0; externalIndex < mpuBlocks.length; externalIndex++) {
+        addWarning(warnings, mpuBlocks[externalIndex], msg('mpu6050RobotConflict'));
+      }
+      for (var robotIndex = 0; robotIndex < robotBlocks.length; robotIndex++) {
+        addWarning(warnings, robotBlocks[robotIndex], msg('mpu6050RobotConflict'));
+      }
+    }
+
+    if (ballBlocks.length > 1) {
+      for (var ballIndex = 0; ballIndex < ballBlocks.length; ballIndex++) {
+        addWarning(warnings, ballBlocks[ballIndex], msg('mpu6050BallDuplicate'));
+      }
+    }
+
+    if (ballBlocks.length > 0 && otherDisplayBlocks.length > 0) {
+      for (var ballDisplayIndex = 0; ballDisplayIndex < ballBlocks.length; ballDisplayIndex++) {
+        addWarning(warnings, ballBlocks[ballDisplayIndex], msg('mpu6050BallDisplayConflict'));
+      }
+      for (var displayIndex = 0; displayIndex < otherDisplayBlocks.length; displayIndex++) {
+        addWarning(warnings, otherDisplayBlocks[displayIndex], msg('mpu6050BallDisplayConflict'));
       }
     }
   }
@@ -818,6 +1123,36 @@
     var warnings = {};
     var notices = {};
 
+    var selectedProject = '';
+    try {
+      selectedProject = global.localStorage && global.localStorage.getItem('bitdoglab_project') || '';
+    } catch (e) {}
+    var isArrowProject = selectedProject === 'robo_setas' || blocks.some(function(block) {
+      return block.type && block.type.indexOf('robo_setas_') === 0;
+    });
+    if (isArrowProject) {
+      var joystickMessage = String(Code.LANG || 'pt-br').indexOf('en') === 0
+        ? 'Arrow mode runs a programmed mission. Remove this joystick block or choose another project.'
+        : 'O modo por setas executa uma missão programada. Remova este bloco que usa o joystick ou escolha outro projeto.';
+      var foreverMessage = String(Code.LANG || 'pt-br').indexOf('en') === 0
+        ? 'This forever loop prevents the arrow mission from finishing. Use a finite repeat block.'
+        : 'Este loop para sempre impede a missão por setas de terminar. Use o bloco repetir um número de vezes.';
+      blocks.forEach(function(block) {
+        var usesJoystick = block.type && (
+          block.type.indexOf('joystick_') === 0 ||
+          block.type === 'robo_joystick' ||
+          block.type === 'servo_joystick_controlar'
+        );
+        if (block.getFieldValue && block.getFieldValue('BOTAO') === 'JOYSTICK') {
+          usesJoystick = true;
+        }
+        if (usesJoystick) addWarning(warnings, block, joystickMessage);
+        if (block.type === 'controls_repeat_forever') {
+          addWarning(warnings, block, foreverMessage);
+        }
+      });
+    }
+
     validateMissingGenerators(blocks, warnings);
     validateValuePlacement(blocks, warnings);
     validateContractRequirements(blocks, warnings);
@@ -831,6 +1166,10 @@
     validateDht11Aht20V7I2c0Conflicts(blocks, warnings);
     validateExternalLedRules(blocks, warnings);
     validateExternalLedOledV7PinConflicts(blocks, warnings, notices);
+    validateExternalContactRules(blocks, warnings, notices);
+    validateLdrRules(blocks, warnings);
+    validateUltrassonicoRules(blocks, warnings);
+    validateMpu6050Rules(blocks, warnings);
     validateExternalResourceConflicts(blocks, warnings);
     validateNearMissConnections(blocks, warnings);
 
@@ -934,17 +1273,43 @@
     workspace.__bitdoglabContractValidation = true;
 
     var timer = null;
+    function validateAndShowPreventiveNotice() {
+      var warnings = validateWorkspace(workspace);
+      var notices = warnings.__bitdoglabNotices || {};
+      var expectedMessage = msg('externalLedOledV7Notice');
+      var hasExternalLedDisplayNotice = false;
+
+      for (var blockId in notices) {
+        if (!notices.hasOwnProperty(blockId)) continue;
+        if (notices[blockId].indexOf(expectedMessage) !== -1) {
+          hasExternalLedDisplayNotice = true;
+          break;
+        }
+      }
+
+      if (!hasExternalLedDisplayNotice) {
+        workspace.__bitdoglabExternalLedDisplayNoticeShown = false;
+        return;
+      }
+      if (workspace.__bitdoglabExternalLedDisplayNoticeShown) return;
+
+      workspace.__bitdoglabExternalLedDisplayNoticeShown = true;
+      if (typeof Code.showExternalLedDisplayNotice === 'function') {
+        Code.showExternalLedDisplayNotice();
+      }
+    }
+
     function schedule(event) {
       if (!shouldValidateEvent(event)) return;
       if (timer) clearTimeout(timer);
       timer = setTimeout(function() {
-        validateWorkspace(workspace);
+        validateAndShowPreventiveNotice();
       }, 120);
     }
 
     workspace.addChangeListener(schedule);
     setTimeout(function() {
-      validateWorkspace(workspace);
+      validateAndShowPreventiveNotice();
     }, 500);
   }
 

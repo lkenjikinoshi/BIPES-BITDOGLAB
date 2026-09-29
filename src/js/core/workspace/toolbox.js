@@ -24,6 +24,9 @@ WorkspaceManager.filterToolboxByProject = function(project) {
       filtered = Code.translateToolboxXml(filtered);
     }
     Code.workspace.updateToolbox(filtered);
+    if (Code.BlockContractValidator) {
+      Code.BlockContractValidator.validateWorkspace(Code.workspace);
+    }
     if (Code.translateDom) {
       setTimeout(function() { Code.translateDom(document.body); }, 0);
     }

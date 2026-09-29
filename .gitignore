@@ -58,6 +58,10 @@ script/
 
 # Testes locais (não versionados)
 /tests/
+!/tests/
+/tests/*
+!/tests/fixtures/
+/tests/fixtures/*
 
 # Logs
 *.log

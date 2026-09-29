@@ -63,6 +63,11 @@ var BitdogLabConfig_V6 = createProfile(BitdogLabProfileBase, {
       '2': 2,
       '3': 3
     },
+    EXTERNAL_CONTACT: {
+      ALLOWED_DIG: ['0', '1', '2', '3'],
+      DEFAULT_COMMON: 'GND',
+      DEBOUNCE_MS: 50
+    },
     SERVO: {
       ALLOWED_DIG: ['0', '1', '2', '3'],
       PWM_FREQ: 50,
@@ -74,6 +79,41 @@ var BitdogLabConfig_V6 = createProfile(BitdogLabProfileBase, {
     DHT11: {
       ALLOWED_DIG: ['0', '1', '2', '3'],
       MIN_INTERVAL_MS: 2000
+    },
+    LDR: {
+      CONNECTION: 'ANA-IN',
+      ADC_PIN: 28
+    },
+    ULTRASSONICO: {
+      I2C_BUS: 1,
+      I2C_FREQ: 100000,
+      I2C_SDA: 14,
+      I2C_SCL: 15,
+      TRIG_CONNECTION: '3',
+      ECHO_CONNECTION: '2'
+    },
+    MPU6050: {
+      SUPPORTED: false,
+      I2C_BUS: 1,
+      I2C_FREQ: 400000,
+      I2C_SDA: 2,
+      I2C_SCL: 3,
+      SDA_CONNECTION: '2',
+      SCL_CONNECTION: '3',
+      ADDRESS: 0x68,
+      SAMPLE_CACHE_MS: 40,
+      RECONNECT_MS: 1000,
+      TILT_DEADZONE_DEG: 2,
+      TILT_RIGHT_SIGN: 1,
+      MOVEMENT_THRESHOLD_MS2: 2.941995,
+      MOVEMENT_RELEASE_THRESHOLD_MS2: 1.96133,
+      MOVEMENT_CONFIRMATION_SAMPLES: 2,
+      MOVEMENT_HOLD_MS: 250,
+      BALL_DEADZONE_G: 0.04,
+      BALL_SMOOTHING: 0.28,
+      BALL_X_SIGN: 1,
+      BALL_Y_SIGN: -1,
+      BALL_RADIUS: 2
     },
     EXTERNAL_LED: {
       ALLOWED_DIG: ['0', '1', '2', '3'],
@@ -105,6 +145,7 @@ var BitdogLabConfig_V6 = createProfile(BitdogLabProfileBase, {
     PWM_FREQ: 1000,
     MOVE_SPEED: 35000,
     TURN_SPEED: 35000,
+    ARROW_COUNTDOWN_BRIGHTNESS: 0.02,
     TURN_DEADZONE_DPS: 0.8,
     TURN_TIMEOUT_MIN_MS: 1500,
     TURN_TIMEOUT_MS_PER_DEGREE: 120
@@ -126,6 +167,7 @@ var BitdogLabConfig_V6 = createProfile(BitdogLabProfileBase, {
     AHT20_ADDR: '0x38',
     I2C_KNOWN_DEVICES: {
       0x38: 'AHT20',
+      0x57: 'Ultrassonico',
       0x68: 'MPU6050'
     }
   }

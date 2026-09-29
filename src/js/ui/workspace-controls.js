@@ -17,11 +17,13 @@ class workspace {
       };
     this.connectButton = get('#connectButton');
     this.saveButton = get('#saveButton');
+    this.captureBlocksButton = get('#captureBlocksButton');
     this.loadButton = get('#loadXML');
     this.saveMainButton = get('#saveMainButton');
     this.connectButton.onclick = () => {this.connectClick ()};
     this.runButton.dom.onclick = () => {this.run ()};
     this.saveButton.onclick = () => {this.saveXML ()};
+    if (this.captureBlocksButton) this.captureBlocksButton.onclick = () => {this.saveBlocksImage ()};
     if (this.saveMainButton) this.saveMainButton.onclick = () => {this.saveMain ()};
 	  this.loadButton.addEventListener ('change', () => {this.loadXML ()});
 
@@ -110,6 +112,46 @@ workspace.prototype.saveXML = function (uid) {
 	element.click ();
 	document.body.removeChild(element);
 }
+
+// Export only the Blockly blocks and let the user choose the PNG destination.
+workspace.prototype.saveBlocksImage = function () {
+  const button = this.captureBlocksButton;
+  const notifyUser = (message) => {
+    if (window.UI && window.UI['notify']) window.UI['notify'].send(message);
+  };
+
+  if (!window.WorkspaceImageExport || !Code.workspace) {
+    notifyUser(MSG['captureBlocksError'] || 'Não foi possível criar a imagem dos blocos.');
+    return Promise.resolve(null);
+  }
+
+  if (button) button.disabled = true;
+  notifyUser(MSG['captureBlocksPreparing'] || 'Preparando imagem dos blocos...');
+
+  return window.WorkspaceImageExport.save(Code.workspace, {
+    filename: 'programa-bitdoglab.png',
+    filenamePrompt: MSG['captureBlocksFilenamePrompt'] || 'Escolha um nome para a imagem:',
+    fileTypeDescription: MSG['captureBlocksFileType'] || 'Imagem PNG',
+    padding: 40,
+    scale: 2
+  }).then((result) => {
+    if (button) button.disabled = false;
+    notifyUser(MSG['captureBlocksSuccess'] || 'Imagem dos blocos salva.');
+    return result;
+  }).catch((error) => {
+    if (button) button.disabled = false;
+    if (error && error.code === 'SAVE_CANCELLED') {
+      notifyUser(MSG['captureBlocksCancelled'] || 'Salvamento da imagem cancelado.');
+    } else if (error && error.code === 'EMPTY_WORKSPACE') {
+      if (window.UI && window.UI['notify']) window.UI['notify'].log(error);
+      notifyUser(MSG['captureBlocksEmpty'] || 'Adicione pelo menos um bloco antes de criar a imagem.');
+    } else {
+      if (window.UI && window.UI['notify']) window.UI['notify'].log(error);
+      notifyUser(MSG['captureBlocksError'] || 'Não foi possível criar a imagem dos blocos.');
+    }
+    return null;
+  });
+};
 
 // Extract metadata from BIPES XML (device, timestamp)
 workspace.prototype.readWorkspace = function (xml, prettyText) {

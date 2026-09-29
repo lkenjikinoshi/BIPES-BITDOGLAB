@@ -1,6 +1,13 @@
 'use strict';
 
 class ExecutionRunner {
+  static workspaceUsesLdr () {
+    if (!Code || !Code.workspace || !Code.workspace.getAllBlocks) return false;
+    return Code.workspace.getAllBlocks(false).some((block) => (
+      block.type === 'ldr_valor' || block.type === 'ldr_plotar'
+    ));
+  }
+
   static updateFileStatus (message) {
     if (typeof Files !== 'undefined' && Files && typeof Files.setStatus === 'function') {
       Files.setStatus(message);
@@ -15,6 +22,15 @@ class ExecutionRunner {
 
     const report = Code.BlockContractValidator.getReport(Code.workspace);
     if (report.valid) return true;
+
+    const workspaceBlocks = Code.workspace.getAllBlocks ? Code.workspace.getAllBlocks(false) : [];
+    const contactIssue = report.issues.find((issue) => (
+      issue.blockType && issue.blockType.indexOf('external_contact_') === 0
+    ));
+    const contactWarningBlock = contactIssue && workspaceBlocks.find((block) => block.id === contactIssue.blockId);
+    if (contactWarningBlock && Code.showExternalContactReminder) {
+      Code.showExternalContactReminder(contactWarningBlock);
+    }
 
     const summary = Code.BlockContractValidator.getSummaryText(report, 3);
     const message = summary || 'Corrija os avisos dos blocos antes de continuar.';
@@ -45,7 +61,7 @@ class ExecutionRunner {
       delete Blockly.Python.buzzerDisplayConfig;
       delete Blockly.Python.activeDisplayType;
       let rawCode = Blockly.Python.workspaceToCode(Code.workspace);
-      code = Code.wrapWithInfiniteLoop(rawCode); // Wrap in while True loop
+      code = Code.wrapWithInfiniteLoop(rawCode, Code.workspace);
     } else {
       code = code_; // Use provided code directly
     }
@@ -67,6 +83,13 @@ class ExecutionRunner {
       UI['progress'].start(estimatedPackets);
 
       mux.bufferPush (`\x05${code}\x04`); // \x05=raw REPL mode, \x04=soft reboot to execute
+
+      // The scale direction is a property of the LDR module. Only ask the
+      // child to check it after an LDR program has actually been queued for
+      // the board, never while they are assembling the blocks.
+      if (ExecutionRunner.workspaceUsesLdr() && Code.showLdrScaleReminder) {
+        Code.showLdrScaleReminder();
+      }
     }
   }
 

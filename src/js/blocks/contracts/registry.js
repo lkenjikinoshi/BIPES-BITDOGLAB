@@ -27,6 +27,16 @@
       externalLedInvalidChannel: 'Escolha o pino R — vermelho, G — verde ou B — azul do módulo de LED colorido KY-016.',
       externalLedOledV7Notice: '👀 Confira os fios! Na BitDogLab V7, a tela usa as Conexões 2 e 3. Se um fio colorido do KY-016 estiver em 2 ou 3, essa cor pode piscar com a tela. Use 0 e 1 para até duas cores junto com a tela. Para usar vermelho, verde e azul, escolha a tela ou o LED colorido.',
       externalLedOledV7PinConflict: 'Na placa BitDogLab V7, as Conexões 2 e 3 também são usadas pelo Display (tela da placa). Para usar este LED externo com a tela, escolha a Conexão 0 ou 1.',
+      externalContactInvalidConnection: 'Esta Conexão não está disponível para contatos na placa selecionada. Escolha uma Conexão mostrada no bloco.',
+      externalContactMissingPrepare: 'Antes de usar os contatos, coloque o bloco 🔌 Preparar contatos no projeto. Deixe ele no começo e escolha o fio comum usado na montagem: GND (recomendado) ou 3,3 V. Sem esse preparo, o programa não será gerado.',
+      externalContactPrepareConflict: 'Há duas preparações diferentes para os contatos. Escolha somente um fio comum para todo o projeto: GND ou 3,3 V.',
+      externalContactPrepareDuplicate: 'Este preparo está repetido. Um único bloco Preparar contatos vale para todas as Conexões.',
+      externalContactOledV7Notice: '👀 Confira os fios! Na BitDogLab V7, o Display usa as Conexões 2 e 3. Se um contato estiver ligado em 2 ou 3, ele pode se atrapalhar com a tela. Para usar contatos e Display juntos, escolha somente as Conexões 0 e 1. Para quatro contatos, retire os blocos do Display durante esse projeto.',
+      externalContactOledV7Conflict: 'A Conexão %1 também é usada pelo Display na BitDogLab V7. Para usar contato e tela juntos, escolha a Conexão 0 ou 1.',
+      externalContact3V3OledV7Conflict: 'Na BitDogLab V7, a Conexão %1 recebe sinais da tela mesmo quando ela não aparece no programa. Com o fio comum em 3,3 V, o contato pode parecer encostado o tempo todo. Use a Conexão 0 ou 1.',
+      externalContactTestOledV7Conflict: 'O teste verifica as quatro Conexões, mas o Display usa as Conexões 2 e 3 na BitDogLab V7. Remova os blocos do Display antes de testar os contatos.',
+      externalContactTest3V3OledV7Conflict: 'Na BitDogLab V7, o teste de contatos usa também as Conexões 2 e 3. Com o fio comum em 3,3 V, a tela pode fazer esses contatos parecerem encostados. Use GND ou retire o teste durante este projeto.',
+      externalContactI2cConflict: 'A Conexão %1 também é usada pelo %2. O contato e esse componente estão tentando usar o mesmo pino da placa. O programa foi bloqueado. Escolha outra Conexão para o contato ou retire um dos dois blocos.',
       servoAngleConnectionMismatch: 'O bloco Último ângulo enviado ao servo usa a Conexão %1, mas nenhum bloco que move o servo usa essa mesma Conexão.',
       servoJoystickSameDirection: 'Escolha direções diferentes para aumentar e diminuir o ângulo do servo. A mesma direção não consegue fazer os dois movimentos.',
       servoRaiseAngleOrder: 'Para aumentar o ângulo do servo, o número inicial deve ser menor que o número final.',
@@ -55,6 +65,16 @@
       externalLedInvalidChannel: 'Choose the R — red, G — green, or B — blue pin on the KY-016 colour LED module.',
       externalLedOledV7Notice: '👀 Check the wires! On BitDogLab V7, the screen uses Connections 2 and 3. If a KY-016 colour wire is on 2 or 3, that colour may blink with the screen. Use 0 and 1 for up to two colours with the screen. To use red, green, and blue, choose the screen or the colour LED.',
       externalLedOledV7PinConflict: 'On board BitDogLab V7, Connections 2 and 3 are also used by the board display. To use this external LED with the screen, choose Connection 0 or 1.',
+      externalContactInvalidConnection: 'This Connection is not available for contacts on the selected board. Choose a Connection shown in the block.',
+      externalContactMissingPrepare: 'Before using contacts, add the 🔌 Set up contacts block to the project. Keep it at the beginning and choose the common wire used in the circuit: GND (recommended) or 3.3 V. Without this setup, the program will not be generated.',
+      externalContactPrepareConflict: 'There are two different contact setups. Choose only one common wire for the whole project: GND or 3.3 V.',
+      externalContactPrepareDuplicate: 'This setup is repeated. One Set up contacts block applies to every Connection.',
+      externalContactOledV7Notice: '👀 Check the wires! On BitDogLab V7, the display uses Connections 2 and 3. If a contact is connected to 2 or 3, it may interfere with the screen. To use contacts and the display together, choose only Connections 0 and 1. For four contacts, remove the display blocks during this project.',
+      externalContactOledV7Conflict: 'Connection %1 is also used by the display on BitDogLab V7. To use a contact and the screen together, choose Connection 0 or 1.',
+      externalContact3V3OledV7Conflict: 'On BitDogLab V7, Connection %1 receives signals from the display even when it is not used in the program. With the common wire on 3.3 V, the contact may look permanently touched. Use Connection 0 or 1.',
+      externalContactTestOledV7Conflict: 'The test checks all four Connections, but the display uses Connections 2 and 3 on BitDogLab V7. Remove the display blocks before testing contacts.',
+      externalContactTest3V3OledV7Conflict: 'On BitDogLab V7, the contact test also uses Connections 2 and 3. With the common wire on 3.3 V, the screen may make these contacts look touched. Use GND or remove the test from this project.',
+      externalContactI2cConflict: 'Connection %1 is also used by the %2. The contact and this component are trying to use the same board pin. The program was blocked. Choose another contact Connection or remove one of the two blocks.',
       servoAngleConnectionMismatch: 'The Last angle sent to servo block uses Connection %1, but no block that moves the servo uses that same Connection.',
       servoJoystickSameDirection: 'Choose different directions to increase and decrease the servo angle. The same direction cannot perform both movements.',
       servoRaiseAngleOrder: 'To increase the servo angle, the initial number must be less than the final number.',
@@ -73,6 +93,31 @@
   MESSAGES.en.externalLedPwmRequired = 'Connection %1 cannot control this LED correctly. Choose another board Connection.';
   MESSAGES.en.externalLedRgbOledConflict = 'On board BitDogLab V7, the complete colour LED module needs three Connections, but the board display uses Connections 2 and 3. Choose the colour LED or the screen for this project.';
   MESSAGES.en.externalLedGlobalOledV7Conflict = 'The Turn off all external LEDs block checks all four board Connections: 0, 1, 2, and 3. On board V7, it cannot be used together with the board display.';
+
+  MESSAGES['pt-br'].ldrInvalidConnection = 'O sensor de luz deve usar somente a entrada ANA-IN. Confira se o pino S está ligado na ANA-IN da placa.';
+  MESSAGES['pt-br'].ldrMicrophoneConflict = 'O sensor de luz e o microfone usam a mesma entrada analógica da placa. Eles não podem funcionar juntos. Retire um dos dois blocos e peça ao professor para conferir o jumper JP1.';
+  MESSAGES['pt-br'].ultrassonicoInvalidConnection = 'O sensor ultrassônico deve usar TRIG/SCL na Conexão 3 e ECHO/SDA na Conexão 2. Essas ligações são fixas para funcionar junto com o display.';
+  MESSAGES['pt-br'].mpu6050UnsupportedProfile = 'O sensor externo MPU6050 ainda não pode ser usado com esta versão da BitDogLab. Escolha a placa V7 para usar os blocos de Movimento e Inclinação.';
+  MESSAGES['pt-br'].mpu6050InvalidProfile = 'A configuração do MPU6050 está incompleta nesta versão da placa. Recarregue o projeto e confirme o perfil da BitDogLab.';
+  MESSAGES['pt-br'].mpu6050InvalidConnection = 'O MPU6050 deve usar SDA na Conexão 2 e SCL na Conexão 3. Essas ligações são fixas e não podem ser trocadas.';
+  MESSAGES['pt-br'].mpu6050InvalidDirection = 'Escolha direita ou esquerda para medir a inclinação.';
+  MESSAGES['pt-br'].mpu6050InvalidAxis = 'Escolha o eixo X, Y ou Z para medir a aceleração.';
+  MESSAGES['pt-br'].mpu6050InvalidDisplayType = 'Escolha somente uma das telas disponíveis para movimentar a bolinha.';
+  MESSAGES['pt-br'].mpu6050RobotConflict = 'O MPU6050 externo e o MPU6050 do robô não podem ser usados no mesmo programa. Escolha somente um sensor de movimento.';
+  MESSAGES['pt-br'].mpu6050BallDuplicate = 'Use apenas um bloco de bolinha controlada pelo movimento no programa.';
+  MESSAGES['pt-br'].mpu6050BallDisplayConflict = 'A bolinha controlada pelo movimento precisa cuidar sozinha do Display. Retire os outros blocos que desenham ou mostram informações na tela.';
+  MESSAGES.en.ldrInvalidConnection = 'The light sensor must use only the ANA-IN input. Check that the S pin is connected to ANA-IN on the board.';
+  MESSAGES.en.ldrMicrophoneConflict = 'The light sensor and microphone use the same analogue input on the board. They cannot work together. Remove one of the two blocks and ask your teacher to check jumper JP1.';
+  MESSAGES.en.ultrassonicoInvalidConnection = 'The ultrasonic sensor must use TRIG/SCL on Connection 3 and ECHO/SDA on Connection 2. These connections are fixed so it can work with the display.';
+  MESSAGES.en.mpu6050UnsupportedProfile = 'The external MPU6050 sensor cannot be used with this BitDogLab version yet. Select board V7 to use the Movement and Tilt blocks.';
+  MESSAGES.en.mpu6050InvalidProfile = 'The MPU6050 configuration is incomplete for this board version. Reload the project and check the BitDogLab profile.';
+  MESSAGES.en.mpu6050InvalidConnection = 'The MPU6050 must use SDA on Connection 2 and SCL on Connection 3. These fixed connections cannot be swapped.';
+  MESSAGES.en.mpu6050InvalidDirection = 'Choose right or left to measure the tilt.';
+  MESSAGES.en.mpu6050InvalidAxis = 'Choose the X, Y, or Z axis to measure acceleration.';
+  MESSAGES.en.mpu6050InvalidDisplayType = 'Choose only one of the available screens to move the ball.';
+  MESSAGES.en.mpu6050RobotConflict = 'The external MPU6050 and the robot MPU6050 cannot be used in the same program. Choose only one motion sensor.';
+  MESSAGES.en.mpu6050BallDuplicate = 'Use only one motion-controlled ball block in the program.';
+  MESSAGES.en.mpu6050BallDisplayConflict = 'The motion-controlled ball must manage the Display by itself. Remove the other blocks that draw or show information on the screen.';
 
   var Domains = Code.BlockTypeDomains;
   var MATRIX_OPTION_COMMANDS = Domains ? Domains.get('MATRIX_OPTION_COMMANDS') : [];
@@ -132,6 +177,53 @@
       requiredValueInputs: {
         VALOR: 'temperatura ou umidade do DHT11'
       }
+    },
+    ldr_valor: {
+      kind: 'value'
+    },
+    ldr_plotar: {
+      kind: 'statement',
+      requiredValueInputs: {
+        VALOR: 'valor do sensor de luz'
+      }
+    },
+    ultrassonico_distancia: {
+      kind: 'value'
+    },
+    ultrassonico_plotar: {
+      kind: 'statement',
+      requiredValueInputs: {
+        VALOR: 'distância do sensor ultrassônico'
+      }
+    },
+    mpu6050_inclinacao: {
+      kind: 'value'
+    },
+    mpu6050_foi_movimentado: {
+      kind: 'value'
+    },
+    mpu6050_aceleracao: {
+      kind: 'value'
+    },
+    mpu6050_bolinha_display: {
+      kind: 'statement'
+    },
+    external_contact_prepare: {
+      kind: 'statement'
+    },
+    external_contact_when_closed: {
+      kind: 'container',
+      inputs: {
+        DO: {
+          label: 'ações do programa'
+        }
+      }
+    },
+    external_contact_is_closed: {
+      kind: 'value'
+    },
+    external_contact_test_matrix: {
+      kind: 'statement'
     },
     microfone_vu_meter: {
       kind: 'statement',
@@ -405,7 +497,7 @@
   }
 
   Code.BlockContracts = {
-    VERSION: '2026-08-14-external-resources',
+    VERSION: '2026-08-29-mpu6050',
     contracts: CONTRACTS,
     messages: MESSAGES,
     get: function(blockType) {

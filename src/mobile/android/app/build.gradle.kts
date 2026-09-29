@@ -1,3 +1,4 @@
+import groovy.json.JsonSlurper
 import java.util.Properties
 
 plugins {
@@ -6,6 +7,21 @@ plugins {
 
 val repositoryRoot = projectDir.resolve("../../../..").canonicalFile
 val generatedWebAssets = layout.buildDirectory.dir("generated/webAssets")
+val catalogFile = repositoryRoot.resolve("examples/catalog.json")
+val catalog = JsonSlurper().parse(catalogFile) as Map<*, *>
+val catalogCategories = catalog["categories"] as? List<*>
+    ?: error("O catálogo de exemplos não contém categorias.")
+val catalogImagePaths = catalogCategories.flatMap { category ->
+    val examples = (category as? Map<*, *>)?.get("examples") as? List<*> ?: emptyList<Any>()
+    examples.mapNotNull { example ->
+        (example as? Map<*, *>)?.get("image") as? String
+    }
+}.filter { it.startsWith("images/") }.distinct().sorted()
+catalogImagePaths.forEach { imagePath ->
+    check(repositoryRoot.resolve(imagePath).isFile) {
+        "Imagem do catálogo ausente: $imagePath"
+    }
+}
 val signingPropertiesFile = rootProject.file("keystore.properties")
 val signingProperties = Properties().apply {
     if (signingPropertiesFile.isFile) {
@@ -26,6 +42,13 @@ val prepareWebAssets by tasks.registering(Sync::class) {
     from(repositoryRoot.resolve("device-file-manager")) {
         into("device-file-manager")
     }
+    from(repositoryRoot.resolve("examples")) {
+        into("examples")
+    }
+    from(repositoryRoot.resolve("images")) {
+        into("images")
+        include(*catalogImagePaths.map { it.removePrefix("images/") }.toTypedArray())
+    }
 }
 
 android {
@@ -36,8 +59,8 @@ android {
         applicationId = "org.bitdoglab.bipes"
         minSdk = 26
         targetSdk = 36
-        versionCode = 19
-        versionName = "0.3.6"
+        versionCode = 21
+        versionName = "0.3.8"
     }
 
     signingConfigs {
@@ -93,6 +116,6 @@ tasks.matching { it.name == "packageRelease" || it.name == "bundleRelease" }.con
 
 dependencies {
     implementation("androidx.activity:activity:1.13.0")
-    implementation("androidx.webkit:webkit:1.16.0")
+    implementation("androidx.webkit:webkit:1.17.0")
     implementation("com.github.mik3y:usb-serial-for-android:3.11.0")
 }

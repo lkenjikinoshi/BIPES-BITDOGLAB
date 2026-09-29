@@ -11,7 +11,8 @@
       'controls_if',
       'controls_ifelse',
       'botao_enquanto_apertado',
-      'botao_se_apertado'
+      'botao_se_apertado',
+      'external_contact_when_closed'
     ],
 
     DISPLAY_COMMANDS: [
@@ -26,7 +27,9 @@
       'display_mostrar_status_buzzer',
       'display_dashboard_matriz',
       'display_mostrar_tempo_ligado',
-      'cronometro_mostrar'
+      'cronometro_mostrar',
+      'ultrassonico_plotar',
+      'mpu6050_bolinha_display'
     ],
 
     MATRIX_OPTION_COMMANDS: [

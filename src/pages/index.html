@@ -12,10 +12,11 @@
   <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicons/bitdog-logo.jpg">
   <meta name="theme-color" content="#2980b9">
 
-  <link rel="stylesheet" href="../styles/main.css?ver=20260816led1">
+  <link rel="stylesheet" href="../styles/main.css?ver=20260922capture1">
   <link rel="stylesheet" href="../styles/visual-themes.css?ver=20260722b2">
   <link rel="stylesheet" href="../../device-file-manager/device-files.css?ver=20260718a8">
   <link rel="stylesheet" href="../styles/libs.css">
+  <link rel="stylesheet" href="../styles/examples.css?ver=20260923display-model-selector1">
   <link rel="stylesheet" href="../js/lib/codemirror/codemirror.css">
   <script src="../js/ui/visual-themes.js?ver=20260722b2"></script>
   <!-- Blockly core -->
@@ -24,8 +25,8 @@
 
   <!-- BitdogLab core modules -->
   <script src="../js/core/storage.js?ver=20260402v3"></script>
-  <script src="../js/core/execution/runner.js?ver=20260817validation1"></script>
-  <script src="../js/core/execution/main-file.js?ver=20260809arch1"></script>
+  <script src="../js/core/execution/runner.js?ver=20260923robotMission1"></script>
+  <script src="../js/core/execution/main-file.js?ver=20260923robotMission1"></script>
   <script src="../js/core/dom.js?ver=20260809arch1"></script>
   <script src="../js/core/terminal.js?ver=20260809arch1"></script>
   <script src="../js/core/execution/index.js?ver=20260809arch1"></script>
@@ -36,36 +37,38 @@
   <script src="../../device-file-manager/browser.js?ver=20260727files6"></script>
   <script src="../../device-file-manager/preview.js?ver=20260727files6"></script>
   <script src="../../device-file-manager/operations.js?ver=20260727files6"></script>
-  <script src="../js/config/profiles/base.js?ver=20260809arch1"></script>
-  <script src="../js/config/profiles/v7.js?ver=20260814dht3"></script>
-  <script src="../js/config/profiles/v6.js?ver=20260814dht3"></script>
-  <script src="../js/core/language.js?ver=20260817category2"></script>
+  <script src="../js/config/profiles/base.js?ver=20260831i2cmod1"></script>
+  <script src="../js/config/profiles/v7.js?ver=20260830mpuMotion1"></script>
+  <script src="../js/config/profiles/v6.js?ver=20260830mpuMotion1"></script>
+  <script src="../js/core/language.js?ver=20260922savepicker1"></script>
+  <script src="../js/core/ldr-settings.js?ver=20260821ldr1"></script>
   <script src="../js/core/tabs.js?ver=20260403a7"></script>
-  <script src="../js/core/codegen/python-organizer.js?ver=20260809arch1"></script>
-  <script src="../js/core/codegen/generator.js?ver=20260809arch1"></script>
+  <script src="../js/core/codegen/python-organizer.js?ver=20260923robotMission1"></script>
+  <script src="../js/core/codegen/generator.js?ver=20260923robotMission1"></script>
   <script src="../js/core/codegen/auto-generation.js?ver=20260809arch1"></script>
   <script src="../js/core/codegen/index.js?ver=20260809arch1"></script>
   <script src="../js/core/workspace/lifecycle.js?ver=20260809arch1"></script>
-  <script src="../js/core/workspace/toolbox.js?ver=20260809arch1"></script>
-  <script src="../js/core/workspace/projects.js?ver=20260809arch1"></script>
-  <script src="../js/core/workspace/hints.js?ver=20260817language1"></script>
-  <script src="../js/core/workspace/index.js?ver=20260817language1"></script>
+  <script src="../js/core/workspace/toolbox.js?ver=20260923robotMission2"></script>
+  <script src="../js/core/workspace/projects.js?ver=20260903moonMission1"></script>
+  <script src="../js/core/workspace/hints.js?ver=20260902externalLedDisplay1"></script>
+  <script src="../js/core/workspace/index.js?ver=20260902externalLedDisplay1"></script>
+  <script src="../js/core/workspace/image-export.js?ver=20260922savepicker1"></script>
   <script src="../js/core/app.js?ver=20260814device1"></script>
-  <script src="../js/communication/i2c_scanner.js?ver=20260612a1"></script>
+  <script src="../js/communication/i2c_scanner.js?ver=20260823ultra1"></script>
   <script src="../js/communication/webserial.js?ver=20260604a1"></script>
   <script src="../js/communication/channel.js?ver=0.2.3.20251001v2"></script>
   <script src="../js/ui/panels.js?ver=20260809arch1"></script>
   <script src="../js/ui/notifications.js?ver=20260809arch1"></script>
   <script src="../js/ui/progress.js?ver=20260809arch1"></script>
-  <script src="../js/ui/workspace-controls.js?ver=20260814device1"></script>
+  <script src="../js/ui/workspace-controls.js?ver=20260922savepicker1"></script>
   <script src="../js/ui/ui.js?ver=20260809arch1"></script>
-  <script src="../js/core/i18n/index.js?ver=20260809arch1"></script>
+  <script src="../js/core/i18n/index.js?ver=20260903robotArrows1"></script>
   <script src="../js/core/i18n/generated-code.js?ver=20260809arch1"></script>
   <script src="../js/core/i18n/interface.js?ver=20260809arch1"></script>
   <script src="../js/lib/filesaver/FileSaver.js"></script>
 
   <!-- Custom BitdogLab blocks (includes basic repetition blocks) -->
-  <script src="../js/blocks/contracts/types.js?ver=20260816led2"></script>
+  <script src="../js/blocks/contracts/types.js?ver=20260829mpu1"></script>
   <script src="../js/blocks/definitions/base.js?ver=20260402a2"></script>
   <script src="../js/blocks/definitions/variables.js?ver=20260718a8"></script>
   <script src="../js/blocks/definitions/led.js?ver=20260716b1"></script>
@@ -75,30 +78,40 @@
   <script src="../js/blocks/definitions/input.js?ver=20260612a1"></script>
   <script src="../js/blocks/definitions/joystick.js?ver=20260716b1"></script>
   <script src="../js/blocks/definitions/sensor.js?ver=20260612a1"></script>
+  <script src="../js/blocks/definitions/external_contact.js?ver=20260819contacts1"></script>
   <script src="../js/blocks/definitions/dht11.js?ver=20260817language1"></script>
+  <script src="../js/blocks/definitions/ultrassonico.js?ver=20260825ultrafix1"></script>
+  <script src="../js/blocks/definitions/mpu6050.js?ver=20260830mpuMotion1"></script>
+  <script src="../js/blocks/definitions/ldr.js?ver=20260821ldr3"></script>
   <script src="../js/blocks/definitions/external_led.js?ver=20260817seconds1"></script>
   <script src="../js/blocks/definitions/servo.js?ver=20260817language1"></script>
-  <script src="../js/blocks/definitions/robot.js?ver=20260614a4"></script>
-  <script src="../js/blocks/definitions/index.js?ver=20260716c1"></script>
-  <script src="../js/blocks/contracts/registry.js?ver=20260817language1"></script>
-  <script src="../js/blocks/contracts/external_resources.js?ver=20260817language1"></script>
-  <script src="../js/blocks/contracts/validator.js?ver=20260816led2"></script>
-  <script src="../js/ui/block_warning_ui.js?ver=20260817warning8"></script>
-  <script src="../js/blocks/sensor_libs.js?ver=20260811a2"></script>
-  <script src="../js/blocks/generators/helpers.js?ver=20260612a1"></script>
-  <script src="../js/blocks/generators/base.js?ver=20260729a2"></script>
+  <script src="../js/blocks/definitions/robot.js?ver=20260923robotArrowColours2"></script>
+  <script src="../js/blocks/definitions/index.js?ver=20260829mpu1"></script>
+  <script src="../js/blocks/contracts/registry.js?ver=20260829mpu4"></script>
+  <script src="../js/blocks/contracts/external_resources.js?ver=20260829mpu4"></script>
+  <script src="../js/blocks/contracts/validator.js?ver=20260923robotMission1"></script>
+  <script src="../js/ui/block_warning_ui.js?ver=20260820ldr1"></script>
+  <script src="../js/blocks/sensor_libs.js?ver=20260829mpu2"></script>
+  <script src="../js/blocks/generators/i2c_policy.js?ver=20260831i2cmod1"></script>
+  <script src="../js/blocks/generators/display_transport.js?ver=20260831i2cmod1"></script>
+  <script src="../js/blocks/generators/helpers.js?ver=20260831i2cmod1"></script>
+  <script src="../js/blocks/generators/base.js?ver=20260923robotMission1"></script>
   <script src="../js/blocks/generators/variables.js?ver=20260718a4"></script>
   <script src="../js/blocks/generators/led.js?ver=20260402a1"></script>
   <script src="../js/blocks/generators/matrix.js?ver=20260604a1"></script>
-  <script src="../js/blocks/generators/display.js?ver=20260614a4"></script>
+  <script src="../js/blocks/generators/display.js?ver=20260831i2cmod1"></script>
   <script src="../js/blocks/generators/sound.js?ver=20260612a1"></script>
   <script src="../js/blocks/generators/input.js?ver=20260612a2"></script>
   <script src="../js/blocks/generators/joystick.js?ver=20260612a1"></script>
-  <script src="../js/blocks/generators/sensor.js?ver=20260612a1"></script>
+  <script src="../js/blocks/generators/sensor.js?ver=20260823ultra1"></script>
+  <script src="../js/blocks/generators/ultrassonico.js?ver=20260831sharedi2c1"></script>
+  <script src="../js/blocks/generators/mpu6050.js?ver=20260830mpuMotion1"></script>
+  <script src="../js/blocks/generators/external_contact.js?ver=20260819contacts1"></script>
   <script src="../js/blocks/generators/dht11.js?ver=20260814dht3"></script>
+  <script src="../js/blocks/generators/ldr.js?ver=20260821ldr1"></script>
   <script src="../js/blocks/generators/external_led.js?ver=20260817seconds1"></script>
   <script src="../js/blocks/generators/servo.js?ver=20260813a1"></script>
-  <script src="../js/blocks/generators/robot.js?ver=20260614a4"></script>
+  <script src="../js/blocks/generators/robot.js?ver=20260923robotMission1"></script>
   <script src="../js/blocks/generators/index.js?ver=20260716c1"></script>
   <script src="../js/blocks/generators/piano.js?ver=20260723piano1"></script>
   <script src="../js/blocks/generators/timing.js?ver=20260723piano1"></script>
@@ -162,6 +175,72 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <div id="robot-mode-selector" class="robot-mode-selector" role="dialog" aria-modal="true" aria-labelledby="robotModeDialogTitle" hidden>
+    <section class="robot-mode-selector-card">
+      <button
+        id="closeRobotModeSelector"
+        class="robot-mode-selector-close"
+        type="button"
+        aria-label="Voltar aos projetos"
+        data-i18n-aria-label="app.robotModeBackLabel">&times;</button>
+      <h2 id="robotModeDialogTitle" data-i18n="app.robotModeDialogTitle">Escolha o modo do Robô Móvel</h2>
+
+      <div class="robot-mode-options">
+        <button id="selectCompleteRobotMode" class="robot-mode-option is-complete" type="button">
+          <strong data-i18n="app.robotModeCompleteTitle">🧩 Modo Completo</strong>
+          <span data-i18n="app.robotModeCompleteAudience">Indicado para estudantes do Ensino Fundamental, Ensino Médio e Ensino Superior.</span>
+        </button>
+
+        <button id="selectArrowRobotMode" class="robot-mode-option is-arrows" type="button">
+          <strong data-i18n="app.robotModeArrowsTitle">⬆️ Modo por Setas</strong>
+          <span data-i18n="app.robotModeArrowsAudience">Indicado para crianças da Educação Infantil e dos anos iniciais do Ensino Fundamental.</span>
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <div id="arrow-mode-intro" class="arrow-mode-intro" role="dialog" aria-modal="true" aria-labelledby="arrowModeIntroTitle" hidden>
+    <section class="arrow-mode-intro-card">
+      <img
+        class="arrow-mode-intro-image"
+        src="../assets/images/projects/missao-lua-rover-setas.png"
+        alt="Exemplo da Missão Lua com um rover e setas sobre o tapete"
+        data-i18n-alt="app.arrowModeIntroImageAlt">
+      <h2 id="arrowModeIntroTitle" data-i18n="app.arrowModeIntroTitle">🤖 Programação em Tapetes</h2>
+      <p data-i18n="app.arrowModeIntroDescription">Este modo foi desenvolvido para tapetes didáticos. Na Missão Lua, o robô sai de um ponto e chega a outro, desviando de obstáculos.</p>
+      <button id="startArrowMode" type="button" data-i18n="app.arrowModeIntroStart">Começar</button>
+    </section>
+  </div>
+
+  <div id="external-project-warning" class="external-project-warning" role="dialog" aria-modal="true" aria-labelledby="externalProjectWarningTitle" hidden>
+    <section class="external-project-warning-card">
+      <header class="external-project-warning-header">
+        <p id="externalProjectWarningEyebrow" class="external-project-warning-eyebrow"></p>
+        <h2 id="externalProjectWarningTitle"></h2>
+        <p id="externalProjectWarningIntro"></p>
+      </header>
+
+      <div class="external-project-warning-grid">
+        <section>
+          <h3 id="externalProjectComponentsTitle"></h3>
+          <ul id="externalProjectComponents"></ul>
+        </section>
+        <section>
+          <h3 id="externalProjectMaterialsTitle"></h3>
+          <ul id="externalProjectMaterials"></ul>
+        </section>
+      </div>
+
+      <p id="externalProjectSensorNote" class="external-project-sensor-note"></p>
+      <p id="externalProjectSafety" class="external-project-safety"></p>
+
+      <footer class="external-project-warning-actions">
+        <button id="cancelExternalProject" class="external-project-cancel" type="button"></button>
+        <button id="confirmExternalProject" class="external-project-confirm" type="button"></button>
+      </footer>
+    </section>
   </div>
 
   <aside id="project-hardware-notice" class="project-hardware-notice" role="region" aria-live="polite" aria-labelledby="projectHardwareNoticeTitle" hidden>
@@ -297,6 +376,7 @@
         <button id="runButton" class="notext primary icon" title="Executar Programa"></button>
       </div>
 
+        <button id="captureBlocksButton" class="notext icon" title="Salvar imagem dos blocos" aria-label="Salvar imagem dos blocos" data-i18n-title="app.captureBlocksTooltip"></button>
         <button id="saveButton" class="notext icon" title="Salvar"></button>
 
         <label id="loadButton" for="loadXML"  class="notext button icon" title="..."></label>
@@ -334,6 +414,41 @@
   <input type="checkbox" id="resetBoard" style="display:none" value="off">
 
   <div id="content_blocks" class="content"></div>
+
+  <button
+    id="examplesToggle"
+    class="examples-toggle"
+    type="button"
+    aria-controls="examplesPanel"
+    aria-expanded="false">
+    <span class="examples-toggle-icon" aria-hidden="true">📚</span>
+    <span>Exemplos</span>
+  </button>
+
+  <aside
+    id="examplesPanel"
+    class="examples-panel"
+    aria-label="Biblioteca de exemplos"
+    hidden>
+    <header class="examples-panel-header">
+      <div>
+        <h2 id="examplesPanelTitle">Exemplos</h2>
+      </div>
+      <button id="examplesClose" class="examples-panel-close" type="button" aria-label="Fechar exemplos">&times;</button>
+    </header>
+
+    <div class="examples-panel-body">
+      <button id="examplesBack" class="examples-back" type="button" hidden>
+        <span aria-hidden="true">←</span>
+        <span>Voltar às categorias</span>
+      </button>
+      <p id="examplesPanelIntro" class="examples-panel-intro">
+        Escolha uma categoria para encontrar um projeto pronto para editar.
+      </p>
+      <div id="examplesContent"></div>
+    </div>
+  </aside>
+
   <div id="content_console" class="content">
 
     <tr height="25%">
@@ -381,7 +496,9 @@
 
 <script src="../js/bootstrap/onboarding.js?ver=20260809arch1"></script>
 <script src="../js/bootstrap/services.js?ver=20260809arch1"></script>
-<script src="../js/bootstrap/page.js?ver=20260817category2"></script>
+<script src="../js/bootstrap/page.js?ver=20260903robotArrows1"></script>
+<script src="../js/core/examples/catalog.js?ver=20260923displayFamilies2"></script>
+<script src="../js/ui/examples-panel.js?ver=20260923display-model-selector1"></script>
 
 </body>
 </html>

@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.webkit.CookieManager;
+import android.webkit.RenderProcessGoneDetail;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -17,6 +18,8 @@ import android.webkit.WebViewClient;
 import androidx.annotation.Nullable;
 import androidx.activity.ComponentActivity;
 import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.webkit.WebViewAssetLoader;
 import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
@@ -36,6 +39,15 @@ public final class MainActivity extends ComponentActivity {
 
     private WebView webView;
     private NativeSerialBridge serialBridge;
+    private NativeFileSaveBridge fileSaveBridge;
+    private final ActivityResultLauncher<Intent> createDocumentLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (fileSaveBridge != null) {
+                    fileSaveBridge.onDocumentResult(result.getResultCode(), result.getData());
+                }
+            }
+    );
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -44,8 +56,11 @@ public final class MainActivity extends ComponentActivity {
         WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG);
         webView = new WebView(this);
         serialBridge = new NativeSerialBridge(this, webView);
+        fileSaveBridge = new NativeFileSaveBridge(this, webView, createDocumentLauncher);
         installNativeSerialBridge(webView);
+        installNativeFileBridge(webView);
         installSerialCompatibility(webView);
+        installFileSaveCompatibility(webView);
         installContentHardening(webView);
         installMobileWorkspace(webView);
         installMobileLayout(webView);
@@ -56,7 +71,9 @@ public final class MainActivity extends ComponentActivity {
         if (savedInstanceState == null) {
             webView.loadUrl(START_URL);
         } else {
-            webView.restoreState(savedInstanceState);
+            if (webView.restoreState(savedInstanceState) == null) {
+                webView.loadUrl(START_URL);
+            }
         }
     }
 
@@ -66,6 +83,29 @@ public final class MainActivity extends ComponentActivity {
 
     private void installMobileWorkspace(WebView view) {
         installLocalDocumentStartScript(view, R.raw.mobile_workspace);
+    }
+
+    @SuppressLint("RequiresFeature")
+    private void installNativeFileBridge(WebView view) {
+        if (!WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
+            throw new IllegalStateException(
+                    "Atualize o Android System WebView para salvar arquivos."
+            );
+        }
+        WebViewCompat.addWebMessageListener(
+                view,
+                "BitDogLabFileNative",
+                Collections.singleton(APP_ORIGIN),
+                (webView, message, sourceOrigin, isMainFrame, replyProxy) -> {
+                    if (!isMainFrame || !APP_ORIGIN.equals(sourceOrigin.toString())) {
+                        return;
+                    }
+                    String data = message.getData();
+                    if (data != null) {
+                        fileSaveBridge.postMessage(data);
+                    }
+                }
+        );
     }
 
     @SuppressLint("RequiresFeature")
@@ -148,19 +188,49 @@ public final class MainActivity extends ComponentActivity {
         );
     }
 
+    @SuppressLint("RequiresFeature")
+    private void installFileSaveCompatibility(WebView view) {
+        if (!WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+            throw new IllegalStateException(
+                    "Atualize o Android System WebView para salvar arquivos."
+            );
+        }
+        WebViewCompat.addDocumentStartJavaScript(
+                view,
+                readRawResource(R.raw.mobile_file_save_shim),
+                Collections.singleton(APP_ORIGIN)
+        );
+    }
+
     private void configureBackNavigation() {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                if (webView != null && webView.canGoBack()) {
-                    webView.goBack();
+                if (webView == null) {
+                    navigateBackOrExit(this);
                     return;
                 }
-                setEnabled(false);
-                getOnBackPressedDispatcher().onBackPressed();
-                setEnabled(true);
+                webView.evaluateJavascript(
+                        "Boolean(window.__bitdoglabHandleMobileBack"
+                                + " && window.__bitdoglabHandleMobileBack())",
+                        handled -> {
+                            if (!"true".equals(handled)) {
+                                navigateBackOrExit(this);
+                            }
+                        }
+                );
             }
         });
+    }
+
+    private void navigateBackOrExit(OnBackPressedCallback callback) {
+        if (webView != null && webView.canGoBack()) {
+            webView.goBack();
+            return;
+        }
+        callback.setEnabled(false);
+        getOnBackPressedDispatcher().onBackPressed();
+        callback.setEnabled(true);
     }
 
     private String readRawResource(int resourceId) {
@@ -201,6 +271,25 @@ public final class MainActivity extends ComponentActivity {
                 .build();
 
         view.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean onRenderProcessGone(
+                    WebView affectedView,
+                    RenderProcessGoneDetail detail
+            ) {
+                Log.e(
+                        "BipesMobile",
+                        detail.didCrash()
+                                ? "O processo do WebView falhou; reiniciando a interface."
+                                : "O processo do WebView foi encerrado; reiniciando a interface."
+                );
+                if (webView == affectedView) {
+                    affectedView.destroy();
+                    webView = null;
+                    recreate();
+                }
+                return true;
+            }
+
             @Override
             public WebResourceResponse shouldInterceptRequest(
                     WebView webView,
@@ -261,12 +350,18 @@ public final class MainActivity extends ComponentActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        webView.saveState(outState);
+        if (webView != null) {
+            webView.saveState(outState);
+        }
         super.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onDestroy() {
+        if (fileSaveBridge != null) {
+            fileSaveBridge.destroy();
+            fileSaveBridge = null;
+        }
         if (serialBridge != null) {
             serialBridge.destroy();
             serialBridge = null;

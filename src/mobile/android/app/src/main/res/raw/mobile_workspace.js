@@ -77,6 +77,72 @@
     applyState(true);
   }
 
+  function isVisible(element) {
+    if (!element || element.hidden) {
+      return false;
+    }
+    const style = global.getComputedStyle(element);
+    return style.display !== 'none'
+      && style.visibility !== 'hidden'
+      && element.getClientRects().length > 0;
+  }
+
+  function clickIfVisible(elementId) {
+    const element = document.getElementById(elementId);
+    if (!isVisible(element)) {
+      return false;
+    }
+    element.click();
+    return true;
+  }
+
+  global.__bitdoglabHandleMobileBack = function handleMobileBack() {
+    // Dismiss overlays from highest to lowest stacking order before closing menus.
+    if (clickIfVisible('cancelExternalProject')) {
+      return true;
+    }
+    if (clickIfVisible('arrow-mode-intro')) {
+      return true;
+    }
+    if (clickIfVisible('closeRobotModeSelector')) {
+      return true;
+    }
+    if (clickIfVisible('closeProjectModal')) {
+      return true;
+    }
+    if (clickIfVisible('closeProjectHardwareNotice')) {
+      return true;
+    }
+
+    const examplesPanel = document.getElementById('examplesPanel');
+    if (isVisible(examplesPanel)) {
+      const examplesClose = document.getElementById('examplesClose');
+      if (examplesClose) {
+        examplesClose.click();
+      }
+      return true;
+    }
+
+    const channelPanel = document.querySelector('.channel-panel#show');
+    if (channelPanel) {
+      const channelButton = document.getElementById('channelButton');
+      if (channelButton) {
+        channelButton.click();
+      }
+      return true;
+    }
+
+    const toolbar = document.querySelector('.top-menu > .toolbar#show');
+    if (toolbar) {
+      const toolbarButton = document.getElementById('toolbarButton');
+      if (toolbarButton) {
+        toolbarButton.click();
+      }
+      return true;
+    }
+    return false;
+  };
+
   function attachControl() {
     const currentToolbox = document.querySelector('.blocklyToolboxDiv');
     if (!currentToolbox) {
